@@ -104,9 +104,10 @@ function redraw() {
 
   // apply style to indicate that the user is currently adding a link
   if (isAddingLink) {
-    showAddingLinkStyle(true);
-  } else {
-    showAddingLinkStyle(false);
+    showAddingStyle("adding link");
+  }
+  else {
+    showAddingStyle(false);
   }
 
   // stop the animation if something's selected
@@ -223,18 +224,25 @@ function fillInfo(selected, isNode, showTooltip) {
     delButton.innerHTML = 'x';
     delButton.onclick = onDelClick;
 
-    // add add button
-    var button = document.createElement("div");
-    button.className = 'add button';
-    button.innerHTML = '+'
-    button.onclick = onAddLinkClick;
+    // add link button
+    var nodeButton = document.createElement("div");
+    nodeButton.className = 'add button';
+    nodeButton.innerHTML = 'node+'
+    nodeButton.onclick = onAddLinkedNodeClick;
+
+    // add node button
+    var linkButton = document.createElement("div");
+    linkButton.className = 'add button';
+    linkButton.innerHTML = 'link+'
+    linkButton.onclick = onAddLinkClick;
   
     document.body.appendChild(div);
     div.innerHTML = tooltipContent;
     div.appendChild(delButton);
 
     if (isNode) {
-      div.appendChild(button)
+      div.appendChild(nodeButton);
+      div.appendChild(linkButton);
     }
   }
 
@@ -255,9 +263,19 @@ function deleteLink(link) {
 }
 
 function onAddLinkClick() {
-  console.log('clicked add from node');
-  console.log(selected_node);
   isAddingLink = true;
+  redraw();
+}
+
+function onAddLinkedNodeClick() {
+  var newNode = {x:selected_node.x-100, y:selected_node.y-100};
+  var newLink = {
+    source: selected_node,
+    target: newNode
+  };
+  nodes.push(newNode);
+  links.push(newLink);
+  selected_node = null;
   redraw();
 }
 
@@ -273,7 +291,6 @@ function onDelClick() {
 }
 
 function onAddNodeClick() {
-  console.log('clicked add new node');
   nodes.push({x:0,y:0});
   resetSelected();
 }
@@ -286,11 +303,11 @@ function removeElementsByClass(className){
     }
 }
 
-function showAddingLinkStyle(show) {
+function showAddingStyle(text) {
   // style to make it v clear that adding a link is currently what is happening
-  if (show) {
+  if (text) {
     svg.append("text")
-      .text("adding link")
+      .text(text)
       .attr("x", "50px")
       .attr("y", "50px")
       .attr("font-size", "50px")
