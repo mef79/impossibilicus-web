@@ -5,6 +5,21 @@
   padding: 10px;
 }
 
+#undo {
+  float: right;
+  display: inline-block;
+  cursor: pointer;
+}
+
+#undo.disabled {
+  cursor: not-allowed;
+  color: #ccc;
+}
+
+#add-node {
+  display: inline-block;
+}
+
 body {
   font: 13px sans-serif;
   position: relative;

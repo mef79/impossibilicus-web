@@ -2,6 +2,8 @@
 var width = 540,
     height = 500;
 
+var actions = [];
+
 var fill = d3.scale.category20();
 
 // mouse event vars
@@ -55,6 +57,16 @@ svg.node().focus();
 
 initTopBar();
 
+var isUndoing = false;
+
+function onUndoClick() {
+  var latestAction = actions.pop();
+  isUndoing = true;
+  latestAction();
+  isUndoing = false;
+  redraw();
+}
+
 function initTopBar() {
   // just "add node" for now
   var addNode = document.getElementById('add-node');
@@ -102,6 +114,15 @@ function redraw() {
 
   if (!link) return;
 
+  var undo = document.getElementById("undo");
+  if (actions.length == 0 && !undo.classList.contains('disabled')) {
+    undo.classList.add("disabled");
+    undo.onclick = null;
+  } else if (actions.length > 0 && undo.classList.contains('disabled')) {
+    undo.classList.remove('disabled');
+    undo.onclick = onUndoClick;
+  }
+
   // apply style to indicate that the user is currently adding a link
   if (isAddingLink) {
     showAddingStyle("adding link");
@@ -139,11 +160,7 @@ function redraw() {
     .on("click", function(d) {
       if (isAddingLink) {
         // create a link from selected to this node
-        var newlink = {
-          source: selected_node,
-          target: d
-        };
-        links.push(newlink);
+        insertNewLink(selected_node, d);
         isAddingLink = false;
       } else {
         selected_node = d;
@@ -249,32 +266,15 @@ function fillInfo(selected, isNode, showTooltip) {
   bottom.innerHTML = bottomContent;
 }
 
-function deleteNode(node) {
-  nodes.splice(nodes.indexOf(node), 1);
-  links.forEach(link => { 
-    if (link.source === node || link.target === node) {
-      links.splice(links.indexOf(link), 1);
-    }
-  });
-}
-
-function deleteLink(link) {
-  links.splice(links.indexOf(link), 1);
-}
-
 function onAddLinkClick() {
   isAddingLink = true;
   redraw();
 }
 
 function onAddLinkedNodeClick() {
-  var newNode = {x:selected_node.x-100, y:selected_node.y-100};
-  var newLink = {
-    source: selected_node,
-    target: newNode
-  };
-  nodes.push(newNode);
-  links.push(newLink);
+  var x = selected_node.x - 100;
+  var y = selected_node.y - 100;
+  insertNewNode(x, y, selected_node);
   selected_node = null;
   redraw();
 }
@@ -291,7 +291,7 @@ function onDelClick() {
 }
 
 function onAddNodeClick() {
-  nodes.push({x:0,y:0});
+  insertNewNode(0, 0);
   resetSelected();
 }
 
@@ -327,5 +327,57 @@ function showAddingStyle(text) {
       .attr("stroke", "black")
       .attr("stroke-width", "1px")
       .attr("stroke-dasharray", null)
+  }
+}
+
+function insertNewNode(x, y, linkedFrom) {
+  var newNode = {x: x, y: y};
+  nodes.push(newNode);
+  if (linkedFrom) {
+    var newLink = {source: linkedFrom, target: newNode};
+    links.push(newLink);
+  }
+  if (!isUndoing) {
+    actions.push(function () {
+      deleteNode(newNode)
+    })
+  }
+}
+
+function insertNewLink(source, target) {
+  var newlink = { source: source, target: target };
+  links.push(newlink);
+  if (!isUndoing) {
+    actions.push(function () {
+      deleteLink(newlink);
+    })
+  }
+}
+
+function deleteNode(node) {
+  nodes.splice(nodes.indexOf(node), 1);
+  var deletedlinks = [];
+  links.forEach(link => { 
+    if (link.source === node || link.target === node) {
+      deletedlinks.push(link);
+      links.splice(links.indexOf(link), 1);
+    }
+  });
+  if (!isUndoing) {
+    actions.push(function () {
+      insertNewNode(node)
+      deletedlinks.forEach(link => {
+        insertNewLink(link)
+      })
+    })
+  }
+}
+
+function deleteLink(link) {
+  links.splice(links.indexOf(link), 1);
+  if (!isUndoing) {
+    actions.push(function () {
+      insertNewLink(link)
+    })
   }
 }
