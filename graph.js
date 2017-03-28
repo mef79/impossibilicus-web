@@ -1,5 +1,5 @@
 
-var width = 540,
+var width = 800,
     height = 500;
 
 var actions = [];
@@ -36,19 +36,31 @@ var container = svg.append("rect")
   .attr("fill", "white")
   .attr("stroke", "black");
 
-// line displayed when dragging new nodes
-var drag_line = svg.append("line")
-  .attr("class", "drag_line")
-  .attr("x1", 0)
-  .attr("y1", 0)
-  .attr("x2", 0)
-  .attr("y2", 0);
+// build the arrow.
+svg.append("svg:defs").selectAll("marker")
+    .data(["end"])      // Different link/path types can be defined here
+  .enter().append("svg:marker")    // This section adds in the arrows
+    .attr("id", String)
+    .attr("viewBox", "0 -5 10 10")
+    .attr("refX", 18)
+    .attr("refY", 0)
+    .attr("markerWidth", 5)
+    .attr("markerHeight", 5)
+    .attr("orient", "auto")
+  .append("svg:path")
+    .attr("d", "M0,-5L10,0L0,5");
+
 
 // get layout properties
 var nodes = force.nodes(),
   links = force.links(),
-  node = svg.selectAll(".node"),
-    link = svg.selectAll(".link");
+  node = svg.selectAll(".node");
+
+var link = svg.append("svg:g").selectAll("path")
+    .data(force.links())
+  .enter().append("svg:path")
+    .attr("class", function(d) { return "link " + d.type; })
+    .attr("marker-end", "url(#end)");
 
 redraw();
 
@@ -100,10 +112,10 @@ function resetMouseVars() {
 }
 
 function tick() {
-  link.attr("x1", function(d) { return d.source.x; })
-    .attr("y1", function(d) { return d.source.y; })
-    .attr("x2", function(d) { return d.target.x; })
-    .attr("y2", function(d) { return d.target.y; });
+  link.attr("d", function(d) {
+      return "M" + d.source.x + "," + d.source.y +
+             "L" + d.target.x + "," + d.target.y;
+    });
 
   node.attr("cx", function(d) { return d.x; })
     .attr("cy", function(d) { return d.y; });
@@ -138,8 +150,9 @@ function redraw() {
 
   link = link.data(links);
 
-  link.enter().insert("line", ".node")
+  link.enter().insert("path", ".node")
     .attr("class", "link")
+    .attr("marker-end", "url(#end)")
     .on("mousedown", 
       function(d) { 
         mousedown_link = d; 
@@ -156,7 +169,7 @@ function redraw() {
 
   node.enter().insert("circle")
     .attr("class", "node")
-    .attr("r", 5)
+    .attr("r", 10)
     .on("click", function(d) {
       if (isAddingLink) {
         // create a link from selected to this node
@@ -172,7 +185,7 @@ function redraw() {
     .transition()
       .duration(750)
       .ease("elastic")
-      .attr("r", 6.5);
+      .attr("r", 10);
 
   node.exit().transition()
     .attr("r", 0)

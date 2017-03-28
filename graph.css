@@ -23,7 +23,7 @@
 body {
   font: 13px sans-serif;
   position: relative;
-  width: 540px;
+  width: 800px;
   height: 500px;
 }
 
@@ -34,30 +34,19 @@ form {
 }
 
 .node {
-  fill: #000;
+  fill: #ccc;
+  stroke: #000;
+  stroke-width: 1.5px;
   cursor: pointer;
 }
 
 .node_selected {
   fill: #ff7f0e;
-  stroke: #ff7f0e;
-}
-
-.drag_line {
-  stroke: #999;
-  stroke-width: 5;
-  pointer-events: none;
-}
-
-.drag_line_hidden {
-  stroke: #999;
-  stroke-width: 0;
-  pointer-events: none;
 }
 
 .link {
-  stroke: #999;
-  stroke-width: 5;
+  stroke: #000;
+  stroke-width: 2;
   cursor: pointer;
 }
 
