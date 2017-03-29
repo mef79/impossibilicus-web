@@ -161,9 +161,6 @@ function redraw() {
 
   link.enter().insert("path", ".node")
     .attr("class", "link")
-    .attr("marker-end", function(d) {
-      return d === selected_link ? "url(#end-selected" : "url(#end)"
-    })
     .on("mousedown", 
       function(d) { 
         d3.event.stopPropagation();
@@ -175,7 +172,11 @@ function redraw() {
 
   link.exit().remove();
 
-  link.classed("link_selected", function(d) { return d === selected_link; });
+  link
+    .classed("link_selected", function(d) { return d === selected_link; })
+    .attr("marker-end", function(d) {
+      return d === selected_link ? "url(#end-selected" : "url(#end)"
+    });
 
   node = node.data(nodes);
 
