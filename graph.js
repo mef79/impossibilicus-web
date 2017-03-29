@@ -8,27 +8,28 @@ var fill = d3.scale.category20();
 
 // mouse event vars
 var dragged = null,
-  selected_node = null,
-  selected_link = null,
-  mousedown_link = null,
-  mousedown_node = null,
-  mouseup_node = null,
-  isAddingLink = false;
+  selected_node = null, // currently selected node
+  selected_link = null, // currently selected link
+  mousedown_link = null, // the link that has been mousedown'd on
+  mousedown_node = null, // the node that has been mousedown'd on
+  isAddingLink = false, // whether or not we are in the 'adding link' state
+  isUndoing = false; // whether or not we are in the 'undoing' state
 
 // init force layout
-var force = d3.layout.force()
-  .size([width, height])
-  .nodes([{}]) // initialize with a single node
-  .linkDistance(50)
-  .charge(-200) // they repel
-  .on("tick", tick);
+var force = d3.layout.force() // create a force layout
+  .size([width, height]) // of the given width/height
+  .nodes([{}]) // initialize with a single node - ???
+  .linkDistance(50) // how far the nodes are away from eachother
+  .charge(-200) // how strongly the nodes repel eachother
+  .on("tick", tick); // call the 'tick' function when drawing frames
 
 // init svg
-var svg = d3.select("#graph").append("svg")
-  .attr("width", width)
-  .attr("height", height)
-  .on("click", onClick)
-  .on("mouseup", mouseup);
+var svg = d3.select("#graph")
+  .append("svg")
+    .attr("width", width) 
+    .attr("height", height)
+    .on("click", onSvgClick)
+    .on("mouseup", mouseup);
     
 var container = svg.append("rect")
 	.attr("width", "100%")
@@ -38,25 +39,25 @@ var container = svg.append("rect")
 
 // build the arrow.
 svg.append("svg:defs").selectAll("marker")
-    .data(["end"])      // Different link/path types can be defined here
-  .enter().append("svg:marker")    // This section adds in the arrows
-    .attr("id", String)
-    .attr("viewBox", "0 -5 10 10")
-    .attr("refX", 18)
-    .attr("refY", 0)
-    .attr("markerWidth", 5)
-    .attr("markerHeight", 5)
-    .attr("orient", "auto")
-  .append("svg:path")
-    .attr("d", "M0,-5L10,0L0,5");
-
+    .data(["end"])
+  .enter()
+    .append("svg:marker")    // This section adds in the arrows
+      .attr("id", String)
+      .attr("viewBox", "0 -5 10 10")
+      .attr("refX", 18)
+      .attr("refY", 0)
+      .attr("markerWidth", 5)
+      .attr("markerHeight", 5)
+      .attr("orient", "auto")
+      .append("svg:path")
+        .attr("d", "M0,-5L10,0L0,5");
 
 // get layout properties
 var nodes = force.nodes(),
   links = force.links(),
   node = svg.selectAll(".node");
 
-var link = svg.append("svg:g").selectAll("path")
+var link = svg.selectAll("path")
     .data(force.links())
   .enter().append("svg:path")
     .attr("class", function(d) { return "link " + d.type; })
@@ -69,26 +70,10 @@ svg.node().focus();
 
 initTopBar();
 
-var isUndoing = false;
-
-function onUndoClick() {
-  var latestAction = actions.pop();
-  isUndoing = true;
-  latestAction();
-  isUndoing = false;
-  redraw();
-}
-
 function initTopBar() {
   // just "add node" for now
   var addNode = document.getElementById('add-node');
   addNode.onclick = onAddNodeClick;
-}
-
-function onClick() {
-  if (!mousedown_node && !mousedown_link) {
-    resetSelected();
-  }
 }
 
 function resetSelected() {
@@ -107,46 +92,31 @@ function mouseup() {
 function resetMouseVars() {
   dragged = null;
   mousedown_node = null;
-  mouseup_node = null;
   mousedown_link = null;
 }
 
+// called by the d3 force graph every time a frame is redrawn
 function tick() {
-  link.attr("d", function(d) {
-      return "M" + d.source.x + "," + d.source.y +
-             "L" + d.target.x + "," + d.target.y;
+
+  // redraw the path of the links given their source/target node positions
+  link
+    .attr("d", function(d) {
+      return "M" + d.source.x + "," + d.source.y + // where the path starts
+             "L" + d.target.x + "," + d.target.y; // where the path ends (absolute, not relative)
     });
 
-  node.attr("cx", function(d) { return d.x; })
+  // redraw the ndes at their new position
+  node
+    .attr("cx", function(d) { return d.x; })
     .attr("cy", function(d) { return d.y; });
 }
 
 // redraw force layout
 function redraw() {
 
-  if (!link) return;
-
-  var undo = document.getElementById("undo");
-  if (actions.length == 0 && !undo.classList.contains('disabled')) {
-    undo.classList.add("disabled");
-    undo.onclick = null;
-  } else if (actions.length > 0 && undo.classList.contains('disabled')) {
-    undo.classList.remove('disabled');
-    undo.onclick = onUndoClick;
-  }
-
-  // apply style to indicate that the user is currently adding a link
-  if (isAddingLink) {
-    showAddingStyle("adding link");
-  }
-  else {
-    showAddingStyle(false);
-  }
-
-  // stop the animation if something's selected
-  if (selected_link || selected_node) {
-    force.stop()
-  }
+  updateUndo(); // set the style/action of the undo button
+  updateStyle(); // update the overall style of the container
+  setMotion(); // pause the graph when some element is selected
 
   link = link.data(links);
 
@@ -199,13 +169,42 @@ function redraw() {
     // prevent browser's default behavior
     d3.event.preventDefault();
   }
-
-  if (!selected_link && !selected_node) {
-    force.start();
-  }
-
 }
 
+// stop the animation if anything is selected
+function setMotion() {
+  if (selected_link || selected_node) {
+    force.stop()
+  }
+  else {
+    force.start();
+  }
+}
+
+// disable/gray out the undo button if there's nothing to undo
+function updateUndo() {
+  var undo = document.getElementById("undo");
+  if (actions.length == 0 && !undo.classList.contains('disabled')) {
+    undo.classList.add("disabled");
+    undo.onclick = null;
+  } 
+  else if (actions.length > 0 && undo.classList.contains('disabled')) {
+    undo.classList.remove('disabled');
+    undo.onclick = onUndoClick;
+  }
+}
+
+function updateStyle() {
+  // apply style to indicate that the user is currently adding a link
+  if (isAddingLink) {
+    showAddingStyle("adding link");
+  }
+  else {
+    showAddingStyle(false);
+  }
+}
+
+// update the tooltip and the bottom section of the page
 function updateInfo() {
 	if (selected_node) {
     fillInfo(selected_node, true, !isAddingLink);
@@ -232,22 +231,29 @@ function fillInfo(selected, isNode, showTooltip) {
   var div = document.createElement("div");
   div.className = 'tooltip'
   var offsetTop = 15;
+  var xSource, ySource, xTarget, yTarget;
+
   if (isNode) {
   	div.style.left = Math.round(selected.x) - 104 + "px";
   	div.style.top = Math.round(selected.y) - 48 + offsetTop + "px";
 	  tooltipContent = '(' + Math.round(selected.x) + ', ' + Math.round(selected.y) + ')';
     bottomContent = tooltipContent;
-  } else {
-  	bottomContent = 'source: (' + Math.round(selected.source.x) + ', ' + Math.round(selected.source.y) + ')';
+  } 
+
+  else {
+    xSource = Math.round(selected.source.x);
+    ySource = Math.round(selected.source.y);
+    xTarget = Math.round(selected.target.x);
+    yTarget = Math.round(selected.target.y);
+  	bottomContent = 'source: (' + xSource + ', ' + ySource + ')';
     bottomContent += '<br>'
-    bottomContent += 'target: (' + Math.round(selected.target.x) + ', ' + Math.round(selected.target.y) + ')';
+    bottomContent += 'target: (' + xTarget + ', ' + yTarget + ')';
     tooltipContent = 'link selected';
-    div.style.left = (Math.round(selected.source.x) + Math.round(selected.target.x))/2 - 100;
-    div.style.top = (Math.round(selected.source.y) + Math.round(selected.target.y))/2 - 25;
+    div.style.left = (xSource + xTarget)/2 - 100;
+    div.style.top = (ySource + yTarget)/2 - 25;
   }
 
   if (showTooltip) {
-
     // add delete button
     var delButton = document.createElement("div");
     delButton.className = 'del button';
@@ -279,6 +285,48 @@ function fillInfo(selected, isNode, showTooltip) {
   bottom.innerHTML = bottomContent;
 }
 
+function showAddingStyle(text) {
+  // style to make it v clear that adding a link is currently what is happening
+  if (text) {
+    svg.append("text")
+      .text(text)
+      .attr("x", "50px")
+      .attr("y", "50px")
+      .attr("font-size", "50px")
+      .attr("font-weight", "bold")
+      .attr("fill", "#ffe3e3")
+
+    container
+      .attr("stroke", "red")
+      .attr("stroke-dasharray", "10,10")
+      .attr("stroke-width", "6px")
+  } 
+
+  // go back to the original style
+  else {
+    svg.selectAll("text").remove();
+    container
+      .attr("stroke", "black")
+      .attr("stroke-width", "1px")
+      .attr("stroke-dasharray", null)
+  }
+}
+
+//-- onClicks ------------------------------------------------------------------------------------//
+function onSvgClick() {
+  if (!mousedown_node && !mousedown_link) {
+    resetSelected();
+  }
+}
+
+function onUndoClick() {
+  var latestAction = actions.pop();
+  isUndoing = true;
+  latestAction();
+  isUndoing = false;
+  redraw();
+}
+
 function onAddLinkClick() {
   isAddingLink = true;
   redraw();
@@ -308,41 +356,7 @@ function onAddNodeClick() {
   resetSelected();
 }
 
-// util
-function removeElementsByClass(className){
-    var elements = document.getElementsByClassName(className);
-    while(elements.length > 0){
-        elements[0].parentNode.removeChild(elements[0]);
-    }
-}
-
-function showAddingStyle(text) {
-  // style to make it v clear that adding a link is currently what is happening
-  if (text) {
-    svg.append("text")
-      .text(text)
-      .attr("x", "50px")
-      .attr("y", "50px")
-      .attr("font-size", "50px")
-      .attr("font-weight", "bold")
-      .attr("fill", "#ffe3e3")
-
-    container
-      .attr("stroke", "red")
-      .attr("stroke-dasharray", "10,10")
-      .attr("stroke-width", "6px")
-  } 
-
-  // go back to the original style
-  else {
-    svg.selectAll("text").remove();
-    container
-      .attr("stroke", "black")
-      .attr("stroke-width", "1px")
-      .attr("stroke-dasharray", null)
-  }
-}
-
+//-- actions -------------------------------------------------------------------------------------//
 function insertNewNode(x, y, linkedFrom) {
   var newNode = {x: x, y: y};
   nodes.push(newNode);
@@ -393,4 +407,12 @@ function deleteLink(link) {
       insertNewLink(link)
     })
   }
+}
+
+//-- util ----------------------------------------------------------------------------------------//
+function removeElementsByClass(className){
+    var elements = document.getElementsByClassName(className);
+    while(elements.length > 0){
+        elements[0].parentNode.removeChild(elements[0]);
+    }
 }
