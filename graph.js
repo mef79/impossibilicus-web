@@ -13,6 +13,8 @@ var dragged = null,
   mousedown_link = null, // the link that has been mousedown'd on
   mousedown_node = null, // the node that has been mousedown'd on
   isAddingLink = false, // whether or not we are in the 'adding link' state
+  dragged = false,
+  dragstart_position = null,
   isUndoing = false; // whether or not we are in the 'undoing' state
 
 // init force layout
@@ -66,7 +68,7 @@ var link = svg.selectAll("path")
     .attr("marker-end", function(d) { return selected_link === d ? "url(#end-selected)" : "url(#end)"});
 
 function dragStart(d) {
-  clearInfo();
+  dragstart_position = {x: d.x, y: d.y}
   force.stop();
 }
 
@@ -75,11 +77,23 @@ function dragMove(d) {
   d.py += d3.event.dy;
   d.x += d3.event.dx;
   d.y += d3.event.dy;
+  if (distance(dragstart_position, {x: d.x, y:d.y}) > 5) {
+    clearInfo();
+    dragged = true;
+  }
   tick();
 }
 
+function distance(start, end) {
+  return Math.sqrt(Math.pow((end.x - start.x), 2) + Math.pow((end.y - start.y), 2))
+}
+
 function dragEnd(d) {
-  d.fixed = true;
+  if (dragged) {
+    d.fixed = true;
+    dragged = false;
+    dragstart_position = null;
+  }
   force.resume();
 }
 
