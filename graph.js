@@ -39,7 +39,7 @@ var container = svg.append("rect")
 
 // build the arrow.
 svg.append("svg:defs").selectAll("marker")
-    .data(["end"])
+    .data(["end", "end-selected"])
   .enter()
     .append("svg:marker")    // This section adds in the arrows
       .attr("id", String)
@@ -49,8 +49,10 @@ svg.append("svg:defs").selectAll("marker")
       .attr("markerWidth", 5)
       .attr("markerHeight", 5)
       .attr("orient", "auto")
+      .attr("class", function(d) { return d })
       .append("svg:path")
-        .attr("d", "M0,-5L10,0L0,5");
+        .attr("d", "M0,-5L10,0L0,5")
+        .attr("fill", function(d) { return d == "end-selected" ? "#ff7f0e" : "#000"});
 
 // get layout properties
 var nodes = force.nodes(),
@@ -61,7 +63,30 @@ var link = svg.selectAll("path")
     .data(force.links())
   .enter().append("svg:path")
     .attr("class", function(d) { return "link " + d.type; })
-    .attr("marker-end", "url(#end)");
+    .attr("marker-end", function(d) { return selected_link === d ? "url(#end-selected)" : "url(#end)"});
+
+function dragStart(d) {
+  clearInfo();
+  force.stop();
+}
+
+function dragMove(d) {
+  d.px += d3.event.dx;
+  d.py += d3.event.dy;
+  d.x += d3.event.dx;
+  d.y += d3.event.dy;
+  tick();
+}
+
+function dragEnd(d) {
+  d.fixed = true;
+  force.resume();
+}
+
+var node_drag = d3.behavior.drag()
+    .on("dragstart", dragStart)
+    .on("drag", dragMove)
+    .on("dragend", dragEnd);
 
 redraw();
 
@@ -122,9 +147,12 @@ function redraw() {
 
   link.enter().insert("path", ".node")
     .attr("class", "link")
-    .attr("marker-end", "url(#end)")
+    .attr("marker-end", function(d) {
+      return d === selected_link ? "url(#end-selected" : "url(#end)"
+    })
     .on("mousedown", 
       function(d) { 
+        d3.event.stopPropagation();
         mousedown_link = d; 
         selected_link = d; 
         selected_node = null; 
@@ -145,13 +173,28 @@ function redraw() {
         // create a link from selected to this node
         insertNewLink(selected_node, d);
         isAddingLink = false;
-      } else {
+      } 
+      else {
         selected_node = d;
         mousedown_node = d;
         selected_link = null;
       }
       redraw();
     })
+    // .on("mousedown", function(d) {
+    //   mousedown_node = d;
+    // })
+    // .on("mousemove", function(d) {
+    //   mousedown_node = null;
+    // })
+    // .on("mouseup", function(d) {
+    //   d.fixed = true;
+    //   if (d == mousedown_node) {
+    //     selected_node = d;
+    //     selected_link = null;
+    //   }
+    // })
+    .call(node_drag)
     .transition()
       .duration(750)
       .ease("elastic")
