@@ -15,15 +15,17 @@ var dragged = null,
   isAddingLink = false, // whether or not we are in the 'adding link' state
   dragged = false,
   dragstart_position = null,
+  node_counter = 0,
   isUndoing = false; // whether or not we are in the 'undoing' state
 
 // init force layout
 var force = d3.layout.force() // create a force layout
   .size([width, height]) // of the given width/height
-  .nodes([{}]) // initialize with a single node - ???
+  .nodes([{id: 'node-' + node_counter}]) // initialize with a single node - ???
   .linkDistance(50) // how far the nodes are away from eachother
   .charge(-200) // how strongly the nodes repel eachother
   .on("tick", tick); // call the 'tick' function when drawing frames
+node_counter++;
 
 // init svg
 var svg = d3.select("#graph")
@@ -196,19 +198,6 @@ function redraw() {
       }
       redraw();
     })
-    // .on("mousedown", function(d) {
-    //   mousedown_node = d;
-    // })
-    // .on("mousemove", function(d) {
-    //   mousedown_node = null;
-    // })
-    // .on("mouseup", function(d) {
-    //   d.fixed = true;
-    //   if (d == mousedown_node) {
-    //     selected_node = d;
-    //     selected_link = null;
-    //   }
-    // })
     .call(node_drag)
     .transition()
       .duration(750)
@@ -416,7 +405,12 @@ function onAddNodeClick() {
 
 //-- actions -------------------------------------------------------------------------------------//
 function insertNewNode(x, y, linkedFrom) {
-  var newNode = {x: x, y: y};
+  var newNode = {
+    x: x, 
+    y: y,
+    id: 'node-' + node_counter
+  };
+  node_counter++;
   nodes.push(newNode);
   if (linkedFrom) {
     var newLink = {source: linkedFrom, target: newNode};
@@ -429,6 +423,10 @@ function insertNewNode(x, y, linkedFrom) {
   }
 }
 
+function insertNode(node) {
+  nodes.push(node);
+}
+
 function insertNewLink(source, target) {
   var newlink = { source: source, target: target };
   links.push(newlink);
@@ -437,6 +435,10 @@ function insertNewLink(source, target) {
       deleteLink(newlink);
     })
   }
+}
+
+function insertLink(link) {
+  links.push(link);
 }
 
 function deleteNode(node) {
@@ -450,9 +452,11 @@ function deleteNode(node) {
   });
   if (!isUndoing) {
     actions.push(function () {
-      insertNewNode(node)
+      insertNode(node);
       deletedlinks.forEach(link => {
-        insertNewLink(link)
+        var source = getNode(link.source);
+        var target = getNode(link.target);
+        insertNewLink(source, target);
       })
     })
   }
@@ -468,6 +472,12 @@ function deleteLink(link) {
 }
 
 //-- util ----------------------------------------------------------------------------------------//
+function getNode(node) {
+  return nodes.find(e => {
+    return e.x === node.x && e.y === node.y;
+  })
+}
+
 function removeElementsByClass(className){
     var elements = document.getElementsByClassName(className);
     while(elements.length > 0){
