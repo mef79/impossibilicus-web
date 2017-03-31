@@ -5,13 +5,17 @@
   padding: 10px;
 }
 
-#undo {
+#undo,
+#redo {
+  margin-left: 5px;
+  margin-right: 5px;
   float: right;
   display: inline-block;
   cursor: pointer;
 }
 
-#undo.disabled {
+#undo.disabled,
+#redo.disabled {
   cursor: not-allowed;
   color: #ccc;
 }
@@ -65,17 +69,6 @@ form {
   width: 200px;
 }
 
-/* Creates a small triangle extender for the tooltip */
-/*.tooltip:after, .tooltip:before {
-  content:'';
-    display:block;
-    position:absolute;
-    top: 36px;
-    left: 100px;
-    border-top: 8px solid #dbe8fc;
-    border-left: 8px solid transparent; 
-    border-right:8px solid transparent;    
-}*/
 .tooltip:after,
 .tooltip:before {
     content: '';
@@ -87,23 +80,22 @@ form {
     color: transparent;
 }
 
-
-/* this border color controlls the color of the triangle (what looks like the fill of the triangle) */
+/* this border color controls the color of the triangle (what looks like the fill of the triangle) */
 .tooltip:after {
     top: 37px;
     left: 101px;
     border-top: 10px solid #F5F5F5;
-    border-left: 10px solid transparent; 
-    border-right:10px solid transparent;  
+    border-left: 10px solid transparent;
+    border-right:10px solid transparent;
 }
 
-/* this border color controlls the outside, thin border */
+/* this border color controls the outside, thin border */
 .tooltip:before {
     top: 37px;
     left: 100px;
     border-top: 11px solid #858585;
-    border-left: 11px solid transparent; 
-    border-right:11px solid transparent; 
+    border-left: 11px solid transparent;
+    border-right:11px solid transparent;
 }
 
 .button {
