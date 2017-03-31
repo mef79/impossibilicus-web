@@ -16,16 +16,21 @@ var dragged = null,
   dragged = false,
   dragstart_position = null,
   node_counter = 0,
+  should_show_info = true,
   isUndoing = false; // whether or not we are in the 'undoing' state
 
 // init force layout
 var force = d3.layout.force() // create a force layout
   .size([width, height]) // of the given width/height
-  .nodes([{id: 'node-' + node_counter}]) // initialize with a single node - ???
+  .nodes([{id: 'node-' + node_counter, x:0, y: 0}]) // initialize with a single node - ???
   .linkDistance(50) // how far the nodes are away from eachother
   .charge(-200) // how strongly the nodes repel eachother
   .on("tick", tick); // call the 'tick' function when drawing frames
 node_counter++;
+
+var zoom = d3.behavior.zoom()
+    .scaleExtent([.1, 10])
+    .on("zoom", zoomed);
 
 // init svg
 var svg = d3.select("#graph")
@@ -33,13 +38,23 @@ var svg = d3.select("#graph")
     .attr("width", width) 
     .attr("height", height)
     .on("click", onSvgClick)
-    .on("mouseup", mouseup);
+    .on("mouseup", mouseup)
+  .append("g")
+    .call(zoom);
     
-var container = svg.append("rect")
-	.attr("width", "100%")
+	// .attr("width", "100%")
+ //  .attr("height", "100%")
+ //  .attr("fill", "white")
+ //  .attr("stroke", "black");
+
+ var rect = svg.append("rect")
+    .attr("width", "100%")
   .attr("height", "100%")
-  .attr("fill", "white")
-  .attr("stroke", "black");
+  .attr("fill", "none")
+  .attr("stroke", "black")
+    .style("pointer-events", "all");
+
+var container = svg.append("g")
 
 // build the arrow.
 svg.append("svg:defs").selectAll("marker")
@@ -58,19 +73,11 @@ svg.append("svg:defs").selectAll("marker")
         .attr("d", "M0,-5L10,0L0,5")
         .attr("fill", function(d) { return d == "end-selected" ? "#ff7f0e" : "#000"});
 
-// get layout properties
-var nodes = force.nodes(),
-  links = force.links(),
-  node = svg.selectAll(".node");
-
-var link = svg.selectAll("path")
-    .data(force.links())
-  .enter().append("svg:path")
-    .attr("class", function(d) { return "link " + d.type; })
-    .attr("marker-end", function(d) { return selected_link === d ? "url(#end-selected)" : "url(#end)"});
-
 function dragStart(d) {
-  dragstart_position = {x: d.x, y: d.y}
+  d3.event.sourceEvent.stopPropagation();
+  dragstart_position = {x: d.x, y: d.y};
+  selected_node = d;
+  redraw();
   force.stop();
 }
 
@@ -82,6 +89,7 @@ function dragMove(d) {
   if (distance(dragstart_position, {x: d.x, y:d.y}) > 5) {
     clearInfo();
     dragged = true;
+    should_show_info = false
   }
   tick();
 }
@@ -93,16 +101,36 @@ function distance(start, end) {
 function dragEnd(d) {
   if (dragged) {
     d.fixed = true;
-    dragged = false;
     dragstart_position = null;
+    should_show_info = true;
   }
+  tick();
   force.resume();
+  redraw();
 }
 
 var node_drag = d3.behavior.drag()
     .on("dragstart", dragStart)
     .on("drag", dragMove)
     .on("dragend", dragEnd);
+
+// get layout properties
+var nodes = force.nodes(),
+  links = force.links();
+
+var link = container.append("g").selectAll("path")
+    .data(force.links())
+  .enter().append("svg:path")
+    .attr("class", function(d) { return "link " + d.type; })
+    .attr("marker-end", function(d) { return selected_link === d ? "url(#end-selected)" : "url(#end)"});
+
+var node = container.append("g").selectAll(".node")
+    .data(force.nodes())
+  .enter().append("circle")
+    .on("click", onNodeClick)
+    .attr("r", "10")
+    .attr("class", "node")
+    .call(node_drag)
 
 redraw();
 
@@ -185,19 +213,7 @@ function redraw() {
   node.enter().insert("circle")
     .attr("class", "node")
     .attr("r", 10)
-    .on("click", function(d) {
-      if (isAddingLink) {
-        // create a link from selected to this node
-        insertNewLink(selected_node, d);
-        isAddingLink = false;
-      } 
-      else {
-        selected_node = d;
-        mousedown_node = d;
-        selected_link = null;
-      }
-      redraw();
-    })
+    .on("click", onNodeClick)
     .call(node_drag)
     .transition()
       .duration(750)
@@ -212,9 +228,8 @@ function redraw() {
 
   updateInfo();
 
-  if (d3.event) {
-    // prevent browser's default behavior
-    d3.event.preventDefault();
+  if (dragged) {
+    dragged = false;
   }
 }
 
@@ -254,10 +269,10 @@ function updateStyle() {
 // update the tooltip and the bottom section of the page
 function updateInfo() {
 	if (selected_node) {
-    fillInfo(selected_node, true, !isAddingLink);
+    fillInfo(selected_node, true, !isAddingLink && !dragged && should_show_info);
   }
   else if (selected_link) {
-  	fillInfo(selected_link, false, !isAddingLink);
+  	fillInfo(selected_link, false, !isAddingLink && !dragged && should_show_info);
   }
   else if (document.getElementById('bottom')) {
     clearInfo();
@@ -272,7 +287,7 @@ function clearInfo() {
 
 function fillInfo(selected, isNode, showTooltip) {
 	var bottom = document.getElementById('bottom');
-  var tooltipContent;
+  var tooltipContent = ''
   var bottomContent;
   removeElementsByClass('tooltip');
   var div = document.createElement("div");
@@ -283,7 +298,7 @@ function fillInfo(selected, isNode, showTooltip) {
   if (isNode) {
   	div.style.left = Math.round(selected.x) - 104 + "px";
   	div.style.top = Math.round(selected.y) - 48 + offsetTop + "px";
-	  tooltipContent = '(' + Math.round(selected.x) + ', ' + Math.round(selected.y) + ')';
+	  // tooltipContent = '(' + Math.round(selected.x) + ', ' + Math.round(selected.y) + ')';
     bottomContent = tooltipContent;
   } 
 
@@ -318,6 +333,11 @@ function fillInfo(selected, isNode, showTooltip) {
     linkButton.className = 'add button';
     linkButton.innerHTML = 'link+'
     linkButton.onclick = onAddLinkClick;
+
+    var unlockButton = document.createElement("div")
+    unlockButton.className = 'button'
+    unlockButton.innerHTML = 'unlock'
+    unlockButton.onclick = onUnlockClick;
   
     document.body.appendChild(div);
     div.innerHTML = tooltipContent;
@@ -326,6 +346,9 @@ function fillInfo(selected, isNode, showTooltip) {
     if (isNode) {
       div.appendChild(nodeButton);
       div.appendChild(linkButton);
+      if (selected_node.fixed) {
+        div.appendChild(unlockButton);
+      }
     }
   }
 
@@ -374,6 +397,12 @@ function onUndoClick() {
   redraw();
 }
 
+function onUnlockClick() {
+  selected_node.fixed = false;
+  selected_node = null;
+  redraw();
+}
+
 function onAddLinkClick() {
   isAddingLink = true;
   redraw();
@@ -401,6 +430,28 @@ function onDelClick() {
 function onAddNodeClick() {
   insertNewNode(0, 0);
   resetSelected();
+}
+
+function onNodeMousedown(d) {
+  console.log(d);
+}
+
+function onNodeMouseup(d) {
+  console.log(d);
+}
+
+function onNodeClick(d) {
+  if (isAddingLink) {
+    // create a link from selected to this node
+    insertNewLink(selected_node, d);
+    isAddingLink = false;
+  } 
+  else {
+    selected_node = d;
+    mousedown_node = d;
+    selected_link = null;
+  }
+  redraw();
 }
 
 //-- actions -------------------------------------------------------------------------------------//
@@ -483,4 +534,8 @@ function removeElementsByClass(className){
     while(elements.length > 0){
         elements[0].parentNode.removeChild(elements[0]);
     }
+}
+
+function zoomed() {
+  container.attr("transform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")");
 }
