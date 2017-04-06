@@ -12,22 +12,26 @@
 import React from 'react';
 import { FormattedMessage } from 'react-intl';
 import messages from './messages';
+import * as d3 from 'd3';
+
 
 export default class HomePage extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
-  render() {
+ 
+  
+  render() { 
     return (
       <div>
-      <h1>
-        <FormattedMessage {...messages.header} />
-      </h1>
-      <div id='add-node'>Add node</div>
-<div id='undo'>undo</div>
-<div id='redo'>redo</div>
-<div id='graph'>
+        <h1>
+          <FormattedMessage {...messages.header} />
+        </h1>
+        <div id='add-node'>Add node</div>
+        <div id='undo'>undo</div>
+        <div id='redo'>redo</div>
+        <div id='graph'>
 
-</div>
-<div id='bottom'>
-No element selected
+        </div>
+        <div id='bottom'>
+          No element selected
 </div>
       </div>
     );
