@@ -1,10 +1,12 @@
 # proj
 
-Not much here yet.
+We have a board: to see it, go here to install ZenHub: https://www.zenhub.com/
 
-To see, clone the repo and open the html file.
+## Requirements
+- Install `node` and `npm` - [Docs](https://docs.npmjs.com/getting-started/installing-node)
 
-I tried adding things to a board, go here to install ZenHub:
-https://www.zenhub.com/
-
-Install the extension, sign in, and come back here
+## Starting the app
+- Clone the repo
+- Run `npm install` to install the dependencies
+- Run `npm start` to start the app - it will be running at http://localhost:3000
+- (That's all)
