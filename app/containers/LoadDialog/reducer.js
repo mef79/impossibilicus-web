@@ -1,6 +1,6 @@
 /*
  *
- * {{ properCase name }} reducer
+ * LoadDialog reducer
  *
  */
 
@@ -11,13 +11,13 @@ import {
 
 const initialState = fromJS({})
 
-function {{ camelCase name }}Reducer(state = initialState, action) {
+function loadDialogReducer(state = initialState, action) {
   switch (action.type) {
     case DEFAULT_ACTION:
-      return state;
+      return state
     default:
-      return state;
+      return state
   }
 }
 
-export default {{ camelCase name }}Reducer
+export default loadDialogReducer

@@ -1,6 +1,6 @@
 /*
  *
- * {{ properCase name }} actions
+ * LoadDialog actions
  *
  */
 

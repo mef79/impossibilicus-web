@@ -9,15 +9,25 @@
  * the linting exception.
  */
 
-import React from 'react';
-import { FormattedMessage } from 'react-intl';
-import messages from './messages';
-import * as d3 from 'd3';
+ /* ignore lots of eslint functions because d3 */
+ /* eslint no-unused-vars: 0, indent: 0, no-param-reassign:0, no-var: 0, camelcase: 0, prefer-arrow-callback: 0, no-shadow: 0, no-mixed-operators: 0 */
 
+import React from 'react'
+import * as d3 from 'd3'
+import LoadDialog from 'containers/LoadDialog'
 
 export default class HomePage extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
+    constructor(props) {
+        super(props)
+        this.renderLoadDialog = this.renderLoadDialog.bind(this)
+        this.showLoadDialog = this.showLoadDialog.bind(this)
+        this.closeLoadDialog = this.closeLoadDialog.bind(this)
+        this.state = {
+            showLoadDialog: false
+        }
+    }
+
     componentDidMount() {
-        console.log(d3);
         // size of the graph
         var dimensions = {
             width: 800,
@@ -65,51 +75,51 @@ export default class HomePage extends React.PureComponent { // eslint-disable-li
             .nodes([createNode()]) // initialize with a single node - ???
             .linkDistance(50) // how far the nodes are away from eachother
             .charge(-200) // how strongly the nodes repel eachother
-            .on("tick", tick) // call the 'tick' function when drawing frames
+            .on('tick', tick) // call the 'tick' function when drawing frames
 
         // defines the zoom behavior
         var zoom = d3.behavior.zoom()
-            .scaleExtent([.1, 10]) // min/max zoom
-            .on("zoom", zoomed) // call the zoom function when zooming
+            .scaleExtent([0.1, 10]) // min/max zoom
+            .on('zoom', zoomed) // call the zoom function when zooming
 
         // init svg
-        var svg = d3.select("#graph")
-            .append("svg")
-            .attr("width", dimensions.width)
-            .attr("height", dimensions.height)
-            .on("click", onSvgClick)
-            .on("mouseup", mouseup)
-            .append("g")
+        var svg = d3.select('#graph')
+            .append('svg')
+            .attr('width', dimensions.width)
+            .attr('height', dimensions.height)
+            .on('click', onSvgClick)
+            .on('mouseup', mouseup)
+            .append('g')
             .call(zoom)
 
-        var rect = svg.append("rect")
-            .attr("width", "100%")
-            .attr("height", "100%")
-            .attr("fill", "none")
-            .attr("stroke", "black")
-            .style("pointer-events", "all")
+        var rect = svg.append('rect')
+            .attr('width', '100%')
+            .attr('height', '100%')
+            .attr('fill', 'none')
+            .attr('stroke', 'black')
+            .style('pointer-events', 'all')
 
-        var container = svg.append("g")
+        var container = svg.append('g')
 
         // build the arrow
-        svg.append("svg:defs").selectAll("marker")
-            .data(["end", "end-selected"])
+        svg.append('svg:defs').selectAll('marker')
+            .data(['end', 'end-selected'])
             .enter()
-            .append("svg:marker")    // This section adds in the arrows
-            .attr("id", String)
-            .attr("viewBox", "0 -5 10 10")
-            .attr("refX", 18)
-            .attr("refY", 0)
-            .attr("markerWidth", 5)
-            .attr("markerHeight", 5)
-            .attr("orient", "auto")
-            .attr("class", function(d) { return d })
-            .append("svg:path")
-            .attr("d", "M0,-5L10,0L0,5")
-            .attr("fill", function(d) { return d == "end-selected" ? "#ff7f0e" : "#000" })
+            .append('svg:marker')    // This section adds in the arrows
+            .attr('id', String)
+            .attr('viewBox', '0 -5 10 10')
+            .attr('refX', 18)
+            .attr('refY', 0)
+            .attr('markerWidth', 5)
+            .attr('markerHeight', 5)
+            .attr('orient', 'auto')
+            .attr('class', d => { return d })
+            .append('svg:path')
+            .attr('d', 'M0,-5L10,0L0,5')
+            .attr('fill', d => { return d === 'end-selected' ? '#ff7f0e' : '#000' })
 
         function zoomed() {
-            container.attr("transform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")")
+            container.attr('transform', `translate(${d3.event.translate})scale(${d3.event.scale})`)
         }
 
         function dragStart(d) {
@@ -134,7 +144,7 @@ export default class HomePage extends React.PureComponent { // eslint-disable-li
         }
 
         function distance(start, end) {
-            return Math.sqrt(Math.pow((end.x - start.x), 2) + Math.pow((end.y - start.y), 2))
+            return Math.sqrt((end.x - start.x) ** 2 + (end.y - start.y) ** 2)
         }
 
         function dragEnd(d) {
@@ -149,33 +159,33 @@ export default class HomePage extends React.PureComponent { // eslint-disable-li
         }
 
         var node_drag = d3.behavior.drag()
-            .on("dragstart", dragStart)
-            .on("drag", dragMove)
-            .on("dragend", dragEnd)
+            .on('dragstart', dragStart)
+            .on('drag', dragMove)
+            .on('dragend', dragEnd)
 
         // get layout properties
         var nodes = force.nodes(),
             links = force.links()
 
-        var link = container.append("g").selectAll("path")
+        var link = container.append('g').selectAll('path')
             .data(force.links())
-            .enter().append("svg:path")
-            .attr("class", function(d) { return "link " + d.type })
-            .attr("marker-end", function(d) { return selected_link === d ? "url(#end-selected)" : "url(#end)" })
+            .enter().append('svg:path')
+            .attr('class', d => { return `link ${d.type}` })
+            .attr('marker-end', d => { return selected_link === d ? 'url(#end-selected)' : 'url(#end)' })
 
-        var node = container.append("g").selectAll(".node")
+        var node = container.append('g').selectAll('.node')
             .data(force.nodes())
-            .enter().append("circle")
-            .on("click", onNodeClick)
-            .attr("r", "10")
-            .attr("class", "node")
+            .enter().append('circle')
+            .on('click', onNodeClick)
+            .attr('r', '10')
+            .attr('class', 'node')
             .call(node_drag)
 
         redraw()
         initTopBar()
 
         function initTopBar() {
-            // just "add node" for now
+            // just 'add node' for now
             var addNode = document.getElementById('add-node')
             addNode.onclick = onAddNodeClick
         }
@@ -193,23 +203,16 @@ export default class HomePage extends React.PureComponent { // eslint-disable-li
             mousedown_link = null
         }
 
-        function resetMouseVars() {
-            dragged = null
-            mousedown_node = null
-            mousedown_link = null
-        }
-
         // called by the d3 force graph every time a frame is redrawn
         function tick() {
             // redraw the path of the links given their source/target node positions
-            link.attr("d", function(d) {
-                return "M" + d.source.x + "," + d.source.y + // where the path starts
-                    "L" + d.target.x + "," + d.target.y // where the path ends (absolute, not relative)
+            link.attr('d', d => {
+                return `M${d.source.x},${d.source.y}L${d.target.x},${d.target.y}`
             })
 
             // redraw the ndes at their new position
-            node.attr("cx", function(d) { return d.x })
-                .attr("cy", function(d) { return d.y })
+            node.attr('cx', d => { return d.x })
+                .attr('cy', d => { return d.y })
         }
 
         // redraw force layout
@@ -220,10 +223,10 @@ export default class HomePage extends React.PureComponent { // eslint-disable-li
 
             link = link.data(links)
 
-            link.enter().insert("path", ".node")
-                .attr("class", "link")
-                .on("mousedown",
-                function(d) {
+            link.enter().insert('path', '.node')
+                .attr('class', 'link')
+                .on('mousedown',
+                d => {
                     d3.event.stopPropagation()
                     mousedown_link = d
                     selected_link = d
@@ -234,28 +237,30 @@ export default class HomePage extends React.PureComponent { // eslint-disable-li
             link.exit().remove()
 
             link
-                .classed("link_selected", function(d) { return d === selected_link })
-                .attr("marker-end", function(d) {
-                    return d === selected_link ? "url(#end-selected" : "url(#end)"
+                .classed('link_selected', d => { return d === selected_link })
+                .attr('marker-end', d => {
+                    return d === selected_link ? 'url(#end-selected' : 'url(#end)'
                 })
 
             node = node.data(nodes)
 
-            node.enter().insert("circle")
-                .attr("class", "node")
-                .attr("r", 10)
-                .on("click", onNodeClick)
+            node.enter().insert('circle')
+                .attr('class', 'node')
+                .attr('r', 10)
+                .on('click', onNodeClick)
                 .call(node_drag)
                 .transition()
                 .duration(750)
-                .ease("elastic")
-                .attr("r", 10)
+                .ease('elastic')
+                .attr('r', 10)
 
             node.exit().transition()
-                .attr("r", 0)
+                .attr('r', 0)
                 .remove()
 
-            node.classed("node_selected", function(d) { return d === selected_node })
+            node.classed('node_selected', d => {
+              return d === selected_node
+            })
 
             updateInfo()
 
@@ -276,18 +281,18 @@ export default class HomePage extends React.PureComponent { // eslint-disable-li
 
         // disable/gray out the undo button if there's nothing to undo
         function updateUndo() {
-            var undo = document.getElementById("undo")
-            if (undoStack.length == 0 && !undo.classList.contains('disabled')) {
-                undo.classList.add("disabled")
+            var undo = document.getElementById('undo')
+            if (undoStack.length === 0 && !undo.classList.contains('disabled')) {
+                undo.classList.add('disabled')
                 undo.onclick = null
             }
             else if (undoStack.length > 0 && undo.classList.contains('disabled')) {
                 undo.classList.remove('disabled')
                 undo.onclick = onUndoClick
             }
-            var redo = document.getElementById("redo")
-            if (redoStack.length == 0 && !redo.classList.contains('disabled')) {
-                redo.classList.add("disabled")
+            var redo = document.getElementById('redo')
+            if (redoStack.length === 0 && !redo.classList.contains('disabled')) {
+                redo.classList.add('disabled')
                 redo.onclick = null
             }
             else if (redoStack.length > 0 && redo.classList.contains('disabled')) {
@@ -299,7 +304,7 @@ export default class HomePage extends React.PureComponent { // eslint-disable-li
         function updateStyle() {
             // apply style to indicate that the user is currently adding a link
             if (isAddingLink) {
-                showAddingStyle("adding link")
+                showAddingStyle('adding link')
             }
             else {
                 showAddingStyle(false)
@@ -320,9 +325,9 @@ export default class HomePage extends React.PureComponent { // eslint-disable-li
         }
 
         function clearInfo() {
-            removeElementsByClass("tooltip")
+            removeElementsByClass('tooltip')
             var bottom = document.getElementById('bottom')
-            bottom.innerHTML = "No element selected"
+            bottom.innerHTML = 'No element selected'
         }
 
         function fillInfo(selected, isNode, showTooltip) {
@@ -330,14 +335,14 @@ export default class HomePage extends React.PureComponent { // eslint-disable-li
             var tooltipContent = ''
             var bottomContent
             removeElementsByClass('tooltip')
-            var div = document.createElement("div")
+            var div = document.createElement('div')
             div.className = 'tooltip'
             var offsetTop = 15
             var xSource, ySource, xTarget, yTarget
 
             if (isNode) {
-                div.style.left = Math.round(selected.x) - 104 + "px"
-                div.style.top = Math.round(selected.y) - 48 + offsetTop + "px"
+                div.style.left = `${Math.round(selected.x) - 104}px`
+                div.style.top = `${Math.round(selected.y) - 48 + offsetTop}px`
                 // tooltipContent = '(' + Math.round(selected.x) + ', ' + Math.round(selected.y) + ')'
                 bottomContent = tooltipContent
             }
@@ -347,9 +352,9 @@ export default class HomePage extends React.PureComponent { // eslint-disable-li
                 ySource = Math.round(selected.source.y)
                 xTarget = Math.round(selected.target.x)
                 yTarget = Math.round(selected.target.y)
-                bottomContent = 'source: (' + xSource + ', ' + ySource + ')'
+                bottomContent = `source: (${xSource}, ${ySource})`
                 bottomContent += '<br>'
-                bottomContent += 'target: (' + xTarget + ', ' + yTarget + ')'
+                bottomContent += `target: (${xTarget}, ${yTarget})`
                 tooltipContent = 'link selected'
                 div.style.left = (xSource + xTarget) / 2 - 100
                 div.style.top = (ySource + yTarget) / 2 - 25
@@ -357,24 +362,24 @@ export default class HomePage extends React.PureComponent { // eslint-disable-li
 
             if (showTooltip) {
                 // add delete button
-                var delButton = document.createElement("div")
+                var delButton = document.createElement('div')
                 delButton.className = 'del button'
                 delButton.innerHTML = 'x'
                 delButton.onclick = onDelClick
 
                 // add link button
-                var nodeButton = document.createElement("div")
+                var nodeButton = document.createElement('div')
                 nodeButton.className = 'add button'
                 nodeButton.innerHTML = 'node+'
                 nodeButton.onclick = onAddLinkedNodeClick
 
                 // add node button
-                var linkButton = document.createElement("div")
+                var linkButton = document.createElement('div')
                 linkButton.className = 'add button'
                 linkButton.innerHTML = 'link+'
                 linkButton.onclick = onAddLinkClick
 
-                var unlockButton = document.createElement("div")
+                var unlockButton = document.createElement('div')
                 unlockButton.className = 'button'
                 unlockButton.innerHTML = 'unlock'
                 unlockButton.onclick = onUnlockClick
@@ -398,31 +403,31 @@ export default class HomePage extends React.PureComponent { // eslint-disable-li
         function showAddingStyle(text) {
             // style to make it v clear that adding a link is currently what is happening
             if (text) {
-                svg.append("text")
+                svg.append('text')
                     .text(text)
-                    .attr("x", "50px")
-                    .attr("y", "50px")
-                    .attr("font-size", "50px")
-                    .attr("font-weight", "bold")
-                    .attr("fill", "#ffe3e3")
+                    .attr('x', '50px')
+                    .attr('y', '50px')
+                    .attr('font-size', '50px')
+                    .attr('font-weight', 'bold')
+                    .attr('fill', '#ffe3e3')
 
                 container
-                    .attr("stroke", "red")
-                    .attr("stroke-dasharray", "10,10")
-                    .attr("stroke-width", "6px")
+                    .attr('stroke', 'red')
+                    .attr('stroke-dasharray', '10,10')
+                    .attr('stroke-width', '6px')
             }
 
             // go back to the original style
             else {
-                svg.selectAll("text").remove()
+                svg.selectAll('text').remove()
                 container
-                    .attr("stroke", "black")
-                    .attr("stroke-width", "1px")
-                    .attr("stroke-dasharray", null)
+                    .attr('stroke', 'black')
+                    .attr('stroke-width', '1px')
+                    .attr('stroke-dasharray', null)
             }
         }
 
-        //-- onClicks ------------------------------------------------------------------------------------//
+        // onClicks ------------------------------------------------------------------------------------//
         function onSvgClick() {
             if (!mousedown_node && !mousedown_link) {
                 resetSelected()
@@ -482,14 +487,6 @@ export default class HomePage extends React.PureComponent { // eslint-disable-li
             resetSelected()
         }
 
-        function onNodeMousedown(d) {
-            console.log(d)
-        }
-
-        function onNodeMouseup(d) {
-            console.log(d)
-        }
-
         function onNodeClick(d) {
             if (isAddingLink) {
                 // create a link from selected to this node
@@ -504,14 +501,10 @@ export default class HomePage extends React.PureComponent { // eslint-disable-li
             redraw()
         }
 
-        //-- actions -------------------------------------------------------------------------------------//
+        // actions -------------------------------------------------------------------------------------//
         // create a node object nodes have an x, y, and index
         function createNode(x, y) {
-            var node = {
-                x: x,
-                y: y,
-                id: 'node-' + node_counter
-            }
+            var node = { x, y, id: `node-${node_counter}` }
             node_counter++
             return node
         }
@@ -526,10 +519,11 @@ export default class HomePage extends React.PureComponent { // eslint-disable-li
 
         // create and insert a node
         function insertNewNode(x, y, linkedFrom) {
+            var link
             var node = createNode(x, y)
             nodes.push(node)
             if (linkedFrom) {
-                var link = createLink(linkedFrom, node)
+                link = createLink(linkedFrom, node)
                 links.push(link)
             }
             if (!isUndoing) {
@@ -560,7 +554,7 @@ export default class HomePage extends React.PureComponent { // eslint-disable-li
                 undoStack.push(() => {
                     deleteLink(newlink)
                     redoStack.push(() => {
-                        links.push(newLink)
+                        links.push(newlink)
                     })
                 })
             }
@@ -603,7 +597,7 @@ export default class HomePage extends React.PureComponent { // eslint-disable-li
             removeLink(link)
             if (!isUndoing) {
                 redoStack = []
-                undoStack.push(function() {
+                undoStack.push(() => {
                     insertLink(link)
                     redoStack.push(() => {
                         removeLink(link)
@@ -618,14 +612,16 @@ export default class HomePage extends React.PureComponent { // eslint-disable-li
         }
 
         // remove a link from the list
-        function removeLink(node) {
+        function removeLink(link) {
             links.splice(nodes.indexOf(link), 1)
         }
 
-        //-- util ----------------------------------------------------------------------------------------//
+        // util ----------------------------------------------------------------------------------------//
         // find a node by its index
         function getNode(node) {
-            return nodes.find(e => { return e.id == node.id })
+            return nodes.find(e => {
+              return e.id === node.id
+            })
         }
 
         // remove all elements of a given class
@@ -635,25 +631,45 @@ export default class HomePage extends React.PureComponent { // eslint-disable-li
                 elements[0].parentNode.removeChild(elements[0])
             }
         }
+    }
 
+    showLoadDialog() {
+        this.setState({
+            showLoadDialog: true
+        })
+    }
+
+    closeLoadDialog() {
+        this.setState({
+            showLoadDialog: false
+        })
+    }
+
+    renderLoadDialog() {
+        if (this.state.showLoadDialog) {
+            return (
+              <LoadDialog close={ this.closeLoadDialog } />
+            )
+        }
     }
 
     render() {
-        return (
-            <div>
-                <h1>
-                    <FormattedMessage {...messages.header} />
-                </h1>
-                <div id='add-node'>Add node</div>
-                <div id='undo'>undo</div>
-                <div id='redo'>redo</div>
-                <div id='graph'>
+      return (
+        <div>
+          <div id="add-node">Add node</div>
+          <div id="undo">undo</div>
+          <div id="redo">redo</div>
+          <div id="graph">
 
-                </div>
-                <div id='bottom'>
-                    No element selected
-</div>
-            </div>
-        );
+          </div>
+          <div id="bottom">
+              No element selected
+          </div>
+          <div onClick={this.showLoadDialog}>
+              Load
+          </div>
+          { this.renderLoadDialog() }
+        </div>
+      )
     }
 }

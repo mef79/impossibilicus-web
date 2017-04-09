@@ -1,9 +1,9 @@
 // import React from 'react'
 // import { shallow } from 'enzyme'
 
-// import { {{ properCase name }} } from '../index'
+// import ModalHeader from '../index'
 
-describe('<{{ properCase name }} />', () => {
+describe('<ModalHeader />', () => {
   it('Expect to have unit tests specified', () => {
     expect(true).toEqual(false)
   })

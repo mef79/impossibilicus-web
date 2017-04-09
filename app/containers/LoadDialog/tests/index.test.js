@@ -1,9 +1,9 @@
 // import React from 'react'
 // import { shallow } from 'enzyme'
 
-// import { {{ properCase name }} } from '../index'
+// import { LoadDialog } from '../index'
 
-describe('<{{ properCase name }} />', () => {
+describe('<LoadDialog />', () => {
   it('Expect to have unit tests specified', () => {
     expect(true).toEqual(false)
   })
