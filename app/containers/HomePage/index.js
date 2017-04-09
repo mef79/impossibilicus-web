@@ -34,6 +34,14 @@ export default class HomePage extends React.PureComponent { // eslint-disable-li
             height: 500
         }
 
+        // size of the nodes
+        var nodeSize = {
+            width: 100,
+            height: 30,
+            rx: 5,
+            ry: 5
+        }
+
         // stacks of the most recently taken/undone actions
         var undoStack = []
         var redoStack = []
@@ -73,8 +81,8 @@ export default class HomePage extends React.PureComponent { // eslint-disable-li
         var force = d3.layout.force() // create a force layout
             .size([dimensions.width, dimensions.height]) // of the given width/height
             .nodes([createNode()]) // initialize with a single node - ???
-            .linkDistance(50) // how far the nodes are away from eachother
-            .charge(-200) // how strongly the nodes repel eachother
+            .linkDistance(150) // how far the nodes are away from eachother
+            .charge(-500) // how strongly the nodes repel eachother
             .on('tick', tick) // call the 'tick' function when drawing frames
 
         // defines the zoom behavior
@@ -108,15 +116,15 @@ export default class HomePage extends React.PureComponent { // eslint-disable-li
             .append('svg:marker')    // This section adds in the arrows
             .attr('id', String)
             .attr('viewBox', '0 -5 10 10')
-            .attr('refX', 18)
+            .attr('refX', 12)
             .attr('refY', 0)
             .attr('markerWidth', 5)
             .attr('markerHeight', 5)
             .attr('orient', 'auto')
-            .attr('class', d => { return d })
+            .attr('class', d => d)
             .append('svg:path')
             .attr('d', 'M0,-5L10,0L0,5')
-            .attr('fill', d => { return d === 'end-selected' ? '#ff7f0e' : '#000' })
+            .attr('fill', d => d === 'end-selected' ? '#ff7f0e' : '#000')
 
         function zoomed() {
             container.attr('transform', `translate(${d3.event.translate})scale(${d3.event.scale})`)
@@ -170,14 +178,17 @@ export default class HomePage extends React.PureComponent { // eslint-disable-li
         var link = container.append('g').attr('class', 'link-group').selectAll('path')
             .data(force.links())
             .enter().append('svg:path')
-            .attr('class', d => { return `link ${d.type}` })
-            .attr('marker-end', d => { return selected_link === d ? 'url(#end-selected)' : 'url(#end)' })
+            .attr('class', d => `link ${d.type}`)
+            .attr('marker-end', d => selected_link === d ? 'url(#end-selected)' : 'url(#end)')
 
         var node = container.append('g').attr('class', 'node-group').selectAll('.node')
             .data(force.nodes())
-            .enter().append('circle')
+            .enter().append('rect')
             .on('click', onNodeClick)
-            .attr('r', '10')
+            .attr('width', nodeSize.width)
+            .attr('height', nodeSize.height)
+            .attr('rx', nodeSize.rx)
+            .attr('ry', nodeSize.ry)
             .attr('class', 'node')
             .call(node_drag)
 
@@ -185,14 +196,12 @@ export default class HomePage extends React.PureComponent { // eslint-disable-li
             .data(force.nodes())
             .enter()
             .append('text')
-            .attr('x', d => {
-                return d.x
-            })
-            .attr('y', d => {return d.y})
+            .attr('x', d => d.x)
+            .attr('y', d => d.y)
             .attr('class', 'nodelabel')
             .attr('stroke', 'black')
-            .text(d => {return d.id})
-        console.log('rebuild pls')
+            .text(d => d.id)
+
         redraw()
         initTopBar()
 
@@ -219,15 +228,21 @@ export default class HomePage extends React.PureComponent { // eslint-disable-li
         function tick() {
             // redraw the path of the links given their source/target node positions
             link.attr('d', d => {
-                return `M${d.source.x},${d.source.y}L${d.target.x},${d.target.y}`
+                const prevStart = d.start ? d.start : d.source
+                const prevEnd = d.end ? d.end : d.target
+                const start = getClosestPointOnRect(prevEnd, d.source)
+                const end = getClosestPointOnRect(prevStart, d.target)
+                d.start = start
+                d.end = end
+                return `M${start.x},${start.y}L${end.x},${end.y}`
             })
 
             // redraw the ndes at their new position
-            node.attr('cx', d => { return d.x })
-                .attr('cy', d => { return d.y })
+            node.attr('x', d => d.x - nodeSize.width / 2)
+                .attr('y', d => d.y - nodeSize.height / 2)
 
-            nodelabels.attr('x', function(d) { return d.x + 12 })
-                  .attr('y', function(d) { return d.y + 3 })
+            nodelabels.attr('x', d => d.x - nodeSize.width / 2 + 6)
+                  .attr('y', d => d.y + 4)
         }
 
         // redraw force layout
@@ -252,42 +267,43 @@ export default class HomePage extends React.PureComponent { // eslint-disable-li
             link.exit().remove()
 
             link
-                .classed('link_selected', d => { return d === selected_link })
-                .attr('marker-end', d => {
-                    return d === selected_link ? 'url(#end-selected' : 'url(#end)'
-                })
+                .classed('link_selected', d => d === selected_link)
+                .attr('marker-end', d => d === selected_link ? 'url(#end-selected' : 'url(#end)')
 
             node = node.data(nodes)
 
-            node.enter().insert('circle')
+            node.enter().insert('rect')
                 .attr('class', 'node')
-                .attr('r', 10)
+                .attr('height', nodeSize.height)
+                .attr('width', nodeSize.width)
+                .attr('rx', nodeSize.rx)
+                .attr('ry', nodeSize.ry)
                 .on('click', onNodeClick)
                 .call(node_drag)
                 .transition()
                 .duration(750)
                 .ease('elastic')
-                .attr('r', 10)
+                .attr('height', nodeSize.height)
+                .attr('width', nodeSize.width)
+                .attr('rx', nodeSize.rx)
+                .attr('ry', nodeSize.ry)
 
             node.exit().transition()
-                .attr('r', 0)
+                .attr('height', 0)
+                .attr('width', 0)
                 .remove()
 
-            node.classed('node_selected', d => {
-              return d === selected_node
-            })
+            node.classed('node_selected', d => d === selected_node)
 
             nodelabels = nodelabels.data(nodes)
             nodelabels
                 .enter()
-                .insert("text")
-                .attr('x',function(d){
-                    return d.x
-                })
-                .attr('y',function(d){return d.y})
-                .attr('class','nodelabel')
-                .attr('stroke','black')
-                .text(function(d){return d.id})
+                .insert('text')
+                .attr('x', d => d.x)
+                .attr('y', d => d.y)
+                .attr('class', 'nodelabel')
+                .attr('stroke', 'black')
+                .text(d => d.id)
 
             updateInfo()
 
@@ -602,7 +618,7 @@ export default class HomePage extends React.PureComponent { // eslint-disable-li
             removeNode(node)
 
             // store the links that have been deleted so that they can be stored in the undo action
-            var deleted = links.filter(link => { return link.source === node || link.target === node })
+            var deleted = links.filter(link => link.source === node || link.target === node)
 
             // remove the deleted links
             deleted.forEach(link => { removeLink(link) })
@@ -647,9 +663,7 @@ export default class HomePage extends React.PureComponent { // eslint-disable-li
         // util ----------------------------------------------------------------------------------------//
         // find a node by its index
         function getNode(node) {
-            return nodes.find(e => {
-              return e.id === node.id
-            })
+            return nodes.find(e => e.id === node.id)
         }
 
         // remove all elements of a given class
@@ -658,6 +672,42 @@ export default class HomePage extends React.PureComponent { // eslint-disable-li
             while (elements.length > 0) {
                 elements[0].parentNode.removeChild(elements[0])
             }
+        }
+
+        function getClosestPointOnRect(from, rect) {
+            var xmin = rect.x - nodeSize.width / 2
+            var ymin = rect.y - nodeSize.height / 2
+            var xmax = rect.x + nodeSize.width / 2
+            var ymax = rect.y + nodeSize.height / 2
+
+            var point = {
+                x: null,
+                y: null
+            }
+
+            if (from.x < xmin) {
+                point.x = xmin + 3
+            }
+            if (from.x > xmax) {
+                point.x = xmax - 3
+            }
+
+            if (from.y < ymin) {
+                point.y = ymin + 3
+            }
+            if (from.y > ymax) {
+                point.y = ymax - 3
+            }
+
+            // if either x or y was within the bounds
+            if (!point.x) {
+                point.x = from.x
+            }
+            if (!point.y) {
+                point.y = from.y
+            }
+
+            return point
         }
     }
 
