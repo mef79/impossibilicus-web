@@ -51,8 +51,8 @@ export default class HomePage extends React.PureComponent { // eslint-disable-li
         // the node that has been mousedown'd on
         var mousedown_node = null
 
-        // whether or not we are in the 'adding link' state
-        var isAddingLink = false
+        // the node we're currently creating a link to
+        var linkingNode = false
 
         // whether a node was just dragged
         var dragged = false
@@ -167,13 +167,13 @@ export default class HomePage extends React.PureComponent { // eslint-disable-li
         var nodes = force.nodes(),
             links = force.links()
 
-        var link = container.append('g').selectAll('path')
+        var link = container.append('g').attr('class', 'link-group').selectAll('path')
             .data(force.links())
             .enter().append('svg:path')
             .attr('class', d => { return `link ${d.type}` })
             .attr('marker-end', d => { return selected_link === d ? 'url(#end-selected)' : 'url(#end)' })
 
-        var node = container.append('g').selectAll('.node')
+        var node = container.append('g').attr('class', 'node-group').selectAll('.node')
             .data(force.nodes())
             .enter().append('circle')
             .on('click', onNodeClick)
@@ -181,6 +181,18 @@ export default class HomePage extends React.PureComponent { // eslint-disable-li
             .attr('class', 'node')
             .call(node_drag)
 
+        var nodelabels = container.append('g').attr('class', 'nodelabel-group').selectAll('.nodelabel')
+            .data(force.nodes())
+            .enter()
+            .append('text')
+            .attr('x', d => {
+                return d.x
+            })
+            .attr('y', d => {return d.y})
+            .attr('class', 'nodelabel')
+            .attr('stroke', 'black')
+            .text(d => {return d.id})
+        console.log('rebuild pls')
         redraw()
         initTopBar()
 
@@ -193,7 +205,7 @@ export default class HomePage extends React.PureComponent { // eslint-disable-li
         function resetSelected() {
             selected_node = null
             selected_link = null
-            isAddingLink = false
+            linkingNode = null
             redraw()
         }
 
@@ -213,6 +225,9 @@ export default class HomePage extends React.PureComponent { // eslint-disable-li
             // redraw the ndes at their new position
             node.attr('cx', d => { return d.x })
                 .attr('cy', d => { return d.y })
+
+            nodelabels.attr('x', function(d) { return d.x + 12 })
+                  .attr('y', function(d) { return d.y + 3 })
         }
 
         // redraw force layout
@@ -262,6 +277,18 @@ export default class HomePage extends React.PureComponent { // eslint-disable-li
               return d === selected_node
             })
 
+            nodelabels = nodelabels.data(nodes)
+            nodelabels
+                .enter()
+                .insert("text")
+                .attr('x',function(d){
+                    return d.x
+                })
+                .attr('y',function(d){return d.y})
+                .attr('class','nodelabel')
+                .attr('stroke','black')
+                .text(function(d){return d.id})
+
             updateInfo()
 
             if (dragged) {
@@ -303,7 +330,7 @@ export default class HomePage extends React.PureComponent { // eslint-disable-li
 
         function updateStyle() {
             // apply style to indicate that the user is currently adding a link
-            if (isAddingLink) {
+            if (linkingNode) {
                 showAddingStyle('adding link')
             }
             else {
@@ -314,10 +341,10 @@ export default class HomePage extends React.PureComponent { // eslint-disable-li
         // update the tooltip and the bottom section of the page
         function updateInfo() {
             if (selected_node) {
-                fillInfo(selected_node, true, !isAddingLink && !dragged && should_show_info)
+                fillInfo(selected_node, true, !linkingNode && !dragged && should_show_info)
             }
             else if (selected_link) {
-                fillInfo(selected_link, false, !isAddingLink && !dragged && should_show_info)
+                fillInfo(selected_link, false, !linkingNode && !dragged && should_show_info)
             }
             else if (document.getElementById('bottom')) {
                 clearInfo()
@@ -410,8 +437,9 @@ export default class HomePage extends React.PureComponent { // eslint-disable-li
                     .attr('font-size', '50px')
                     .attr('font-weight', 'bold')
                     .attr('fill', '#ffe3e3')
+                    .attr('class', 'top-label')
 
-                container
+                rect
                     .attr('stroke', 'red')
                     .attr('stroke-dasharray', '10,10')
                     .attr('stroke-width', '6px')
@@ -419,8 +447,8 @@ export default class HomePage extends React.PureComponent { // eslint-disable-li
 
             // go back to the original style
             else {
-                svg.selectAll('text').remove()
-                container
+                svg.selectAll('.top-label').remove()
+                rect
                     .attr('stroke', 'black')
                     .attr('stroke-width', '1px')
                     .attr('stroke-dasharray', null)
@@ -459,7 +487,7 @@ export default class HomePage extends React.PureComponent { // eslint-disable-li
         }
 
         function onAddLinkClick() {
-            isAddingLink = true
+            linkingNode = selected_node
             redraw()
         }
 
@@ -488,10 +516,10 @@ export default class HomePage extends React.PureComponent { // eslint-disable-li
         }
 
         function onNodeClick(d) {
-            if (isAddingLink) {
+            if (linkingNode) {
                 // create a link from selected to this node
-                insertNewLink(selected_node, d)
-                isAddingLink = false
+                insertNewLink(linkingNode, d)
+                linkingNode = null
             }
             else {
                 selected_node = d
