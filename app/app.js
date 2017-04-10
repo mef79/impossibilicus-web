@@ -6,39 +6,39 @@
  */
 
 // Needed for redux-saga es6 generator support
-import 'babel-polyfill';
+import 'babel-polyfill'
 
 // Import all the third party stuff
-import React from 'react';
-import ReactDOM from 'react-dom';
-import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
-import { Provider } from 'react-redux';
-import { applyRouterMiddleware, Router, browserHistory } from 'react-router';
-import { syncHistoryWithStore } from 'react-router-redux';
-import { useScroll } from 'react-router-scroll';
-import injectTapEventPlugin from 'react-tap-event-plugin';
-import 'sanitize.css/sanitize.css';
+import React from 'react'
+import ReactDOM from 'react-dom'
+import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider'
+import { Provider } from 'react-redux'
+import { applyRouterMiddleware, Router, browserHistory } from 'react-router'
+import { syncHistoryWithStore } from 'react-router-redux'
+import { useScroll } from 'react-router-scroll'
+import injectTapEventPlugin from 'react-tap-event-plugin'
+import 'sanitize.css/sanitize.css'
 
 // Import root app
-import App from 'containers/App';
+import App from 'containers/App'
 
 // Import selector for `syncHistoryWithStore`
-import { makeSelectLocationState } from 'containers/App/selectors';
+import { makeSelectLocationState } from 'containers/App/selectors'
 
 // Import Language Provider
-import LanguageProvider from 'containers/LanguageProvider';
+import LanguageProvider from 'containers/LanguageProvider'
 
 // Load the favicon, the manifest.json file and the .htaccess file
 /* eslint-disable import/no-unresolved, import/extensions */
-import '!file-loader?name=[name].[ext]!./favicon.ico';
-import '!file-loader?name=[name].[ext]!./manifest.json';
-import 'file-loader?name=[name].[ext]!./.htaccess';
+import '!file-loader?name=[name].[ext]!./favicon.ico'
+import '!file-loader?name=[name].[ext]!./manifest.json'
+import 'file-loader?name=[name].[ext]!./.htaccess'
 /* eslint-enable import/no-unresolved, import/extensions */
 
-import configureStore from './store';
+import configureStore from './store'
 
 // Import i18n messages
-import { translationMessages } from './i18n';
+import { translationMessages } from './i18n'
 
 // Import CSS reset and Global Styles
 import './global-styles';
@@ -69,18 +69,18 @@ const rootRoute = {
 const render = (messages) => {
   ReactDOM.render(
     <Provider store={store}>
-      <MuiThemeProvider>
-      <LanguageProvider messages={messages}>
-        <Router
-          history={history}
-          routes={rootRoute}
-          render={
-            // Scroll to top when going to a new page, imitating default browser
-            // behaviour
-            applyRouterMiddleware(useScroll())
-          }
-        />
-      </LanguageProvider>
+      <MuiThemeProvider >
+        <LanguageProvider messages={messages}>
+          <Router
+            history={history}
+            routes={rootRoute}
+            render={
+              // Scroll to top when going to a new page, imitating default browser
+              // behaviour
+              applyRouterMiddleware(useScroll())
+            }
+          />
+        </LanguageProvider>
       </MuiThemeProvider>
     </Provider>,
     document.getElementById('app')
@@ -96,8 +96,8 @@ if (module.hot) {
   });
 }
 
-// Needed for onTouchTap 
-// http://stackoverflow.com/a/34015469/988941 
+// Needed for onTouchTap
+// http://stackoverflow.com/a/34015469/988941
 injectTapEventPlugin();
 
 // Chunked polyfill for browsers without Intl support

@@ -4,6 +4,7 @@ import { injectGlobal } from 'styled-components';
 injectGlobal`
   html,
   body {
+    margin:auto;
     height: 100%;
     width: 100%;
   }
@@ -13,10 +14,11 @@ injectGlobal`
   }
 
   body.fontLoaded {
-    font-family: 'Open Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-family: 'Roboto', sans-serif;
   }
 
   #app {
+    margin:20px;
     background-color: #fafafa;
     min-height: 100%;
     min-width: 100%;
@@ -33,15 +35,18 @@ injectGlobal`
   background: #dbe8fc;
   font-size: 16px;
   padding: 10px;
+  font-family: roboto;
 }
 
 #undo,
 #redo {
   margin-left: 5px;
   margin-right: 5px;
-  float: right;
   display: inline-block;
   cursor: pointer;
+}
+#load{
+  float:right;
 }
 
 #undo.disabled,
