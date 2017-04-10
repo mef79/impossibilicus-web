@@ -305,6 +305,10 @@ export default class HomePage extends React.PureComponent { // eslint-disable-li
                 .attr('stroke', 'black')
                 .text(d => d.id)
 
+            nodelabels.exit().transition()
+                .attr('font-size', '0px')
+                .remove()
+
             updateInfo()
 
             if (dragged) {
