@@ -68,14 +68,14 @@ form {
 }
 
 .node {
-  fill: #ccc;
-  stroke: #000;
+  fill: #004b7d;
+  stroke: #FFF;
   stroke-width: 1.5px;
   cursor: pointer;
 }
 
 .node_selected {
-  fill: #ff7f0e;
+  fill: #ff4a4a;
 }
 
 .link {
@@ -86,6 +86,11 @@ form {
 
 .link_selected {
   stroke: #ff7f0e;
+}
+
+.nodelabel {
+  fill: #fff;
+  stroke-width: 0px;
 }
 
 .tooltip {

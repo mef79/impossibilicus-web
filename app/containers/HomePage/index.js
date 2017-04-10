@@ -110,7 +110,9 @@ export default class HomePage extends React.PureComponent { // eslint-disable-li
         var container = svg.append('g')
 
         // build the arrow
-        svg.append('svg:defs').selectAll('marker')
+        var defs = svg.append('defs')
+
+        defs.selectAll('marker').append('marker')
             .data(['end', 'end-selected'])
             .enter()
             .append('svg:marker')    // This section adds in the arrows
@@ -125,6 +127,38 @@ export default class HomePage extends React.PureComponent { // eslint-disable-li
             .append('svg:path')
             .attr('d', 'M0,-5L10,0L0,5')
             .attr('fill', d => d === 'end-selected' ? '#ff7f0e' : '#000')
+
+        // create filter with id #drop-shadow
+        // height=130% so that the shadow is not clipped
+        var filter = defs.append('filter')
+            .attr('id', 'drop-shadow')
+            .attr('y', '-20%')
+            .attr('height', '150%');
+
+        // SourceAlpha refers to opacity of graphic that this filter will be applied to
+        // convolve that with a Gaussian with standard deviation 3 and store result
+        // in blur
+        filter.append('feGaussianBlur')
+            .attr('in', 'SourceAlpha')
+            .attr('stdDeviation', 2)
+            .attr('result', 'blur');
+
+        // translate output of Gaussian blur to the right and downwards with 2px
+        // store result in offsetBlur
+        filter.append('feOffset')
+            .attr('in', 'blur')
+            .attr('dx', 2)
+            .attr('dy', 2)
+            .attr('result', 'offsetBlur');
+
+        // overlay original SourceGraphic over translated blurred opacity by using
+        // feMerge filter. Order of specifying inputs is important!
+        var feMerge = filter.append('feMerge');
+
+        feMerge.append('feMergeNode')
+            .attr('in', 'offsetBlur')
+        feMerge.append('feMergeNode')
+            .attr('in', 'SourceGraphic');
 
         function zoomed() {
             container.attr('transform', `translate(${d3.event.translate})scale(${d3.event.scale})`)
@@ -181,7 +215,7 @@ export default class HomePage extends React.PureComponent { // eslint-disable-li
             .attr('class', d => `link ${d.type}`)
             .attr('marker-end', d => selected_link === d ? 'url(#end-selected)' : 'url(#end)')
 
-        var node = container.append('g').attr('class', 'node-group').selectAll('.node')
+        var node = container.selectAll('.node')
             .data(force.nodes())
             .enter().append('rect')
             .on('click', onNodeClick)
@@ -190,16 +224,16 @@ export default class HomePage extends React.PureComponent { // eslint-disable-li
             .attr('rx', nodeSize.rx)
             .attr('ry', nodeSize.ry)
             .attr('class', 'node')
+            .style('filter', 'url(#drop-shadow)')
             .call(node_drag)
 
-        var nodelabels = container.append('g').attr('class', 'nodelabel-group').selectAll('.nodelabel')
+        var nodelabels = container.selectAll('.nodelabel')
             .data(force.nodes())
             .enter()
             .append('text')
             .attr('x', d => d.x)
             .attr('y', d => d.y)
             .attr('class', 'nodelabel')
-            .attr('stroke', 'black')
             .text(d => d.id)
 
         redraw()
@@ -278,6 +312,7 @@ export default class HomePage extends React.PureComponent { // eslint-disable-li
                 .attr('width', nodeSize.width)
                 .attr('rx', nodeSize.rx)
                 .attr('ry', nodeSize.ry)
+                .style('filter', 'url(#drop-shadow)')
                 .on('click', onNodeClick)
                 .call(node_drag)
                 .transition()
@@ -302,7 +337,6 @@ export default class HomePage extends React.PureComponent { // eslint-disable-li
                 .attr('x', d => d.x)
                 .attr('y', d => d.y)
                 .attr('class', 'nodelabel')
-                .attr('stroke', 'black')
                 .text(d => d.id)
 
             nodelabels.exit().transition()
