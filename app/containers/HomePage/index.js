@@ -15,6 +15,7 @@
 import React from 'react'
 import * as d3 from 'd3'
 import LoadDialog from 'containers/LoadDialog'
+import FlatButton from 'material-ui/FlatButton';
 
 export default class HomePage extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
     constructor(props) {
@@ -772,18 +773,19 @@ export default class HomePage extends React.PureComponent { // eslint-disable-li
     render() {
       return (
         <div>
-          <div id="add-node">Add node</div>
-          <div id="undo">undo</div>
-          <div id="redo">redo</div>
+          <FlatButton label="Load" id="load" onClick={this.showLoadDialog}/>
+          <FlatButton id="add-node" label="Add Node"/>
+
+          <FlatButton id="undo" label="undo"/>
+          <FlatButton id="redo" label="redo"/>
+
           <div id="graph">
 
           </div>
           <div id="bottom">
               No element selected
           </div>
-          <div onClick={this.showLoadDialog}>
-              Load
-          </div>
+
           { this.renderLoadDialog() }
         </div>
       )
