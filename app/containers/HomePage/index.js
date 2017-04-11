@@ -15,7 +15,8 @@
 import React from 'react'
 import * as d3 from 'd3'
 import LoadDialog from 'containers/LoadDialog'
-import FlatButton from 'material-ui/FlatButton';
+import FlatButton from 'material-ui/FlatButton'
+import ReactDOM from 'react-dom'
 
 export default class HomePage extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
     constructor(props) {
@@ -265,7 +266,7 @@ export default class HomePage extends React.PureComponent { // eslint-disable-li
             link.attr('d', d => {
                 const prevStart = d.start ? d.start : d.source
                 const prevEnd = d.end ? d.end : d.target
-                const start = getClosestPointOnRect(prevEnd, d.source)
+                const start = getClosestMidpointOnRect(d.target, d.source)
                 const end = getClosestPointOnRect(prevStart, d.target)
                 d.start = start
                 d.end = end
@@ -419,13 +420,20 @@ export default class HomePage extends React.PureComponent { // eslint-disable-li
             removeElementsByClass('tooltip')
             var div = document.createElement('div')
             div.className = 'tooltip'
-            var offsetTop = 15
             var xSource, ySource, xTarget, yTarget
 
+            var tooltipLeft = Math.round(selected.x) - 109 // handle the tooltip width
+            var tooltipTop = Math.round(selected.y) - 64 // handle the tooltip height
+
+            // x/y to move the tooltip based on where the graph is in the page
+            var test = document.getElementById('graph')
+            var dimensions = test.getBoundingClientRect()
+            var offsetTop = dimensions.top
+            var offsetLeft = dimensions.left
+
             if (isNode) {
-                div.style.left = `${Math.round(selected.x) - 104}px`
-                div.style.top = `${Math.round(selected.y) - 48 + offsetTop}px`
-                // tooltipContent = '(' + Math.round(selected.x) + ', ' + Math.round(selected.y) + ')'
+                div.style.left = `${tooltipLeft + offsetLeft}px`
+                div.style.top = `${tooltipTop + offsetTop}px`
                 bottomContent = tooltipContent
             }
 
@@ -713,6 +721,8 @@ export default class HomePage extends React.PureComponent { // eslint-disable-li
             }
         }
 
+        // given a starting point, find the closest point along the perimeter of the given
+        // rectangle to that point
         function getClosestPointOnRect(from, rect) {
             var xmin = rect.x - nodeSize.width / 2
             var ymin = rect.y - nodeSize.height / 2
@@ -747,6 +757,28 @@ export default class HomePage extends React.PureComponent { // eslint-disable-li
             }
 
             return point
+        }
+
+        // similar to getClosestPoint, but it will only return a corner or a midpoint
+        function getClosestMidpointOnRect(from, rect) {
+            var xmin = rect.x - nodeSize.width / 2
+            var ymin = rect.y - nodeSize.height / 2
+            var xmax = rect.x + nodeSize.width / 2
+            var ymax = rect.y + nodeSize.height / 2
+
+            var points = [
+                {x: xmin, y: rect.y}, // mid left
+                {x: rect.x, y: ymin}, // top center
+                {x: rect.x, y: ymax}, // bottom center
+                {x: xmax, y: rect.y}, // mid right
+            ]
+
+            points.map(point => {
+                point['dist'] = distance(from, point)
+            })
+
+            points.sort((a, b) => a.dist - b.dist)
+            return points[0]
         }
     }
 
