@@ -96,6 +96,7 @@ form {
 .nodelabel {
   fill: #fff;
   stroke-width: 0px;
+  cursor: pointer;
 }
 
 .tooltip {

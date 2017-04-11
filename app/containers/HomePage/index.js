@@ -109,7 +109,7 @@ export default class HomePage extends React.PureComponent { // eslint-disable-li
             .attr('stroke', 'black')
             .style('pointer-events', 'all')
 
-        var container = svg.append('g')
+        var container = svg.append('g').attr('class', 'transformer')
 
         // build the arrow
         var defs = svg.append('defs')
@@ -135,7 +135,7 @@ export default class HomePage extends React.PureComponent { // eslint-disable-li
         var filter = defs.append('filter')
             .attr('id', 'drop-shadow')
             .attr('y', '-20%')
-            .attr('height', '150%');
+            .attr('height', '150%')
 
         // SourceAlpha refers to opacity of graphic that this filter will be applied to
         // convolve that with a Gaussian with standard deviation 3 and store result
@@ -143,7 +143,7 @@ export default class HomePage extends React.PureComponent { // eslint-disable-li
         filter.append('feGaussianBlur')
             .attr('in', 'SourceAlpha')
             .attr('stdDeviation', 2)
-            .attr('result', 'blur');
+            .attr('result', 'blur')
 
         // translate output of Gaussian blur to the right and downwards with 2px
         // store result in offsetBlur
@@ -151,16 +151,16 @@ export default class HomePage extends React.PureComponent { // eslint-disable-li
             .attr('in', 'blur')
             .attr('dx', 2)
             .attr('dy', 2)
-            .attr('result', 'offsetBlur');
+            .attr('result', 'offsetBlur')
 
         // overlay original SourceGraphic over translated blurred opacity by using
         // feMerge filter. Order of specifying inputs is important!
-        var feMerge = filter.append('feMerge');
+        var feMerge = filter.append('feMerge')
 
         feMerge.append('feMergeNode')
             .attr('in', 'offsetBlur')
         feMerge.append('feMergeNode')
-            .attr('in', 'SourceGraphic');
+            .attr('in', 'SourceGraphic')
 
         function zoomed() {
             container.attr('transform', `translate(${d3.event.translate})scale(${d3.event.scale})`)
@@ -233,6 +233,7 @@ export default class HomePage extends React.PureComponent { // eslint-disable-li
             .data(force.nodes())
             .enter()
             .append('text')
+            .on('click', onNodeClick)
             .attr('x', d => d.x)
             .attr('y', d => d.y)
             .attr('class', 'nodelabel')
@@ -336,6 +337,7 @@ export default class HomePage extends React.PureComponent { // eslint-disable-li
             nodelabels
                 .enter()
                 .insert('text')
+                .on('click', onNodeClick)
                 .attr('x', d => d.x)
                 .attr('y', d => d.y)
                 .attr('class', 'nodelabel')
@@ -422,16 +424,31 @@ export default class HomePage extends React.PureComponent { // eslint-disable-li
             div.className = 'tooltip'
             var xSource, ySource, xTarget, yTarget
 
-            var tooltipLeft = Math.round(selected.x) - 109 // handle the tooltip width
-            var tooltipTop = Math.round(selected.y) - 64 // handle the tooltip height
+            var t = d3.transform(d3.select('.transformer').attr('transform'))
 
-            // x/y to move the tooltip based on where the graph is in the page
-            var test = document.getElementById('graph')
-            var dimensions = test.getBoundingClientRect()
-            var offsetTop = dimensions.top
-            var offsetLeft = dimensions.left
+            // start with just positioning it based on the current scale
+            var tooltipLeft = Math.round(selected.x) * t.scale[0]
+            var tooltipTop = Math.round(selected.y) * t.scale[1]
 
+            // then account for the current translate
+            tooltipLeft += t.translate[0]
+            tooltipTop += t.translate[1]
+
+            // THEN, account for the size of the node (since x/y are at the center)
+            tooltipLeft -= t.scale[0] * nodeSize.width / 2
+            tooltipTop -= t.scale[1] * nodeSize.height / 2
+
+            // finally, account for the size of the tooltip
+            tooltipLeft -= 60
+            tooltipTop -= 50
+
+            // ok, FINALLY finally, account for the page offset
             if (isNode) {
+                var test = document.getElementById('graph')
+                var dimensions = test.getBoundingClientRect()
+                var offsetTop = dimensions.top
+                var offsetLeft = dimensions.left
+
                 div.style.left = `${tooltipLeft + offsetLeft}px`
                 div.style.top = `${tooltipTop + offsetTop}px`
                 bottomContent = tooltipContent
@@ -767,14 +784,15 @@ export default class HomePage extends React.PureComponent { // eslint-disable-li
             var ymax = rect.y + nodeSize.height / 2
 
             var points = [
-                {x: xmin, y: rect.y}, // mid left
-                {x: rect.x, y: ymin}, // top center
-                {x: rect.x, y: ymax}, // bottom center
-                {x: xmax, y: rect.y}, // mid right
+                { x: xmin, y: rect.y }, // mid left
+                { x: rect.x, y: ymin }, // top center
+                { x: rect.x, y: ymax }, // bottom center
+                { x: xmax, y: rect.y }  // mid right
             ]
 
             points.map(point => {
-                point['dist'] = distance(from, point)
+                point.dist = distance(from, point)
+                return point
             })
 
             points.sort((a, b) => a.dist - b.dist)
@@ -805,11 +823,11 @@ export default class HomePage extends React.PureComponent { // eslint-disable-li
     render() {
       return (
         <div>
-          <FlatButton label="Load" id="load" onClick={this.showLoadDialog}/>
-          <FlatButton id="add-node" label="Add Node"/>
+          <FlatButton label="Load" id="load" onClick={ this.showLoadDialog } />
+          <FlatButton id="add-node" label="Add Node" />
 
-          <FlatButton id="undo" label="undo"/>
-          <FlatButton id="redo" label="redo"/>
+          <FlatButton id="undo" label="undo" />
+          <FlatButton id="redo" label="redo" />
 
           <div id="graph">
 
