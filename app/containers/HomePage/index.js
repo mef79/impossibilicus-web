@@ -12,21 +12,23 @@
  /* ignore lots of eslint functions because d3 */
  /* eslint no-unused-vars: 0, indent: 0, no-param-reassign:0, no-var: 0, camelcase: 0, prefer-arrow-callback: 0, no-shadow: 0, no-mixed-operators: 0 */
 
-import React from 'react'
+import React, { PropTypes } from 'react'
 import * as d3 from 'd3'
 import LoadDialog from 'containers/LoadDialog'
 import FlatButton from 'material-ui/FlatButton'
 import ReactDOM from 'react-dom'
+import { loadStories } from '../LoadDialog/actions'
+import { connect } from 'react-redux'
+import { makeSelectStories } from 'containers/LoadDialog/selectors'
+import { createStructuredSelector } from 'reselect'
+import { showLoadDialog, hideLoadDialog } from './actions'
+import { makeSelectShowLoadDialog } from './selectors'
 
-export default class HomePage extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
+
+export class HomePage extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
     constructor(props) {
         super(props)
         this.renderLoadDialog = this.renderLoadDialog.bind(this)
-        this.showLoadDialog = this.showLoadDialog.bind(this)
-        this.closeLoadDialog = this.closeLoadDialog.bind(this)
-        this.state = {
-            showLoadDialog: false
-        }
     }
 
     componentDidMount() {
@@ -800,22 +802,13 @@ export default class HomePage extends React.PureComponent { // eslint-disable-li
         }
     }
 
-    showLoadDialog() {
-        this.setState({
-            showLoadDialog: true
-        })
-    }
-
-    closeLoadDialog() {
-        this.setState({
-            showLoadDialog: false
-        })
-    }
-
     renderLoadDialog() {
-        if (this.state.showLoadDialog) {
+        if (this.props.showLoadDialog) {
             return (
-              <LoadDialog close={ this.closeLoadDialog } />
+              <LoadDialog
+                close={ this.props.onCloseClick }
+                stories={ this.props.stories }
+              />
             )
         }
     }
@@ -823,7 +816,7 @@ export default class HomePage extends React.PureComponent { // eslint-disable-li
     render() {
       return (
         <div>
-          <FlatButton label="Load" id="load" onClick={ this.showLoadDialog } />
+          <FlatButton label="Load" id="load" onClick={ this.props.onLoadClick } />
           <FlatButton id="add-node" label="Add Node" />
 
           <FlatButton id="undo" label="undo" />
@@ -841,3 +834,33 @@ export default class HomePage extends React.PureComponent { // eslint-disable-li
       )
     }
 }
+
+HomePage.propTypes = {
+    onLoadClick: React.PropTypes.func,
+    onCloseClick: React.PropTypes.func,
+    showLoadDialog: React.PropTypes.bool.isRequired,
+    stories: React.PropTypes.oneOfType([
+        React.PropTypes.array,
+        React.PropTypes.object
+    ])
+}
+
+const mapStateToProps = createStructuredSelector({
+  showLoadDialog: makeSelectShowLoadDialog(),
+  stories: makeSelectStories()
+})
+
+export function mapDispatchToProps(dispatch) {
+  return {
+    onLoadClick: (evt) => {
+      console.log('clicked')
+      dispatch(showLoadDialog())
+      dispatch(loadStories())
+    },
+    onCloseClick: evt => {
+      dispatch(hideLoadDialog())
+    }
+  }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(HomePage)

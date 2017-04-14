@@ -4,7 +4,7 @@
 // about the code splitting business
 import { getAsyncInjectors } from 'utils/asyncInjectors'
 
-const errorLoading = (err) => {
+const errorLoading = err => {
   console.error('Dynamic page loading failed', err) // eslint-disable-line no-console
 }
 
@@ -23,18 +23,19 @@ export default function createRoutes(store) {
       getComponent(nextState, cb) {
         const importModules = Promise.all([
           import('containers/HomePage'),
+          import('containers/StoryList/sagas')
         ])
 
         const renderRoute = loadModule(cb)
 
-        importModules.then(([component]) => {
+        importModules.then(([component, sagas]) => {
           // injectReducer('loadDialog', loadDialogReducer.default)
-
+          injectSagas(sagas.default)
           renderRoute(component)
         })
 
         importModules.catch(errorLoading)
-      },
+      }
     }, {
       path: '*',
       name: 'notfound',
@@ -42,7 +43,7 @@ export default function createRoutes(store) {
         import('containers/NotFoundPage')
           .then(loadModule(cb))
           .catch(errorLoading)
-      },
-    },
+      }
+    }
   ]
 }

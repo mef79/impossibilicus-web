@@ -14,15 +14,13 @@ export class StoryListItem extends React.PureComponent { // eslint-disable-line 
     return (
       <Story
         item={this.props.item}
-        isSelected={this.props.selected}
       />
     )
   }
 }
 
 StoryListItem.propTypes = {
-  item: PropTypes.object.isRequired,
-  selected: PropTypes.bool.isRequired
+  item: PropTypes.object.isRequired
 }
 
 const mapStateToProps = createSelector(

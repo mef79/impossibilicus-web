@@ -1,4 +1,4 @@
-import { injectGlobal } from 'styled-components';
+import { injectGlobal } from 'styled-components'
 
 /* eslint no-unused-expressions: 0 */
 injectGlobal`
@@ -36,6 +36,10 @@ injectGlobal`
   font-size: 16px;
   padding: 10px;
   font-family: roboto;
+}
+
+tbody tr:nth-child(odd) {
+   background-color: #fff;
 }
 
 #undo,
@@ -150,4 +154,4 @@ form {
     margin-left: 3px;
     margin-right: 3px;
 }
-`;
+`

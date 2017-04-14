@@ -4,18 +4,21 @@
 *
 */
 
-import React from 'react'
+import React, { PropTypes } from 'react'
 import StoryListItem from 'containers/StoryListItem'
 import Table from './Table'
 import Thead from './Thead'
 import Th from './Th'
+import { makeSelectStories } from 'containers/LoadDialog/selectors'
+import { createStructuredSelector } from 'reselect'
+import { connect } from 'react-redux'
 
 function StoryList(props) {
   let content
 
   // render the items as story list items
-  if (props.items.length > 0) {
-    content = props.items.map((item, index) => (
+  if (props.stories && props.stories.length > 0) {
+    content = props.stories.map((item, index) => (
       <StoryListItem
         key={`item-${index}`}
         item={item}
@@ -27,7 +30,7 @@ function StoryList(props) {
   else {
     content = (
       <tr>
-        <td colSpan="3" style={ { padding: '10px' } }>
+        <td colSpan="5" style={ { padding: '10px' } }>
           No stories found
         </td>
       </tr>
@@ -38,6 +41,8 @@ function StoryList(props) {
       <Thead>
         <tr>
           <Th>Name</Th>
+          <Th>Nodes</Th>
+          <Th>Links</Th>
           <Th>Last Modified</Th>
           <Th>Created</Th>
         </tr>
@@ -50,8 +55,18 @@ function StoryList(props) {
 }
 
 StoryList.propTypes = {
-  items: React.PropTypes.array
-  // selected: React.PropTypes.object
+  stories: PropTypes.array,
+  // loading: PropTypes.bool,
+  // error: React.PropTypes.oneOfType([
+  //   React.PropTypes.object,
+  //   React.PropTypes.bool
+  // ])
 }
 
-export default StoryList
+const mapStateToProps = createStructuredSelector({
+  stories: makeSelectStories(),
+  // loading: makeSelectLoading(),
+  // error: makeSelectError()
+})
+
+export default connect(mapStateToProps)(StoryList)

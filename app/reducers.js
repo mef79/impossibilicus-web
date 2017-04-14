@@ -10,6 +10,7 @@ import { LOCATION_CHANGE } from 'react-router-redux'
 import languageProviderReducer from 'containers/LanguageProvider/reducer'
 import loadDialogReducer from 'containers/LoadDialog/reducer'
 import storyListReducer from 'containers/StoryList/reducer'
+import homeReducer from 'containers/HomePage/reducers'
 
 /*
  * routeReducer
@@ -45,6 +46,7 @@ function routeReducer(state = routeInitialState, action) {
 export default function createReducer(asyncReducers) {
   return combineReducers({
     route: routeReducer,
+    home: homeReducer,
     language: languageProviderReducer,
     loadDialog: loadDialogReducer,
     storyList: storyListReducer,
