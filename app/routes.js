@@ -23,14 +23,16 @@ export default function createRoutes(store) {
       getComponent(nextState, cb) {
         const importModules = Promise.all([
           import('containers/HomePage'),
+          import('containers/HomePage/sagas'),
           import('containers/StoryList/sagas')
         ])
 
         const renderRoute = loadModule(cb)
 
-        importModules.then(([component, sagas]) => {
+        importModules.then(([component, homeSagas, listSagas]) => {
           // injectReducer('loadDialog', loadDialogReducer.default)
-          injectSagas(sagas.default)
+          injectSagas(homeSagas.default)
+          injectSagas(listSagas.default)
           renderRoute(component)
         })
 

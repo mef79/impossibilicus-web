@@ -1,2 +1,6 @@
 export const SHOW_LOAD_DIALOG = 'proj/Home/SHOW_LOAD_DIALOG'
 export const HIDE_LOAD_DIALOG = 'proj/Home/HIDE_LOAD_DIALOG'
+export const LOAD_STORY = 'proj/Home/LOAD_STORY'
+export const LOAD_STORY_SUCCESS = 'proj/Home/LOAD_STORY_SUCCESS'
+export const LOAD_STORY_ERROR = 'proj/Home/LOAD_STORY_ERROR'
+export const SET_CURRENT_STORY = 'proj/Home/SET_CURRENT_STORY'

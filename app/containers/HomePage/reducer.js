@@ -13,7 +13,10 @@ import { fromJS } from 'immutable'
 
 import {
   SHOW_LOAD_DIALOG,
-  HIDE_LOAD_DIALOG
+  HIDE_LOAD_DIALOG,
+  LOAD_STORY,
+  LOAD_STORY_SUCCESS,
+  SET_CURRENT_STORY
 } from './constants'
 
 // The initial state of the App
@@ -30,6 +33,15 @@ function homeReducer(state = initialState, action) {
     case HIDE_LOAD_DIALOG:
       return state
         .set('showLoadDialog', false)
+    case LOAD_STORY:
+      return state
+        .set('loadStory', action.story)
+    case SET_CURRENT_STORY:
+      return state
+        .set('currentStory', action.currentStory)
+    case LOAD_STORY_SUCCESS:
+      return state
+        .set('storyData', action.story)
     default:
       return state
   }

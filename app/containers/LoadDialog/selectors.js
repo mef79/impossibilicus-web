@@ -10,34 +10,23 @@ const selectLoadDialogDomain = (state) => {
 /**
  * Other specific selectors
  */
-const makeSelectLoading = () => createSelector(
+const getLoadingState = () => createSelector(
   selectLoadDialogDomain,
-  (substate) => substate.get('loading')
+  (loadDialogState) => loadDialogState.get('loading')
 )
 
-const makeSelectError = () => createSelector(
+const getLoadingError = () => createSelector(
   selectLoadDialogDomain,
-  (substate) => substate.get('error')
+  (loadDialogState) => loadDialogState.get('error')
 )
 
-const makeSelectStories = () => createSelector(
+const getLoadedStories = () => createSelector(
   selectLoadDialogDomain,
-  (substate) => substate.get('stories')
+  (loadDialogState) => loadDialogState.get('stories')
 )
 
-/**
- * Default selector used by LoadDialog
- */
-
-const makeSelectLoadDialog = () => createSelector(
-  selectLoadDialogDomain,
-  (substate) => substate.toJS()
-)
-
-export default makeSelectLoadDialog
 export {
-  selectLoadDialogDomain,
-  makeSelectStories,
-  makeSelectError,
-  makeSelectLoading
+  getLoadedStories,
+  getLoadingError,
+  getLoadingState
 }

@@ -6,26 +6,36 @@
 import React, { PropTypes } from 'react'
 import { connect } from 'react-redux'
 import Story from 'components/Story'
-import { createSelector } from 'reselect'
-import { makeSelectStoryList } from '../StoryList/selectors'
+import { createStructuredSelector } from 'reselect'
+import { makeSelectCurrentStory } from 'containers/HomePage/selectors'
+import { setCurrentStory } from 'containers/HomePage/actions'
 
 export class StoryListItem extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   render() {
     return (
       <Story
-        item={this.props.item}
+        item={ this.props.item }
+        selectStory={ this.props.onStoryClick }
       />
     )
   }
 }
 
 StoryListItem.propTypes = {
-  item: PropTypes.object.isRequired
+  item: PropTypes.object.isRequired,
+  onStoryClick: PropTypes.function
 }
 
-const mapStateToProps = createSelector(
-  makeSelectStoryList(),
-  (name) => ({ name })
-)
+const mapStateToProps = createStructuredSelector({
+  selectStory: makeSelectCurrentStory()
+})
 
-export default connect(mapStateToProps)(StoryListItem)
+export function mapDispatchToProps(dispatch) {
+  return {
+    onStoryClick: (evt) => {
+      dispatch(setCurrentStory(evt.target.innerText))
+    }
+  }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(StoryListItem)

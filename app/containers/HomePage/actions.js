@@ -17,7 +17,11 @@
 
 import {
   SHOW_LOAD_DIALOG,
-  HIDE_LOAD_DIALOG
+  HIDE_LOAD_DIALOG,
+  LOAD_STORY,
+  LOAD_STORY_SUCCESS,
+  LOAD_STORY_ERROR,
+  SET_CURRENT_STORY
 } from './constants'
 
 export function showLoadDialog() {
@@ -29,5 +33,32 @@ export function showLoadDialog() {
 export function hideLoadDialog() {
   return {
     type: HIDE_LOAD_DIALOG
+  }
+}
+
+export function loadStory() {
+  return {
+    type: LOAD_STORY
+  }
+}
+
+export function storyLoaded(story) {
+  return {
+    type: LOAD_STORY_SUCCESS,
+    story
+  }
+}
+
+export function storyLoadError(error) {
+  return {
+    type: LOAD_STORY_ERROR,
+    error
+  }
+}
+
+export function setCurrentStory(currentStory) {
+  return {
+    type: SET_CURRENT_STORY,
+    currentStory
   }
 }

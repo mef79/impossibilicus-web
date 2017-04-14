@@ -1,15 +1,9 @@
-/**
-*
-* StoryList
-*
-*/
-
 import React, { PropTypes } from 'react'
 import StoryListItem from 'containers/StoryListItem'
 import Table from './Table'
 import Thead from './Thead'
 import Th from './Th'
-import { makeSelectStories } from 'containers/LoadDialog/selectors'
+import { getLoadedStories } from 'containers/LoadDialog/selectors'
 import { createStructuredSelector } from 'reselect'
 import { connect } from 'react-redux'
 
@@ -55,18 +49,11 @@ function StoryList(props) {
 }
 
 StoryList.propTypes = {
-  stories: PropTypes.array,
-  // loading: PropTypes.bool,
-  // error: React.PropTypes.oneOfType([
-  //   React.PropTypes.object,
-  //   React.PropTypes.bool
-  // ])
+  stories: PropTypes.array
 }
 
 const mapStateToProps = createStructuredSelector({
-  stories: makeSelectStories(),
-  // loading: makeSelectLoading(),
-  // error: makeSelectError()
+  stories: getLoadedStories()
 })
 
 export default connect(mapStateToProps)(StoryList)

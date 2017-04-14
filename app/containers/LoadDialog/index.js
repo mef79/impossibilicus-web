@@ -1,9 +1,3 @@
-/*
- *
- * LoadDialog
- *
- */
-
 import React, { PropTypes } from 'react'
 import { connect } from 'react-redux'
 import { createStructuredSelector } from 'reselect'
@@ -11,7 +5,9 @@ import Modal from 'react-modal'
 import ModalHeader from 'components/ModalHeader'
 import ModalClose from 'components/ModalClose'
 import StoryList from 'containers/StoryList'
-import { makeSelectStories, makeSelectLoading, makeSelectError } from './selectors'
+import LoadButton from 'components/LoadButton'
+import { getLoadedStories, getLoadingState, getLoadingError } from './selectors'
+import { loadStory, hideLoadDialog } from 'containers/HomePage/actions'
 
 export class LoadDialog extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   render() {
@@ -20,6 +16,7 @@ export class LoadDialog extends React.PureComponent { // eslint-disable-line rea
         <ModalHeader>Load Story</ModalHeader>
         <ModalClose onClick={this.props.close}>x</ModalClose>
         <StoryList stories={this.props.stories} />
+        <LoadButton onClickLoad={ this.props.onLoadClick }>Load</LoadButton>
       </Modal>
     )
   }
@@ -27,14 +24,23 @@ export class LoadDialog extends React.PureComponent { // eslint-disable-line rea
 
 LoadDialog.propTypes = {
   close: PropTypes.func.isRequired,
-  stories: PropTypes.array
+  stories: PropTypes.array,
+  onLoadClick: PropTypes.func
 }
 
 const mapStateToProps = createStructuredSelector({
-  stories: makeSelectStories(),
-  loading: makeSelectLoading(),
-  error: makeSelectError()
+  stories: getLoadedStories(),
+  loading: getLoadingState(),
+  error: getLoadingError()
 })
 
-export default connect(mapStateToProps)(LoadDialog)
+export function mapDispatchToProps(dispatch) {
+  return {
+    onLoadClick: () => {
+      dispatch(loadStory())
+      dispatch(hideLoadDialog())
+    }
+  }
+}
 
+export default connect(mapStateToProps, mapDispatchToProps)(LoadDialog)

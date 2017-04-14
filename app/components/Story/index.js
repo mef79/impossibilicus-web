@@ -11,7 +11,7 @@ import FormattedDate from 'components/FormattedDate'
 function Story(props) {
   return (
     <tr>
-      <Td onClick={ function () { console.log('loaded a story') } }>{ props.item.name }</Td>
+      <Td onClick={ props.selectStory }>{ props.item.name }</Td>
       <Td>{props.item.nodes.length}</Td>
       <Td>{props.item.links.length}</Td>
       <Td><FormattedDate date={props.item.lastModified} /></Td>
@@ -21,7 +21,8 @@ function Story(props) {
 }
 
 Story.propTypes = {
-  item: React.PropTypes.object.isRequired
+  item: React.PropTypes.object.isRequired,
+  selectStory: React.PropTypes.func.isRequired
 }
 
 export default Story

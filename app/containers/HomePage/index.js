@@ -19,10 +19,10 @@ import FlatButton from 'material-ui/FlatButton'
 import ReactDOM from 'react-dom'
 import { loadStories } from '../LoadDialog/actions'
 import { connect } from 'react-redux'
-import { makeSelectStories } from 'containers/LoadDialog/selectors'
+import { getLoadedStories } from 'containers/LoadDialog/selectors'
 import { createStructuredSelector } from 'reselect'
 import { showLoadDialog, hideLoadDialog } from './actions'
-import { makeSelectShowLoadDialog } from './selectors'
+import { makeSelectShowLoadDialog, makeSelectCurrentStory, makeSelectStoryData } from './selectors'
 
 
 export class HomePage extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
@@ -842,18 +842,21 @@ HomePage.propTypes = {
     stories: React.PropTypes.oneOfType([
         React.PropTypes.array,
         React.PropTypes.object
-    ])
+    ]),
+    currentStory: React.PropTypes.string,
+    storyData: React.PropTypes.object
 }
 
 const mapStateToProps = createStructuredSelector({
   showLoadDialog: makeSelectShowLoadDialog(),
-  stories: makeSelectStories()
+  stories: getLoadedStories(),
+  currentStory: makeSelectCurrentStory(),
+  storyData: makeSelectStoryData()
 })
 
 export function mapDispatchToProps(dispatch) {
   return {
     onLoadClick: (evt) => {
-      console.log('clicked')
       dispatch(showLoadDialog())
       dispatch(loadStories())
     },
