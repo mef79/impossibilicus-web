@@ -23,7 +23,7 @@ export class StoryListItem extends React.PureComponent { // eslint-disable-line 
 
 StoryListItem.propTypes = {
   item: PropTypes.object.isRequired,
-  onStoryClick: PropTypes.function
+  onStoryClick: PropTypes.func
 }
 
 const mapStateToProps = createStructuredSelector({

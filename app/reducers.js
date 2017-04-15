@@ -11,6 +11,7 @@ import languageProviderReducer from 'containers/LanguageProvider/reducer'
 import loadDialogReducer from 'containers/LoadDialog/reducer'
 import homeReducer from 'containers/HomePage/reducer'
 import formPaneReducer from 'containers/FormPane/reducer'
+import graphReducer from 'containers/Graph/reducer'
 
 /*
  * routeReducer
@@ -50,6 +51,7 @@ export default function createReducer(asyncReducers) {
     language: languageProviderReducer,
     loadDialog: loadDialogReducer,
     formPane: formPaneReducer,
+    graph: graphReducer,
     ...asyncReducers
   })
 }

@@ -1,6 +1,6 @@
 /*
  *
- * {{ properCase name }} reducer
+ * Graph reducer
  *
  */
 
@@ -11,7 +11,7 @@ import {
 
 const initialState = fromJS({})
 
-function {{ camelCase name }}Reducer(state = initialState, action) {
+function graphReducer(state = initialState, action) {
   switch (action.type) {
     case DEFAULT_ACTION:
       return state
@@ -20,4 +20,4 @@ function {{ camelCase name }}Reducer(state = initialState, action) {
   }
 }
 
-export default {{ camelCase name }}Reducer
+export default graphReducer
