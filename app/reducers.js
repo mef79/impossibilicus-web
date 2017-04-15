@@ -10,6 +10,8 @@ import { LOCATION_CHANGE } from 'react-router-redux'
 import languageProviderReducer from 'containers/LanguageProvider/reducer'
 import loadDialogReducer from 'containers/LoadDialog/reducer'
 import storyListReducer from 'containers/StoryList/reducer'
+import formPaneReducer from 'containers/FormPane/reducer'
+
 
 /*
  * routeReducer
@@ -48,6 +50,7 @@ export default function createReducer(asyncReducers) {
     language: languageProviderReducer,
     loadDialog: loadDialogReducer,
     storyList: storyListReducer,
+    formPane: formPaneReducer,
     ...asyncReducers
   })
 }

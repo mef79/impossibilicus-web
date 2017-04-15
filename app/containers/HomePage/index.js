@@ -9,14 +9,17 @@
  * the linting exception.
  */
 
- /* ignore lots of eslint functions because d3 */
- /* eslint no-unused-vars: 0, indent: 0, no-param-reassign:0, no-var: 0, camelcase: 0, prefer-arrow-callback: 0, no-shadow: 0, no-mixed-operators: 0 */
+/* ignore lots of eslint functions because d3 */
+/* eslint no-unused-vars: 0, indent: 0, no-param-reassign:0, no-var: 0, camelcase: 0, prefer-arrow-callback: 0, no-shadow: 0, no-mixed-operators: 0 */
 
 import React from 'react'
 import * as d3 from 'd3'
 import LoadDialog from 'containers/LoadDialog'
 import FlatButton from 'material-ui/FlatButton'
 import ReactDOM from 'react-dom'
+import Flexbox from 'flexbox-react';
+import FormPane from 'containers/FormPane'
+import {Toolbar, ToolbarGroup, ToolbarSeparator, ToolbarTitle} from 'material-ui/Toolbar';
 
 export default class HomePage extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
     constructor(props) {
@@ -279,7 +282,7 @@ export default class HomePage extends React.PureComponent { // eslint-disable-li
                 .attr('y', d => d.y - nodeSize.height / 2)
 
             nodelabels.attr('x', d => d.x - nodeSize.width / 2 + 6)
-                  .attr('y', d => d.y + 4)
+                .attr('y', d => d.y + 4)
         }
 
         // redraw force layout
@@ -798,7 +801,7 @@ export default class HomePage extends React.PureComponent { // eslint-disable-li
             points.sort((a, b) => a.dist - b.dist)
             return points[0]
         }
-    }
+}
 
     showLoadDialog() {
         this.setState({
@@ -812,32 +815,42 @@ export default class HomePage extends React.PureComponent { // eslint-disable-li
         })
     }
 
+
     renderLoadDialog() {
         if (this.state.showLoadDialog) {
             return (
-              <LoadDialog close={ this.closeLoadDialog } />
+                <LoadDialog close={ this.closeLoadDialog } />
             )
         }
     }
 
     render() {
-      return (
-        <div>
-          <FlatButton label="Load" id="load" onClick={ this.showLoadDialog } />
-          <FlatButton id="add-node" label="Add Node" />
-
-          <FlatButton id="undo" label="undo" />
-          <FlatButton id="redo" label="redo" />
-
-          <div id="graph">
-
-          </div>
-          <div id="bottom">
-              No element selected
-          </div>
-
-          { this.renderLoadDialog() }
-        </div>
-      )
+        return (
+            <Flexbox flexDirection="column" minHeight="100%" >
+                <Toolbar>
+                    <ToolbarGroup firstChild={true}>
+                        <FlatButton id="add-node" label="Add Node" />
+                        <FlatButton id="undo" label="undo" />
+                        <FlatButton id="redo" label="redo"/>
+                    </ToolbarGroup>
+                    <ToolbarGroup>
+                        <FlatButton label="Load" id="load" onClick={this.showLoadDialog} />
+                    </ToolbarGroup>
+                </Toolbar>
+                <Flexbox flexDirection="row" alignItems="stretch" justifyContent='center' height='100%' minHeight='100%'>
+                <div className="sectionContainer">
+                    <div>
+                        <div id="graph">
+                        </div>
+                        <div id="bottom">
+                            No element selected
+                        </div>
+                    </div>
+                </div>
+                <FormPane />
+            </Flexbox>
+            {this.renderLoadDialog()}
+        </Flexbox>
+        )
     }
 }
