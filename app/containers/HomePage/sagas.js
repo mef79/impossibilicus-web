@@ -10,7 +10,7 @@ import { makeSelectCurrentStory } from './selectors'
  */
 export function* getStory() {
   const storyName = yield select(makeSelectCurrentStory())
-  const requestURL = `http://localhost:5000/story/${storyName}`
+  const requestURL = `${process.env.API_HOST}/story/${storyName}`
   try {
     // Call our request helper (see 'utils/request')
     const story = yield call(request, requestURL)

@@ -8,7 +8,7 @@ import { call, put, takeLatest } from 'redux-saga/effects'
  * Github repos request/response handler
  */
 export function* getStories() {
-  const requestURL = 'http://localhost:5000/stories'
+  const requestURL = `${process.env.API_HOST}/stories`
   try {
     // Call our request helper (see 'utils/request')
     const repos = yield call(request, requestURL)
