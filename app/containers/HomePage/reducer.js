@@ -16,13 +16,19 @@ import {
   HIDE_LOAD_DIALOG,
   LOAD_STORY,
   LOAD_STORY_SUCCESS,
-  SET_CURRENT_STORY
+  SET_CURRENT_STORY,
+  CLEAR_STORY_DATA
 } from './constants'
 
 // The initial state of the App
 const initialState = fromJS({
   showLoadDialog: false,
-  stories: []
+  currentStory: false,
+  stories: [],
+  storyData: {
+    nodes: [],
+    links: []
+  }
 })
 
 function homeReducer(state = initialState, action) {
@@ -42,6 +48,9 @@ function homeReducer(state = initialState, action) {
     case LOAD_STORY_SUCCESS:
       return state
         .set('storyData', action.story)
+    case CLEAR_STORY_DATA:
+      return state
+        .set('storyData', false)
     default:
       return state
   }

@@ -21,7 +21,8 @@ import {
   LOAD_STORY,
   LOAD_STORY_SUCCESS,
   LOAD_STORY_ERROR,
-  SET_CURRENT_STORY
+  SET_CURRENT_STORY,
+  CLEAR_STORY_DATA
 } from './constants'
 
 export function showLoadDialog() {
@@ -60,5 +61,11 @@ export function setCurrentStory(currentStory) {
   return {
     type: SET_CURRENT_STORY,
     currentStory
+  }
+}
+
+export function clearStoryData() {
+  return {
+    type: CLEAR_STORY_DATA
   }
 }

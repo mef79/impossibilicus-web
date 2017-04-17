@@ -80,8 +80,14 @@ HomePage.propTypes = {
     PropTypes.array,
     PropTypes.object
   ]),
-  currentStory: PropTypes.string,
-  storyData: PropTypes.object
+  currentStory: PropTypes.oneOfType([
+    PropTypes.string,
+    PropTypes.bool
+  ]),
+  storyData: PropTypes.oneOfType([
+    PropTypes.object,
+    PropTypes.bool
+  ])
 }
 
 const mapStateToProps = createStructuredSelector({
