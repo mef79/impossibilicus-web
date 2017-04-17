@@ -11,7 +11,11 @@ import 'babel-polyfill'
 // Import all the third party stuff
 import React from 'react'
 import ReactDOM from 'react-dom'
-import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider'
+import 'jquery'
+import tether from 'tether';
+global.Tether = tether;
+import bootstrap from './bootstrap/js/bootstrap.min.js'
+import '!!style-loader!css-loader!./bootstrap/css/bootstrap.css'
 import { Provider } from 'react-redux'
 import { applyRouterMiddleware, Router, browserHistory } from 'react-router'
 import { syncHistoryWithStore } from 'react-router-redux'
@@ -69,19 +73,17 @@ const rootRoute = {
 const render = (messages) => {
   ReactDOM.render(
     <Provider store={store}>
-      <MuiThemeProvider >
-        <LanguageProvider messages={messages}>
-          <Router
-            history={history}
-            routes={rootRoute}
-            render={
-              // Scroll to top when going to a new page, imitating default browser
-              // behaviour
-              applyRouterMiddleware(useScroll())
-            }
-          />
-        </LanguageProvider>
-      </MuiThemeProvider>
+      <LanguageProvider messages={messages}>
+        <Router
+          history={history}
+          routes={rootRoute}
+          render={
+            // Scroll to top when going to a new page, imitating default browser
+            // behaviour
+            applyRouterMiddleware(useScroll())
+          }
+        />
+      </LanguageProvider>
     </Provider>,
     document.getElementById('app')
   );

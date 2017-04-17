@@ -96,7 +96,7 @@ tbody tr:nth-child(odd) {
 }
 
 .savebutton{
-    width: 100px,
+    width: 100px;
     align-self: flex-end
 }
 

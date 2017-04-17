@@ -13,7 +13,6 @@
 
 import React, { PropTypes } from 'react'
 import LoadDialog from 'containers/LoadDialog'
-import FlatButton from 'material-ui/FlatButton'
 import { loadStories } from '../LoadDialog/actions'
 import { connect } from 'react-redux'
 import { getLoadedStories } from 'containers/LoadDialog/selectors'
@@ -22,7 +21,6 @@ import { showLoadDialog, hideLoadDialog } from './actions'
 import { getLoadDialogVisibility, getCurrentStory, getLoadedStoryData } from './selectors'
 import Flexbox from 'flexbox-react'
 import FormPane from 'containers/FormPane'
-import { Toolbar, ToolbarGroup } from 'material-ui/Toolbar'
 import Graph from 'containers/Graph'
 
 export class HomePage extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
@@ -43,16 +41,16 @@ export class HomePage extends React.PureComponent { // eslint-disable-line react
   render() {
     return (
       <Flexbox flexDirection="column" minHeight="100%" >
-        <Toolbar>
-          <ToolbarGroup firstChild={true}>
-            <FlatButton id="add-node" label="Add Node" />
-            <FlatButton id="undo" label="undo" />
-            <FlatButton id="redo" label="redo" />
-          </ToolbarGroup>
-          <ToolbarGroup>
-            <FlatButton label="Load" id="load" onClick={this.props.onLoadClick} />
-          </ToolbarGroup>
-        </Toolbar>
+        <div>
+          <div >
+            <button id="add-node" label="Add Node" />
+            <button id="undo" label="undo" />
+            <button id="redo" label="redo" />
+          </div>
+          <div>
+            <button label="Load" id="load" onClick={this.props.onLoadClick} />
+          </div>
+        </div>
         <Flexbox flexDirection="row" alignItems="stretch" justifyContent="center" height="100%" minHeight="100%">
           <div className="sectionContainer">
             <div>
