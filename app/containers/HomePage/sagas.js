@@ -3,13 +3,13 @@ import request from 'utils/request'
 import { LOAD_STORY } from './constants'
 import { storyLoaded, storyLoadError } from './actions'
 import { call, put, takeLatest, select } from 'redux-saga/effects'
-import { makeSelectCurrentStory } from './selectors'
+import { getCurrentStory } from './selectors'
 
 /**
  * Github repos request/response handler
  */
 export function* getStory() {
-  const storyName = yield select(makeSelectCurrentStory())
+  const storyName = yield select(getCurrentStory())
   const requestURL = `${process.env.API_HOST}/story/${storyName}`
   try {
     // Call our request helper (see 'utils/request')

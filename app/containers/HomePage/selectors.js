@@ -4,24 +4,24 @@
 
 import { createSelector } from 'reselect'
 
-const selectHome = (state) => state.get('home')
+const selectHome = state => state.get('home')
 
-const makeSelectShowLoadDialog = () => createSelector(
+const getLoadDialogVisibility = () => createSelector(
   selectHome,
-  (homeState) => homeState.get('showLoadDialog')
+  homeState => homeState.get('isLoadDialogVisible')
 )
 
-const makeSelectCurrentStory = () => createSelector(
+const getCurrentStory = () => createSelector(
   selectHome,
-  (homeState) => homeState.get('currentStory'))
+  homeState => homeState.get('currentStory'))
 
-const makeSelectStoryData = () => createSelector(
+const getLoadedStoryData = () => createSelector(
   selectHome,
-  (homeState) => homeState.get('storyData'))
+  homeState => homeState.get('storyData'))
 
 export {
   selectHome,
-  makeSelectShowLoadDialog,
-  makeSelectCurrentStory,
-  makeSelectStoryData
+  getLoadDialogVisibility,
+  getCurrentStory,
+  getLoadedStoryData
 }

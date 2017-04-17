@@ -22,7 +22,7 @@ import {
 
 // The initial state of the App
 const initialState = fromJS({
-  showLoadDialog: false,
+  isLoadDialogVisible: false,
   currentStory: false,
   stories: [],
   storyData: {
@@ -35,10 +35,10 @@ function homeReducer(state = initialState, action) {
   switch (action.type) {
     case SHOW_LOAD_DIALOG:
       return state
-        .set('showLoadDialog', true)
+        .set('isLoadDialogVisible', true)
     case HIDE_LOAD_DIALOG:
       return state
-        .set('showLoadDialog', false)
+        .set('isLoadDialogVisible', false)
     case LOAD_STORY:
       return state
         .set('loadStory', action.story)

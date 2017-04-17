@@ -9,7 +9,7 @@ import { connect } from 'react-redux'
 import { createStructuredSelector } from 'reselect'
 import * as d3 from 'd3'
 import makeSelectGraph from './selectors'
-import { makeSelectStoryData, makeSelectCurrentStory } from 'containers/HomePage/selectors'
+import { getLoadedStoryData, getCurrentStory } from 'containers/HomePage/selectors'
 import { clearStoryData } from 'containers/HomePage/actions'
 
 /* disable a ton of linting because this uses d3 and poor linter does not understand */
@@ -844,8 +844,8 @@ Graph.propTypes = {
 }
 
 const mapStateToProps = createStructuredSelector({
-  storyData: makeSelectStoryData(),
-  currentStory: makeSelectCurrentStory(),
+  storyData: getLoadedStoryData(),
+  currentStory: getCurrentStory(),
 })
 
 export function mapDispatchToProps(dispatch) {

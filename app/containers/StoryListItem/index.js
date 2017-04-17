@@ -7,7 +7,7 @@ import React, { PropTypes } from 'react'
 import { connect } from 'react-redux'
 import Story from 'components/Story'
 import { createStructuredSelector } from 'reselect'
-import { makeSelectCurrentStory } from 'containers/HomePage/selectors'
+import { getCurrentStory } from 'containers/HomePage/selectors'
 import { setCurrentStory } from 'containers/HomePage/actions'
 
 export class StoryListItem extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
@@ -16,6 +16,7 @@ export class StoryListItem extends React.PureComponent { // eslint-disable-line 
       <Story
         item={ this.props.item }
         selectStory={ this.props.onStoryClick }
+        isSelected={ this.props.currentStory === this.props.item.name }
       />
     )
   }
@@ -23,16 +24,20 @@ export class StoryListItem extends React.PureComponent { // eslint-disable-line 
 
 StoryListItem.propTypes = {
   item: PropTypes.object.isRequired,
-  onStoryClick: PropTypes.func
+  onStoryClick: PropTypes.func,
+  currentStory: PropTypes.oneOfType([
+    PropTypes.string,
+    PropTypes.bool
+  ])
 }
 
 const mapStateToProps = createStructuredSelector({
-  selectStory: makeSelectCurrentStory()
+  currentStory: getCurrentStory()
 })
 
 export function mapDispatchToProps(dispatch) {
   return {
-    onStoryClick: (evt) => {
+    onStoryClick: evt => {
       dispatch(setCurrentStory(evt.target.innerText))
     }
   }

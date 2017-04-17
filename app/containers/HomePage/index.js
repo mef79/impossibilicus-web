@@ -19,7 +19,7 @@ import { connect } from 'react-redux'
 import { getLoadedStories } from 'containers/LoadDialog/selectors'
 import { createStructuredSelector } from 'reselect'
 import { showLoadDialog, hideLoadDialog } from './actions'
-import { makeSelectShowLoadDialog, makeSelectCurrentStory, makeSelectStoryData } from './selectors'
+import { getLoadDialogVisibility, getCurrentStory, getLoadedStoryData } from './selectors'
 import Flexbox from 'flexbox-react'
 import FormPane from 'containers/FormPane'
 import { Toolbar, ToolbarGroup } from 'material-ui/Toolbar'
@@ -32,14 +32,12 @@ export class HomePage extends React.PureComponent { // eslint-disable-line react
   }
 
   renderLoadDialog() {
-    if (this.props.showLoadDialog) {
-      return (
-        <LoadDialog
-          close={ this.props.onCloseClick }
-          stories={ this.props.stories }
-        />
-      )
-    }
+    return (
+      <LoadDialog
+        close={ this.props.onCloseClick }
+        stories={ this.props.stories }
+      />
+    )
   }
 
   render() {
@@ -66,7 +64,9 @@ export class HomePage extends React.PureComponent { // eslint-disable-line react
           </div>
           <FormPane />
         </Flexbox>
-        {this.renderLoadDialog()}
+        { /* show load dialog if it should be visible */
+          this.props.loadDialogVisible && this.renderLoadDialog()
+        }
       </Flexbox>
     )
   }
@@ -75,7 +75,7 @@ export class HomePage extends React.PureComponent { // eslint-disable-line react
 HomePage.propTypes = {
   onLoadClick: PropTypes.func,
   onCloseClick: PropTypes.func,
-  showLoadDialog: PropTypes.bool.isRequired,
+  loadDialogVisible: PropTypes.bool.isRequired,
   stories: PropTypes.oneOfType([
     PropTypes.array,
     PropTypes.object
@@ -91,10 +91,10 @@ HomePage.propTypes = {
 }
 
 const mapStateToProps = createStructuredSelector({
-  showLoadDialog: makeSelectShowLoadDialog(),
+  loadDialogVisible: getLoadDialogVisibility(),
   stories: getLoadedStories(),
-  currentStory: makeSelectCurrentStory(),
-  storyData: makeSelectStoryData()
+  currentStory: getCurrentStory(),
+  storyData: getLoadedStoryData()
 })
 
 export function mapDispatchToProps(dispatch) {

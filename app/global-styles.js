@@ -189,6 +189,18 @@ form {
     border-right:11px solid transparent;
 }
 
+tr.selected {
+  background: #dbe8fc;
+}
+
+div.load {
+  color: #ccc;
+}
+
+div.load.active {
+  color: black;
+}
+
 .button {
     display: inline-block;
     background: white;

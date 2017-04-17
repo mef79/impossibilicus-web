@@ -8,6 +8,7 @@ import StoryList from 'containers/StoryList'
 import LoadButton from 'components/LoadButton'
 import { getLoadedStories, getLoadingState, getLoadingError } from './selectors'
 import { loadStory, hideLoadDialog } from 'containers/HomePage/actions'
+import { getCurrentStory } from 'containers/HomePage/selectors'
 
 export class LoadDialog extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   render() {
@@ -16,7 +17,12 @@ export class LoadDialog extends React.PureComponent { // eslint-disable-line rea
         <ModalHeader>Load Story</ModalHeader>
         <ModalClose onClick={this.props.close}>x</ModalClose>
         <StoryList stories={this.props.stories} />
-        <LoadButton onClickLoad={ this.props.onLoadClick }>Load</LoadButton>
+        <LoadButton
+          onClickLoad={ this.props.onLoadClick }
+          isActive={ !!this.props.currentStory }
+        >
+          Load
+        </LoadButton>
       </Modal>
     )
   }
@@ -25,13 +31,18 @@ export class LoadDialog extends React.PureComponent { // eslint-disable-line rea
 LoadDialog.propTypes = {
   close: PropTypes.func.isRequired,
   stories: PropTypes.array,
-  onLoadClick: PropTypes.func
+  onLoadClick: PropTypes.func,
+  currentStory: PropTypes.oneOfType([
+    PropTypes.string,
+    PropTypes.bool
+  ])
 }
 
 const mapStateToProps = createStructuredSelector({
   stories: getLoadedStories(),
   loading: getLoadingState(),
-  error: getLoadingError()
+  error: getLoadingError(),
+  currentStory: getCurrentStory()
 })
 
 export function mapDispatchToProps(dispatch) {
