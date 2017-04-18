@@ -19,7 +19,6 @@ import { getLoadedStories } from 'containers/LoadDialog/selectors'
 import { createStructuredSelector } from 'reselect'
 import { showLoadDialog, hideLoadDialog } from './actions'
 import { getLoadDialogVisibility, getCurrentStory, getLoadedStoryData } from './selectors'
-import Flexbox from 'flexbox-react'
 import FormPane from 'containers/FormPane'
 import Graph from 'containers/Graph'
 
@@ -32,40 +31,44 @@ export class HomePage extends React.PureComponent { // eslint-disable-line react
   renderLoadDialog() {
     return (
       <LoadDialog
-        close={ this.props.onCloseClick }
-        stories={ this.props.stories }
+        close={this.props.onCloseClick}
+        stories={this.props.stories}
       />
     )
   }
 
   render() {
-    return (
-      <Flexbox flexDirection="column" minHeight="100%" >
-        <div>
-          <div >
-            <button id="add-node" label="Add Node" />
-            <button id="undo" label="undo" />
-            <button id="redo" label="redo" />
-          </div>
-          <div>
-            <button label="Load" id="load" onClick={this.props.onLoadClick} />
-          </div>
+    return (<div>
+      <nav className="navbar navbar-inverse bg-inverse push-down">
+        <div >
+          <span className="btn btn-primary" id="add-node" label="Add Node">Add Node</span>
+          <span className="btn btn-primary" id="undo" label="undo">Undo</span>
+          <span className="btn btn-primary" id="redo" label="redo">Redo</span>
+          <span
+            className="btn btn-secondary"
+            label="Load"
+            id="load"
+            onClick={this.props.onLoadClick}
+          >
+            Load
+          </span>
         </div>
-        <Flexbox flexDirection="row" alignItems="stretch" justifyContent="center" height="100%" minHeight="100%">
-          <div className="sectionContainer">
-            <div>
-              <Graph />
-              <div id="bottom">
-                No element selected
-              </div>
+      </nav>
+      <div className="container-fluid">
+        <div className="row">
+          <div className="col-6">
+            <Graph />
+            <div id="bottom">
+              No element selected
             </div>
           </div>
           <FormPane />
-        </Flexbox>
+        </div>
         { /* show load dialog if it should be visible */
           this.props.loadDialogVisible && this.renderLoadDialog()
         }
-      </Flexbox>
+      </div>
+    </div>
     )
   }
 }

@@ -7,31 +7,33 @@ import React, { PropTypes } from 'react'
 import { connect } from 'react-redux'
 import { createStructuredSelector } from 'reselect'
 import makeSelectFormPane from './selectors'
-import Flexbox from 'flexbox-react'
+
 
 export class FormPane extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
 
   render() {
     return (
-      <Flexbox element="div" flexDirection="column" width="800px" minHeight="100%" alignItems="stretch" alignContent="stretch" justifyContent="space-between" className="form-container" >
-        <Flexbox element="div" flexDirection="column">
-          <input type="text" className="title-text-field" placeholder="Name" />
-          <input type="text"
-            className="storyText"
-          />
-          <div className="dropdown">
-            <button className="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-    Dropdown button
-  </button>
-  <div className="dropdown-menu">
-    <a className="dropdown-item" href="#">Action</a>
-    <a className="dropdown-item" href="#">Action</a>
-    <a className="dropdown-item" href="#">Action</a>
-    </div>
-            </div>
-        </Flexbox>
-        <button className="btn btn-primary savebutton" label="Save"  />
-      </Flexbox>
+      <div className="col-5 ">
+        <div className="container">
+          <div className="card">
+            <h2 className="card-header">Edit Content</h2>
+            <form className="card-block">
+
+              <div className="form-group">
+                <label htmlFor="title">Title</label>
+                <input type="text" className="form-control" id="title" aria-describedby="titleHelp" placeholder="Enter title"></input>
+                <small id="titleHelp" className="form-text text-muted">Name your content</small>
+              </div>
+              <div className="form-group">
+                <label htmlFor="content">Content</label>
+                <textarea className="form-control" id="content" aria-describedby="contentHelp" rows="6" placeholder="Enter your content here..."></textarea>
+                <small id="contentHelp" className="form-text text-muted">Get writing</small>
+              </div>
+              <button className="btn btn-primary" label="Save">Save</button>
+            </form>
+          </div>
+        </div>
+      </div>
     )
   }
 }

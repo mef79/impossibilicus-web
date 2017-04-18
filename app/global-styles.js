@@ -2,13 +2,6 @@ import { injectGlobal } from 'styled-components'
 
 /* eslint no-unused-expressions: 0 */
 injectGlobal`
-  html,
-  body {
-    margin:auto;
-    height: 100%;
-    width: 100%;
-    background-color: #fafafa;
-  }
 
 body {
     font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
@@ -51,10 +44,7 @@ body {
     font-family: 'Roboto', sans-serif;
   }
 
-  #app {
-    min-height: 100%;
-    min-width: 100%;
-  }
+
 
   #graph {
     background-color: #fafafa;
@@ -78,6 +68,7 @@ body {
   font-size: 16px;
   padding: 10px;
   font-family: roboto;
+  width:800px;
 }
 
 tbody tr:nth-child(odd) {
@@ -87,12 +78,8 @@ tbody tr:nth-child(odd) {
 #undo,
 #redo {
   margin-left: 5px;
-  margin-right: 5px;
-  display: inline-block;
+  margin-right: 5px;  ;
   cursor: pointer;
-}
-#load{
-  align-self:flex-end;
 }
 
 .savebutton{
@@ -100,26 +87,15 @@ tbody tr:nth-child(odd) {
     align-self: flex-end
 }
 
-#undo.disabled,
-#redo.disabled {
-  cursor: not-allowed;
-  color: #ccc;
-}
 
-#add-node {
-  display: inline-block;
-}
 
 body {
   font: 13px sans-serif;
   position: relative;
 
 }
-
-form {
-  position: absolute;
-  bottom: 10px;
-  left: 10px;
+.push-down {
+  margin-bottom: 2em;
 }
 
 .node {

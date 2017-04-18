@@ -11,17 +11,21 @@ import 'babel-polyfill'
 // Import all the third party stuff
 import React from 'react'
 import ReactDOM from 'react-dom'
+
+// bootstrap and support for bootstrap
 import 'jquery'
 import tether from 'tether';
 global.Tether = tether;
-import bootstrap from './bootstrap/js/bootstrap.min.js'
+import '!!style-loader!css-loader!./bootstrap/css/bootstrap-reboot.css'
 import '!!style-loader!css-loader!./bootstrap/css/bootstrap.css'
+import '!!style-loader!css-loader!./bootstrap/css/bootstrap-grid.css'
+
 import { Provider } from 'react-redux'
 import { applyRouterMiddleware, Router, browserHistory } from 'react-router'
 import { syncHistoryWithStore } from 'react-router-redux'
 import { useScroll } from 'react-router-scroll'
 import injectTapEventPlugin from 'react-tap-event-plugin'
-import 'sanitize.css/sanitize.css'
+
 
 // Import root app
 import App from 'containers/App'
