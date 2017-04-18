@@ -125,7 +125,7 @@ body {
   cursor: pointer;
 }
 
-.tooltip {
+.mf-tooltip {
   position: fixed;
   line-height: 1;
   font-weight: bold;
@@ -136,8 +136,8 @@ body {
   width: 200px;
 }
 
-.tooltip:after,
-.tooltip:before {
+.mf-tooltip:after,
+.mf-tooltip:before {
     content: '';
     display: block;
     position: absolute;
@@ -148,7 +148,7 @@ body {
 }
 
 /* this border color controls the color of the triangle (what looks like the fill of the triangle) */
-.tooltip:after {
+.mf-tooltip:after {
     top: 37px;
     left: 101px;
     border-top: 10px solid #F5F5F5;
@@ -157,7 +157,7 @@ body {
 }
 
 /* this border color controls the outside, thin border */
-.tooltip:before {
+.mf-tooltip:before {
     top: 37px;
     left: 100px;
     border-top: 11px solid #858585;

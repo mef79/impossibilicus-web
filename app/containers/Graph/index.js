@@ -434,7 +434,7 @@ export class Graph extends React.PureComponent { // eslint-disable-line react/pr
     }
 
     function clearInfo() {
-        removeElementsByClass('tooltip')
+        removeElementsByClass('mf-tooltip')
         var bottom = document.getElementById('bottom')
         bottom.innerHTML = 'No element selected'
     }
@@ -443,9 +443,9 @@ export class Graph extends React.PureComponent { // eslint-disable-line react/pr
         var bottom = document.getElementById('bottom')
         var tooltipContent = ''
         var bottomContent
-        removeElementsByClass('tooltip')
+        removeElementsByClass('mf-tooltip')
         var div = document.createElement('div')
-        div.className = 'tooltip'
+        div.className = 'mf-tooltip'
         var xSource, ySource, xTarget, yTarget
 
         var t = d3.transform(d3.select('.transformer').attr('transform'))
