@@ -40,7 +40,7 @@ export class HomePage extends React.PureComponent { // eslint-disable-line react
   render() {
     return (<div>
       <nav className="navbar navbar-inverse bg-inverse push-down">
-        <div >
+        <div>
           <span className="btn btn-primary" id="add-node" label="Add Node">Add Node</span>
           <span className="btn btn-primary" id="undo" label="undo">Undo</span>
           <span className="btn btn-primary" id="redo" label="redo">Redo</span>
