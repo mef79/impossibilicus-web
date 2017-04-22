@@ -22,50 +22,58 @@ import {
   LOAD_STORY_SUCCESS,
   LOAD_STORY_ERROR,
   SET_CURRENT_STORY,
-  CLEAR_STORY_DATA
+  CLEAR_STORY_DATA,
+  SAVE_CONTENT_ITEM,
 } from './constants'
 
 export function showLoadDialog() {
   return {
-    type: SHOW_LOAD_DIALOG
+    type: SHOW_LOAD_DIALOG,
   }
 }
 
 export function hideLoadDialog() {
   return {
-    type: HIDE_LOAD_DIALOG
+    type: HIDE_LOAD_DIALOG,
   }
 }
 
 export function loadStory() {
   return {
-    type: LOAD_STORY
+    type: LOAD_STORY,
   }
 }
 
 export function storyLoaded(story) {
   return {
     type: LOAD_STORY_SUCCESS,
-    story
+    story,
   }
 }
 
 export function storyLoadError(error) {
   return {
     type: LOAD_STORY_ERROR,
-    error
+    error,
   }
 }
 
 export function setCurrentStory(currentStory) {
   return {
     type: SET_CURRENT_STORY,
-    currentStory
+    currentStory,
   }
 }
 
 export function clearStoryData() {
   return {
-    type: CLEAR_STORY_DATA
+    type: CLEAR_STORY_DATA,
+  }
+}
+
+export function saveContentItem(contentItem) {
+  return {
+    type: SAVE_CONTENT_ITEM,
+    contentItem,
   }
 }

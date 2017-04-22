@@ -3,13 +3,28 @@
  * FormPane
  *
  */
-import React, { PropTypes } from 'react'
-import { connect } from 'react-redux'
-import { createStructuredSelector } from 'reselect'
-import makeSelectFormPane from './selectors'
+import React, { PropTypes, } from 'react'
+import { connect, } from 'react-redux'
+import { createStructuredSelector, } from 'reselect'
+import { getContentItem, } from 'containers/HomePage/selectors'
+import { saveContentItem, } from 'containers/HomePage/actions'
 
 
 export class FormPane extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
+
+  constructor(props) {
+    super(props)
+    this.saveForm = this.saveForm.bind(this)
+  }
+
+  saveForm(event) {
+    event.preventDefault()
+    const contentItem = {
+      title: document.getElementById('title').value,
+      content: document.getElementById('content').value,
+    }
+    this.props.onSaveFormClick(contentItem)
+  }
 
   render() {
     return (
@@ -18,10 +33,15 @@ export class FormPane extends React.PureComponent { // eslint-disable-line react
           <div className="card">
             <h2 className="card-header">Edit Content</h2>
             <form className="card-block">
-
               <div className="form-group">
                 <label htmlFor="title">Title</label>
-                <input type="text" className="form-control" id="title" aria-describedby="titleHelp" placeholder="Enter title"></input>
+                <input
+                  type="text"
+                  className="form-control"
+                  id="title"
+                  aria-describedby="titleHelp"
+                  placeholder="Enter title"
+                />
                 <small id="titleHelp" className="form-text text-muted">Name your content</small>
               </div>
               <div className="form-group">
@@ -29,7 +49,7 @@ export class FormPane extends React.PureComponent { // eslint-disable-line react
                 <textarea className="form-control" id="content" aria-describedby="contentHelp" rows="6" placeholder="Enter your content here..."></textarea>
                 <small id="contentHelp" className="form-text text-muted">Get writing</small>
               </div>
-              <button className="btn btn-primary" label="Save">Save</button>
+              <button className="btn btn-primary" label="Save" onClick={this.saveForm}>Save</button>
             </form>
           </div>
         </div>
@@ -39,16 +59,19 @@ export class FormPane extends React.PureComponent { // eslint-disable-line react
 }
 
 FormPane.propTypes = {
-  dispatch: PropTypes.func.isRequired
+  contentItem: PropTypes.object,
+  onSaveFormClick: PropTypes.func,
 }
 
 const mapStateToProps = createStructuredSelector({
-  FormPane: makeSelectFormPane()
+  contentItem: getContentItem(),
 })
 
 function mapDispatchToProps(dispatch) {
   return {
-    dispatch
+    onSaveFormClick: contentItem => {
+      dispatch(saveContentItem(contentItem))
+    },
   }
 }
 
