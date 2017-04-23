@@ -36,13 +36,13 @@ export class {{ properCase name }} extends React.{{{ component }}} { // eslint-d
         <FormattedMessage {...messages.header} />
       {{/if}}
       </div>
-    );
+    )
   }
 }
 
 {{ properCase name }}.propTypes = {
   dispatch: PropTypes.func.isRequired
-};
+}
 
 {{#if wantActionsAndReducer}}
 const mapStateToProps = createStructuredSelector({
