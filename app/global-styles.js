@@ -2,13 +2,6 @@ import { injectGlobal } from 'styled-components'
 
 /* eslint no-unused-expressions: 0 */
 injectGlobal`
-  html,
-  body {
-    margin:auto;
-    height: 100%;
-    width: 100%;
-    background-color: #fafafa;
-  }
 
 body {
     font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
@@ -51,10 +44,7 @@ body {
     font-family: 'Roboto', sans-serif;
   }
 
-  #app {
-    min-height: 100%;
-    min-width: 100%;
-  }
+
 
   #graph {
     background-color: #fafafa;
@@ -78,6 +68,7 @@ body {
   font-size: 16px;
   padding: 10px;
   font-family: roboto;
+  width:800px;
 }
 
 tbody tr:nth-child(odd) {
@@ -87,39 +78,24 @@ tbody tr:nth-child(odd) {
 #undo,
 #redo {
   margin-left: 5px;
-  margin-right: 5px;
-  display: inline-block;
+  margin-right: 5px;  ;
   cursor: pointer;
-}
-#load{
-  align-self:flex-end;
 }
 
 .savebutton{
-    width: 100px,
+    width: 100px;
     align-self: flex-end
 }
 
-#undo.disabled,
-#redo.disabled {
-  cursor: not-allowed;
-  color: #ccc;
-}
 
-#add-node {
-  display: inline-block;
-}
 
 body {
   font: 13px sans-serif;
   position: relative;
 
 }
-
-form {
-  position: absolute;
-  bottom: 10px;
-  left: 10px;
+.push-down {
+  margin-bottom: 2em;
 }
 
 .node {
@@ -149,7 +125,7 @@ form {
   cursor: pointer;
 }
 
-.tooltip {
+.mf-tooltip {
   position: fixed;
   line-height: 1;
   font-weight: bold;
@@ -160,8 +136,8 @@ form {
   width: 200px;
 }
 
-.tooltip:after,
-.tooltip:before {
+.mf-tooltip:after,
+.mf-tooltip:before {
     content: '';
     display: block;
     position: absolute;
@@ -172,7 +148,7 @@ form {
 }
 
 /* this border color controls the color of the triangle (what looks like the fill of the triangle) */
-.tooltip:after {
+.mf-tooltip:after {
     top: 37px;
     left: 101px;
     border-top: 10px solid #F5F5F5;
@@ -181,7 +157,7 @@ form {
 }
 
 /* this border color controls the outside, thin border */
-.tooltip:before {
+.mf-tooltip:before {
     top: 37px;
     left: 100px;
     border-top: 11px solid #858585;

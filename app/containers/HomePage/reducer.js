@@ -17,7 +17,8 @@ import {
   LOAD_STORY,
   LOAD_STORY_SUCCESS,
   SET_CURRENT_STORY,
-  CLEAR_STORY_DATA
+  CLEAR_STORY_DATA,
+  SAVE_CONTENT_ITEM
 } from './constants'
 
 // The initial state of the App
@@ -51,6 +52,9 @@ function homeReducer(state = initialState, action) {
     case CLEAR_STORY_DATA:
       return state
         .set('storyData', false)
+    case SAVE_CONTENT_ITEM:
+      return state
+        .set('contentItem', action.contentItem)
     default:
       return state
   }
