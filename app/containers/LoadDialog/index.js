@@ -5,7 +5,7 @@ import Modal from 'react-modal'
 import ModalHeader from 'components/ModalHeader'
 import ModalClose from 'components/ModalClose'
 import StoryList from 'containers/StoryList'
-import LoadButton from 'components/LoadButton'
+import TempButton from 'components/TempButton'
 import { getLoadedStories, getLoadingState, getLoadingError } from './selectors'
 import { loadStory, hideLoadDialog } from 'containers/HomePage/actions'
 import { getCurrentStory } from 'containers/HomePage/selectors'
@@ -17,12 +17,12 @@ export class LoadDialog extends React.PureComponent { // eslint-disable-line rea
         <ModalHeader>Load Story</ModalHeader>
         <ModalClose onClick={this.props.close}>x</ModalClose>
         <StoryList stories={this.props.stories} />
-        <LoadButton
-          onClickLoad={ this.props.onLoadClick }
+        <TempButton
+          onClickFunc={ this.props.onLoadClick }
           isActive={ !!this.props.currentStory }
-        >
-          Load
-        </LoadButton>
+          className="load"
+          buttonText="Load"
+        />
       </Modal>
     )
   }

@@ -193,12 +193,22 @@ tr.selected {
   background: #dbe8fc;
 }
 
-div.load {
+input.invalid {
+  border: 1px solid red;
+}
+
+input.invalid:focus {
+  outline-color: #fb9797;
+}
+
+div.button {
   color: #ccc;
 }
 
-div.load.active {
+div.button.active {
   color: black;
+  background: #4991ff;
+  border: 1px solid black;
 }
 
 .button {
