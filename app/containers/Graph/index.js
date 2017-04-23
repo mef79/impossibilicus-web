@@ -101,8 +101,8 @@ export class Graph extends React.PureComponent { // eslint-disable-line react/pr
 
     var force = d3.layout.force() // create a force layout
         .size([dimensions.width, dimensions.height]) // of the given width/height
-        // .nodes(initialNodes) // initialize with a single node - ???
-        // .links(initialLinks)
+        .nodes(initialNodes) // initialize with a single node - ???
+        .links(initialLinks)
         .linkDistance(150) // how far the nodes are away from eachother
         .charge(-500) // how strongly the nodes repel eachother
         .on('tick', tick) // call the 'tick' function when drawing frames
