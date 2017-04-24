@@ -19,6 +19,7 @@ import { getCurrentStory, getCurrentData, getSaveDialogVisibility } from 'contai
 import { getLoadedStories } from 'containers/LoadDialog/selectors'
 
 import { changeStoryName, setValid, saveStory } from './actions'
+import { hideSaveDialog } from 'containers/HomePage/actions'
 
 const StoryNameInput = styled.input`
   display: block;
@@ -80,7 +81,10 @@ SaveDialog.propTypes = {
     PropTypes.string,
     PropTypes.bool
   ]),
-  existingStories: PropTypes.array,
+  existingStories: PropTypes.oneOfType([
+    PropTypes.array,
+    PropTypes.object
+  ]),
   isValid: PropTypes.bool,
   storyName: PropTypes.string,
   onChangeStoryName: PropTypes.func,
@@ -103,6 +107,7 @@ function mapDispatchToProps(dispatch) {
     onChangeStoryName: name => dispatch(changeStoryName(name)),
     onValidate: (name, existing) => dispatch(setValid(name, existing)),
     onSaveStory: () => dispatch(saveStory()),
+    close: () => dispatch(hideSaveDialog()),
   }
 }
 

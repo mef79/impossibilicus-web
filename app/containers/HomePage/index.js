@@ -20,36 +20,13 @@ import SaveDialog from 'containers/SaveDialog'
 import FormPane from 'containers/FormPane'
 import Graph from 'containers/Graph'
 
-import { showLoadDialog, hideLoadDialog, showSaveDialog, hideSaveDialog } from './actions'
+import { showLoadDialog, showSaveDialog } from './actions'
 import { loadStories } from '../LoadDialog/actions'
 
 import { getLoadedStories } from 'containers/LoadDialog/selectors'
 import { getCurrentStory, getLoadedStoryData } from './selectors'
 
 export class HomePage extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
-  constructor(props) {
-    super(props)
-    this.renderLoadDialog = this.renderLoadDialog.bind(this)
-    this.renderSaveDialog = this.renderSaveDialog.bind(this)
-  }
-
-  renderLoadDialog() {
-    return (
-      <LoadDialog
-        close={this.props.onCloseLoadClick}
-        stories={this.props.stories}
-      />
-    )
-  }
-
-  renderSaveDialog() {
-    return (
-      <SaveDialog
-        close={this.props.onCloseSaveClick}
-      />
-    )
-  }
-
   render() {
     return (<div>
       <nav className="navbar navbar-inverse bg-inverse push-down">
@@ -85,8 +62,8 @@ export class HomePage extends React.PureComponent { // eslint-disable-line react
           </div>
           <FormPane />
         </div>
-        { this.renderLoadDialog() }
-        { this.renderSaveDialog() }
+        <LoadDialog />
+        <SaveDialog />
       </div>
     </div>
     )
@@ -94,12 +71,6 @@ export class HomePage extends React.PureComponent { // eslint-disable-line react
 }
 
 HomePage.propTypes = {
-  onLoadClick: PropTypes.func,
-  onCloseLoadClick: PropTypes.func,
-  loadDialogVisible: PropTypes.bool.isRequired,
-  onSaveClick: PropTypes.func,
-  onCloseSaveClick: PropTypes.func,
-  saveDialogVisible: PropTypes.bool.isRequired,
   stories: PropTypes.oneOfType([
     PropTypes.array,
     PropTypes.object
@@ -111,7 +82,9 @@ HomePage.propTypes = {
   storyData: PropTypes.oneOfType([
     PropTypes.object,
     PropTypes.bool
-  ])
+  ]),
+  onLoadClick: PropTypes.func,
+  onSaveClick: PropTypes.func,
 }
 
 const mapStateToProps = createStructuredSelector({
@@ -126,16 +99,7 @@ export function mapDispatchToProps(dispatch) {
       dispatch(showLoadDialog())
       dispatch(loadStories())
     },
-    onCloseLoadClick: () => {
-      dispatch(hideLoadDialog())
-    },
-    onSaveClick: () => {
-      dispatch(showSaveDialog())
-    },
-    onCloseSaveClick: () => {
-      dispatch(loadStories())
-      dispatch(hideSaveDialog())
-    }
+    onSaveClick: () => dispatch(showSaveDialog())
   }
 }
 

@@ -33,13 +33,16 @@ export class LoadDialog extends React.PureComponent { // eslint-disable-line rea
 
 LoadDialog.propTypes = {
   close: PropTypes.func.isRequired,
-  stories: PropTypes.array,
+  stories: PropTypes.oneOfType([
+    PropTypes.array,
+    PropTypes.object,
+  ]),
   onLoadClick: PropTypes.func,
   currentStory: PropTypes.oneOfType([
     PropTypes.string,
     PropTypes.bool
   ]),
-  isOpen: PropTypes.bool.isRequired
+  isOpen: PropTypes.bool.isRequired,
 }
 
 const mapStateToProps = createStructuredSelector({
@@ -55,7 +58,8 @@ export function mapDispatchToProps(dispatch) {
     onLoadClick: () => {
       dispatch(loadStory())
       dispatch(hideLoadDialog())
-    }
+    },
+    close: () => dispatch(hideLoadDialog())
   }
 }
 
