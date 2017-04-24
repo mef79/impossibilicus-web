@@ -24,7 +24,7 @@ import { showLoadDialog, hideLoadDialog, showSaveDialog, hideSaveDialog } from '
 import { loadStories } from '../LoadDialog/actions'
 
 import { getLoadedStories } from 'containers/LoadDialog/selectors'
-import { getLoadDialogVisibility, getSaveDialogVisibility, getCurrentStory, getLoadedStoryData } from './selectors'
+import { getCurrentStory, getLoadedStoryData } from './selectors'
 
 export class HomePage extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   constructor(props) {
@@ -85,12 +85,8 @@ export class HomePage extends React.PureComponent { // eslint-disable-line react
           </div>
           <FormPane />
         </div>
-        { /* show load dialog if it should be visible */
-          this.props.loadDialogVisible && this.renderLoadDialog()
-        }
-        { /* show save dialog if it should be visible */
-          this.props.saveDialogVisible && this.renderSaveDialog()
-        }
+        { this.renderLoadDialog() }
+        { this.renderSaveDialog() }
       </div>
     </div>
     )
@@ -119,11 +115,9 @@ HomePage.propTypes = {
 }
 
 const mapStateToProps = createStructuredSelector({
-  loadDialogVisible: getLoadDialogVisibility(),
-  saveDialogVisible: getSaveDialogVisibility(),
   stories: getLoadedStories(),
   currentStory: getCurrentStory(),
-  storyData: getLoadedStoryData()
+  storyData: getLoadedStoryData(),
 })
 
 export function mapDispatchToProps(dispatch) {

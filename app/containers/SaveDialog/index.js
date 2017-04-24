@@ -15,7 +15,7 @@ import ModalClose from 'components/ModalClose'
 import TempButton from 'components/TempButton'
 
 import { getValid, getStoryName } from './selectors'
-import { getCurrentStory, getCurrentData } from 'containers/HomePage/selectors'
+import { getCurrentStory, getCurrentData, getSaveDialogVisibility } from 'containers/HomePage/selectors'
 import { getLoadedStories } from 'containers/LoadDialog/selectors'
 
 import { changeStoryName, setValid, saveStory } from './actions'
@@ -50,7 +50,7 @@ export class SaveDialog extends React.PureComponent { // eslint-disable-line rea
   render() {
     const isCurrentStory = this.props.currentStory || false
     return (
-      <Modal isOpen={true} contentLabel="Dialog" style={modalStyle}>
+      <Modal isOpen={this.props.isOpen} contentLabel="Dialog" style={modalStyle}>
         <ModalHeader>Save Story</ModalHeader>
         <ModalClose onClick={this.props.close}>x</ModalClose>
         <StoryNameInput
@@ -86,6 +86,7 @@ SaveDialog.propTypes = {
   onChangeStoryName: PropTypes.func,
   onSaveStory: PropTypes.func,
   onValidate: PropTypes.func,
+  isOpen: PropTypes.bool.isRequired,
 }
 
 const mapStateToProps = createStructuredSelector({
@@ -94,6 +95,7 @@ const mapStateToProps = createStructuredSelector({
   isValid: getValid(),
   storyName: getStoryName(),
   storyData: getCurrentData(),
+  isOpen: getSaveDialogVisibility(),
 })
 
 function mapDispatchToProps(dispatch) {
