@@ -8,7 +8,7 @@ import {
   DEFAULT_ACTION,
   CHANGE_STORY_NAME,
   SET_VALID,
-  SAVE_STORY
+  SAVE_STORY,
 } from './constants'
 
 export function defaultAction() {
@@ -34,6 +34,6 @@ export function setValid(name, existing) {
 
 export function saveStory() {
   return {
-    type: SAVE_STORY
+    type: SAVE_STORY,
   }
 }

@@ -18,12 +18,15 @@
 import {
   SHOW_LOAD_DIALOG,
   HIDE_LOAD_DIALOG,
+  SHOW_SAVE_DIALOG,
+  HIDE_SAVE_DIALOG,
   LOAD_STORY,
   LOAD_STORY_SUCCESS,
   LOAD_STORY_ERROR,
   SET_CURRENT_STORY,
   CLEAR_STORY_DATA,
   SAVE_CONTENT_ITEM,
+  UPDATE_STORY,
 } from './constants'
 
 export function showLoadDialog() {
@@ -35,6 +38,18 @@ export function showLoadDialog() {
 export function hideLoadDialog() {
   return {
     type: HIDE_LOAD_DIALOG,
+  }
+}
+
+export function showSaveDialog() {
+  return {
+    type: SHOW_SAVE_DIALOG,
+  }
+}
+
+export function hideSaveDialog() {
+  return {
+    type: HIDE_SAVE_DIALOG,
   }
 }
 
@@ -75,5 +90,13 @@ export function saveContentItem(contentItem) {
   return {
     type: SAVE_CONTENT_ITEM,
     contentItem,
+  }
+}
+
+export function updateStory(nodes, links) {
+  return {
+    type: UPDATE_STORY,
+    nodes,
+    links
   }
 }

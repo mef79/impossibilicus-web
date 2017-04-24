@@ -21,7 +21,7 @@ class TempButton extends React.PureComponent { // eslint-disable-line react/pref
     return (
       <Button
         className={ this.props.isActive ? `button ${this.props.className} active` : `button ${this.props.className}`}
-        onClick={ this.props.onClickFunc }
+        onClick={this.props.onClickFunc }
       >
         {this.props.buttonText}
       </Button>
@@ -33,7 +33,7 @@ TempButton.propTypes = {
   onClickFunc: PropTypes.func,
   isActive: PropTypes.bool.isRequired,
   className: PropTypes.string,
-  buttonText: PropTypes.string.isRequired
+  buttonText: PropTypes.string.isRequired,
 }
 
 export default TempButton

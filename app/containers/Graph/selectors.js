@@ -1,25 +1,15 @@
-import { createSelector } from 'reselect';
+import { createSelector } from 'reselect'
 
 /**
  * Direct selector to the graph state domain
  */
-const selectGraphDomain = () => (state) => state.get('graph');
+const selectGraphDomain = () => state => state.get('graph')
 
-/**
- * Other specific selectors
- */
-
-
-/**
- * Default selector used by Graph
- */
-
-const makeSelectGraph = () => createSelector(
+const isListening = () => createSelector(
   selectGraphDomain(),
-  (substate) => substate.toJS()
-);
+  substate => substate.get('isListening')
+)
 
-export default makeSelectGraph;
 export {
-  selectGraphDomain,
-};
+  isListening,
+}

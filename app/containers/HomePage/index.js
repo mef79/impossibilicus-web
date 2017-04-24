@@ -12,27 +12,40 @@
 /* ignore lots of eslint functions because d3 */
 
 import React, { PropTypes } from 'react'
-import LoadDialog from 'containers/LoadDialog'
-import { loadStories } from '../LoadDialog/actions'
 import { connect } from 'react-redux'
-import { getLoadedStories } from 'containers/LoadDialog/selectors'
 import { createStructuredSelector } from 'reselect'
-import { showLoadDialog, hideLoadDialog } from './actions'
-import { getLoadDialogVisibility, getCurrentStory, getLoadedStoryData } from './selectors'
+
+import LoadDialog from 'containers/LoadDialog'
+import SaveDialog from 'containers/SaveDialog'
 import FormPane from 'containers/FormPane'
 import Graph from 'containers/Graph'
+
+import { showLoadDialog, hideLoadDialog, showSaveDialog, hideSaveDialog } from './actions'
+import { loadStories } from '../LoadDialog/actions'
+
+import { getLoadedStories } from 'containers/LoadDialog/selectors'
+import { getLoadDialogVisibility, getSaveDialogVisibility, getCurrentStory, getLoadedStoryData } from './selectors'
 
 export class HomePage extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   constructor(props) {
     super(props)
     this.renderLoadDialog = this.renderLoadDialog.bind(this)
+    this.renderSaveDialog = this.renderSaveDialog.bind(this)
   }
 
   renderLoadDialog() {
     return (
       <LoadDialog
-        close={this.props.onCloseClick}
+        close={this.props.onCloseLoadClick}
         stories={this.props.stories}
+      />
+    )
+  }
+
+  renderSaveDialog() {
+    return (
+      <SaveDialog
+        close={this.props.onCloseSaveClick}
       />
     )
   }
@@ -52,6 +65,14 @@ export class HomePage extends React.PureComponent { // eslint-disable-line react
           >
             Load
           </span>
+          <span
+            className="btn btn-secondary"
+            label="Save"
+            id="save"
+            onClick={this.props.onSaveClick}
+          >
+            Save
+          </span>
         </div>
       </nav>
       <div className="container-fluid">
@@ -67,6 +88,9 @@ export class HomePage extends React.PureComponent { // eslint-disable-line react
         { /* show load dialog if it should be visible */
           this.props.loadDialogVisible && this.renderLoadDialog()
         }
+        { /* show save dialog if it should be visible */
+          this.props.saveDialogVisible && this.renderSaveDialog()
+        }
       </div>
     </div>
     )
@@ -75,8 +99,11 @@ export class HomePage extends React.PureComponent { // eslint-disable-line react
 
 HomePage.propTypes = {
   onLoadClick: PropTypes.func,
-  onCloseClick: PropTypes.func,
+  onCloseLoadClick: PropTypes.func,
   loadDialogVisible: PropTypes.bool.isRequired,
+  onSaveClick: PropTypes.func,
+  onCloseSaveClick: PropTypes.func,
+  saveDialogVisible: PropTypes.bool.isRequired,
   stories: PropTypes.oneOfType([
     PropTypes.array,
     PropTypes.object
@@ -93,6 +120,7 @@ HomePage.propTypes = {
 
 const mapStateToProps = createStructuredSelector({
   loadDialogVisible: getLoadDialogVisibility(),
+  saveDialogVisible: getSaveDialogVisibility(),
   stories: getLoadedStories(),
   currentStory: getCurrentStory(),
   storyData: getLoadedStoryData()
@@ -104,8 +132,15 @@ export function mapDispatchToProps(dispatch) {
       dispatch(showLoadDialog())
       dispatch(loadStories())
     },
-    onCloseClick: () => {
+    onCloseLoadClick: () => {
       dispatch(hideLoadDialog())
+    },
+    onSaveClick: () => {
+      dispatch(showSaveDialog())
+    },
+    onCloseSaveClick: () => {
+      dispatch(loadStories())
+      dispatch(hideSaveDialog())
     }
   }
 }

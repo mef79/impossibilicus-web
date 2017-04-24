@@ -8,9 +8,10 @@ import React, { PropTypes } from 'react'
 import { connect } from 'react-redux'
 import { createStructuredSelector } from 'reselect'
 import * as d3 from 'd3'
-import makeSelectGraph from './selectors'
 import { getLoadedStoryData, getCurrentStory } from 'containers/HomePage/selectors'
-import { clearStoryData } from 'containers/HomePage/actions'
+import { clearStoryData, updateStory } from 'containers/HomePage/actions'
+import { setListening } from './actions'
+import { isListening } from './selectors'
 
 /* disable a ton of linting because this uses d3 and poor linter does not understand */
 /* eslint no-unused-vars: 0, indent: 0, no-param-reassign:0, no-var: 0, camelcase: 0, prefer-arrow-callback: 0, no-shadow: 0, no-mixed-operators: 0 */
@@ -32,6 +33,7 @@ export class Graph extends React.PureComponent { // eslint-disable-line react/pr
   }
 
   initialize(initialNodes, initialLinks) {
+    var _this = this
     // remove the svg if there already is one
     d3.select('svg').remove()
 
@@ -88,24 +90,21 @@ export class Graph extends React.PureComponent { // eslint-disable-line react/pr
     if (initialNodes.length < 1) {
       initialNodes = [createNode(dimensions.width / 2, dimensions.height / 2)]
     }
+    this.nodes = initialNodes
 
-    // if (initialLinks.length > 0) {
-    //   let updatedLinks = []
-    //   initialLinks.forEach(link => {
-    //     updatedLinks.push({
-    //       source: initialNodes.find(e => e.id === link.source.id),
-    //     })
-    //   })
-    //   initialLinks = updatedLinks
-    // }
+    initialLinks.forEach(link => {
+      link.source = getNode(link.source)
+      link.target = getNode(link.target)
+    })
+    this.links = initialLinks
 
     var force = d3.layout.force() // create a force layout
         .size([dimensions.width, dimensions.height]) // of the given width/height
-        .nodes(initialNodes) // initialize with a single node - ???
-        .links(initialLinks)
+        .nodes(this.nodes) // initialize with a single node - ???
+        .links(this.links)
         .linkDistance(150) // how far the nodes are away from eachother
         .charge(-500) // how strongly the nodes repel eachother
-        .on('tick', tick) // call the 'tick' function when drawing frames
+        .on('tick', tick.bind(this)) // call the 'tick' function when drawing frames
 
     // defines the zoom behavior
     var zoom = d3.behavior.zoom()
@@ -227,22 +226,14 @@ export class Graph extends React.PureComponent { // eslint-disable-line react/pr
         .on('drag', dragMove)
         .on('dragend', dragEnd)
 
-    // get layout properties
-    var nodes = initialNodes
-    initialLinks.forEach(link => {
-      link.source = getNode(link.source)
-      link.target = getNode(link.target)
-    })
-    var links = initialLinks
-
     var link = container.append('g').attr('class', 'link-group').selectAll('path')
-        .data(links)
+        .data(this.links)
         .enter().append('svg:path')
         .attr('class', d => `link ${d.type}`)
         .attr('marker-end', d => selected_link === d ? 'url(#end-selected)' : 'url(#end)')
 
     var node = container.selectAll('.node')
-        .data(nodes)
+        .data(this.nodes)
         .enter().append('rect')
         .on('click', onNodeClick)
         .attr('width', nodeSize.width)
@@ -254,7 +245,7 @@ export class Graph extends React.PureComponent { // eslint-disable-line react/pr
         .call(node_drag)
 
     var nodelabels = container.selectAll('.nodelabel')
-        .data(force.nodes())
+        .data(this.nodes)
         .enter()
         .append('text')
         .on('click', onNodeClick)
@@ -312,7 +303,11 @@ export class Graph extends React.PureComponent { // eslint-disable-line react/pr
         updateStyle() // update the overall style of the container
         setMotion() // pause the graph when some element is selected
 
-        link = link.data(links)
+        if (_this.props.isListening) {
+          _this.props.onStoryUpdate(_this.nodes, _this.links)
+        }
+
+        link = link.data(_this.links)
 
         link.enter().insert('path', '.node')
             .attr('class', 'link')
@@ -331,7 +326,7 @@ export class Graph extends React.PureComponent { // eslint-disable-line react/pr
             .classed('link_selected', d => d === selected_link)
             .attr('marker-end', d => d === selected_link ? 'url(#end-selected' : 'url(#end)')
 
-        node = node.data(nodes)
+        node = node.data(_this.nodes)
 
         node.enter().insert('rect')
             .attr('class', 'node')
@@ -357,7 +352,7 @@ export class Graph extends React.PureComponent { // eslint-disable-line react/pr
 
         node.classed('node_selected', d => d === selected_node)
 
-        nodelabels = nodelabels.data(nodes)
+        nodelabels = nodelabels.data(_this.nodes)
         nodelabels
             .enter()
             .insert('text')
@@ -653,10 +648,10 @@ export class Graph extends React.PureComponent { // eslint-disable-line react/pr
     function insertNewNode(x, y, linkedFrom) {
         var link
         var node = createNode(x, y)
-        nodes.push(node)
+        _this.nodes.push(node)
         if (linkedFrom) {
             link = createLink(linkedFrom, node)
-            links.push(link)
+            _this.links.push(link)
         }
         if (!isUndoing) {
             redoStack = []
@@ -674,19 +669,19 @@ export class Graph extends React.PureComponent { // eslint-disable-line react/pr
 
     // insert an already created node
     function insertNode(node) {
-        nodes.push(node)
+        _this.nodes.push(node)
     }
 
     // create and insert a link
     function insertNewLink(source, target) {
         var newlink = createLink(source, target)
-        links.push(newlink)
+        _this.links.push(newlink)
         if (!isUndoing) {
             redoStack = []
             undoStack.push(() => {
                 deleteLink(newlink)
                 redoStack.push(() => {
-                    links.push(newlink)
+                    _this.links.push(newlink)
                 })
             })
         }
@@ -694,11 +689,11 @@ export class Graph extends React.PureComponent { // eslint-disable-line react/pr
 
     // safe way to re-insert links whose nodes may have been deleted in the past
     function insertLinks(links) {
-        links.forEach(link => { insertLink(link) })
+        _this.links.forEach(link => { insertLink(link) })
     }
 
     function insertLink(link) {
-        links.push(createLink(link.source, link.target))
+        _this.links.push(createLink(link.source, link.target))
     }
 
     // delete a node from the graph
@@ -706,7 +701,7 @@ export class Graph extends React.PureComponent { // eslint-disable-line react/pr
         removeNode(node)
 
         // store the links that have been deleted so that they can be stored in the undo action
-        var deleted = links.filter(link => link.source === node || link.target === node)
+        var deleted = _this.links.filter(link => link.source === node || link.target === node)
 
         // remove the deleted links
         deleted.forEach(link => { removeLink(link) })
@@ -740,18 +735,18 @@ export class Graph extends React.PureComponent { // eslint-disable-line react/pr
 
     // remove a node from the list
     function removeNode(node) {
-        nodes.splice(nodes.indexOf(node), 1)
+        _this.nodes.splice(_this.nodes.indexOf(node), 1)
     }
 
     // remove a link from the list
     function removeLink(link) {
-        links.splice(nodes.indexOf(link), 1)
+        _this.links.splice(_this.nodes.indexOf(link), 1)
     }
 
     // util ----------------------------------------------------------------------------------------//
     // find a node by its index
     function getNode(node) {
-        return nodes.find(e => e.id === node.id)
+        return _this.nodes.find(e => e.id === node.id)
     }
 
     // remove all elements of a given class
@@ -840,18 +835,25 @@ Graph.propTypes = {
     PropTypes.object,
     PropTypes.bool
   ]),
-  onInitialized: PropTypes.func
+  onInitialized: PropTypes.func,
+  isListening: PropTypes.bool,
+  onStoryUpdate: PropTypes.func,
 }
 
 const mapStateToProps = createStructuredSelector({
   storyData: getLoadedStoryData(),
   currentStory: getCurrentStory(),
+  isListening: isListening(),
 })
 
 export function mapDispatchToProps(dispatch) {
   return {
     onInitialized: () => {
       dispatch(clearStoryData())
+      dispatch(setListening(true)) // update store when things happen
+    },
+    onStoryUpdate: (nodes, links) => {
+      dispatch(updateStory(nodes, links))
     }
   }
 }
