@@ -8,6 +8,7 @@ import { fromJS } from 'immutable'
 import {
   DEFAULT_ACTION,
   SET_LISTENING,
+  SET_SELECTED_NODE,
 } from './constants'
 
 const initialState = fromJS({
@@ -21,6 +22,9 @@ function graphReducer(state = initialState, action) {
     case SET_LISTENING:
       return state
         .set('listening', action.isListening)
+    case SET_SELECTED_NODE:
+      return state
+        .set('selectedNode', action.selectedNode)
     default:
       return state
   }

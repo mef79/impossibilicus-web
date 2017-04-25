@@ -10,8 +10,8 @@ import { createStructuredSelector } from 'reselect'
 import * as d3 from 'd3'
 import { getLoadedStoryData, getCurrentStory } from 'containers/HomePage/selectors'
 import { clearStoryData, updateStory } from 'containers/HomePage/actions'
-import { setListening } from './actions'
-import { isListening } from './selectors'
+import { setListening, setSelectedNode } from './actions'
+import { isListening, getSelectedNode } from './selectors'
 
 /* disable a ton of linting because this uses d3 and poor linter does not understand */
 /* eslint no-unused-vars: 0, indent: 0, no-param-reassign:0, no-var: 0, camelcase: 0, prefer-arrow-callback: 0, no-shadow: 0, no-mixed-operators: 0 */
@@ -621,6 +621,7 @@ export class Graph extends React.PureComponent { // eslint-disable-line react/pr
             linkingNode = null
         }
         else {
+            _this.props.onSelectedNodeUpdate(d)
             selected_node = d
             mousedown_node = d
             selected_link = null
@@ -837,12 +838,14 @@ Graph.propTypes = {
   ]),
   onInitialized: PropTypes.func,
   isListening: PropTypes.bool,
+  selectedNode: PropTypes.object,
   onStoryUpdate: PropTypes.func,
 }
 
 const mapStateToProps = createStructuredSelector({
   storyData: getLoadedStoryData(),
   currentStory: getCurrentStory(),
+  selectedNode: getSelectedNode(),
   isListening: isListening(),
 })
 
@@ -854,6 +857,9 @@ export function mapDispatchToProps(dispatch) {
     },
     onStoryUpdate: (nodes, links) => {
       dispatch(updateStory(nodes, links))
+    },
+    onSelectedNodeUpdate: (node) => {
+        dispatch(setSelectedNode(node))
     }
   }
 }

@@ -7,6 +7,7 @@
 import {
   DEFAULT_ACTION,
   SET_LISTENING,
+  SET_SELECTED_NODE,
 } from './constants'
 
 export function defaultAction() {
@@ -18,5 +19,12 @@ export function defaultAction() {
 export function setListening() {
   return {
     type: SET_LISTENING
+  }
+}
+
+export function setSelectedNode(selectedNode) {
+  return {
+    type: SET_SELECTED_NODE,
+    selectedNode,
   }
 }

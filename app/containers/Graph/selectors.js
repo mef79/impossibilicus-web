@@ -10,6 +10,12 @@ const isListening = () => createSelector(
   substate => substate.get('isListening')
 )
 
+const getSelectedNode = () => createSelector(
+  selectGraphDomain(),
+  substate => substate.get('selectedNode')
+)
+
 export {
   isListening,
+  getSelectedNode,
 }

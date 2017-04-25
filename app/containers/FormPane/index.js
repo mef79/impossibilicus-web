@@ -8,6 +8,7 @@ import { connect, } from 'react-redux'
 import { createStructuredSelector, } from 'reselect'
 import { getContentItem, } from 'containers/HomePage/selectors'
 import { saveContentItem, } from 'containers/HomePage/actions'
+import { getSelectedNode, } from 'containers/Graph/selectors'
 
 
 export class FormPane extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
@@ -34,6 +35,7 @@ export class FormPane extends React.PureComponent { // eslint-disable-line react
             <h2 className="card-header">Edit Content</h2>
             <form className="card-block">
               <div className="form-group">
+                <p>Id: {this.props.selectedNode ? this.props.selectedNode.id : ''}</p>
                 <label htmlFor="title">Title</label>
                 <input
                   type="text"
@@ -61,10 +63,12 @@ export class FormPane extends React.PureComponent { // eslint-disable-line react
 FormPane.propTypes = {
   contentItem: PropTypes.object,
   onSaveFormClick: PropTypes.func,
+  selectedNode: PropTypes.object,
 }
 
 const mapStateToProps = createStructuredSelector({
   contentItem: getContentItem(),
+  selectedNode: getSelectedNode(),
 })
 
 function mapDispatchToProps(dispatch) {
