@@ -420,21 +420,14 @@ export class Graph extends React.PureComponent { // eslint-disable-line react/pr
         else if (selected_link) {
             fillInfo(selected_link, false, !linkingNode && !dragged && should_show_info)
         }
-        else if (document.getElementById('bottom')) {
-            clearInfo()
-        }
     }
 
     function clearInfo() {
         removeElementsByClass('mf-tooltip')
-        var bottom = document.getElementById('bottom')
-        bottom.innerHTML = 'No element selected'
     }
 
     function fillInfo(selected, isNode, showTooltip) {
-        var bottom = document.getElementById('bottom')
         var tooltipContent = ''
-        var bottomContent
         removeElementsByClass('mf-tooltip')
         var div = document.createElement('div')
         div.className = 'mf-tooltip'
@@ -467,7 +460,6 @@ export class Graph extends React.PureComponent { // eslint-disable-line react/pr
 
             div.style.left = `${tooltipLeft + offsetLeft}px`
             div.style.top = `${tooltipTop + offsetTop}px`
-            bottomContent = tooltipContent
         }
 
         else {
@@ -475,9 +467,6 @@ export class Graph extends React.PureComponent { // eslint-disable-line react/pr
             ySource = Math.round(selected.source.y)
             xTarget = Math.round(selected.target.x)
             yTarget = Math.round(selected.target.y)
-            bottomContent = `source: (${xSource}, ${ySource})`
-            bottomContent += '<br>'
-            bottomContent += `target: (${xTarget}, ${yTarget})`
             tooltipContent = 'link selected'
             div.style.left = (xSource + xTarget) / 2 - 100
             div.style.top = (ySource + yTarget) / 2 - 25
@@ -519,8 +508,6 @@ export class Graph extends React.PureComponent { // eslint-disable-line react/pr
                 }
             }
         }
-
-        bottom.innerHTML = bottomContent
     }
 
     function showAddingStyle(text) {

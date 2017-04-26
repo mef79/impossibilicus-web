@@ -56,9 +56,6 @@ export class HomePage extends React.PureComponent { // eslint-disable-line react
         <div className="row">
           <div className="col-7">
             <Graph />
-            <div id="bottom">
-              No element selected
-            </div>
           </div>
           <FormPane />
         </div>
