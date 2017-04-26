@@ -188,14 +188,17 @@ div.button.active {
 }
 
 .button {
-    display: inline-block;
-    background: white;
-    float: right;
-    padding: 1px 2px 3px 2px;
-    border: 1px solid #858585;
-    border-radius: 2px;
-    cursor: pointer;
-    margin-left: 3px;
-    margin-right: 3px;
+  display: inline-block;
+  background: white;
+  float: right;
+  padding: 1px 2px 3px 2px;
+  border: 1px solid #858585;
+  border-radius: 2px;
+  margin-left: 3px;
+  margin-right: 3px;
+}
+
+.button, .btn {
+  cursor: pointer;
 }
 `
