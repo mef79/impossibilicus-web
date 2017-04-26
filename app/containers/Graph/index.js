@@ -420,6 +420,9 @@ export class Graph extends React.PureComponent { // eslint-disable-line react/pr
         else if (selected_link) {
             fillInfo(selected_link, false, !linkingNode && !dragged && should_show_info)
         }
+        else {
+            clearInfo()
+        }
     }
 
     function clearInfo() {
