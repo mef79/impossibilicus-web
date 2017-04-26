@@ -27,13 +27,17 @@ const StoryNameInput = styled.input`
   font-size: 20px;
   border: 1px solid #ccc;
   border-radius: 4px;
-  width: 100%
+  width: 100%;
+  margin-top: 20px;
+  margin-bottom: 20px;
 `
 
 const modalStyle = {
   content: {
     height: '200px',
-    top: '30%'
+    width: '500px',
+    top: '30%',
+    left: '30%',
   }
 }
 
