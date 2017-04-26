@@ -46,7 +46,7 @@ body {
 
 
 
-  #graph {
+  svg {
     background-color: #fafafa;
   }
 

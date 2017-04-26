@@ -11,7 +11,7 @@ import * as d3 from 'd3'
 import { getLoadedStoryData, getCurrentStory } from 'containers/HomePage/selectors'
 import { clearStoryData, updateStory } from 'containers/HomePage/actions'
 import { setListening, setSelectedNode } from './actions'
-import { isListening, getSelectedNode } from './selectors'
+import { isListening, getSelectedNode, getDimensions } from './selectors'
 
 /* disable a ton of linting because this uses d3 and poor linter does not understand */
 /* eslint no-unused-vars: 0, indent: 0, no-param-reassign:0, no-var: 0, camelcase: 0, prefer-arrow-callback: 0, no-shadow: 0, no-mixed-operators: 0 */
@@ -36,12 +36,6 @@ export class Graph extends React.PureComponent { // eslint-disable-line react/pr
     var _this = this
     // remove the svg if there already is one
     d3.select('svg').remove()
-
-    // size of the graph
-    var dimensions = {
-        width: 800,
-        height: 500
-    }
 
     // size of the nodes
     var nodeSize = {
@@ -88,7 +82,9 @@ export class Graph extends React.PureComponent { // eslint-disable-line react/pr
     var isRedoing = false
 
     if (initialNodes.length < 1) {
-      initialNodes = [createNode(dimensions.width / 2, dimensions.height / 2)]
+      var midX = _this.props.dimensions.get('width') / 2
+      var midY = _this.props.dimensions.get('height') / 2
+      initialNodes = [createNode(midX, midY)]
     }
     this.nodes = initialNodes
 
@@ -99,7 +95,7 @@ export class Graph extends React.PureComponent { // eslint-disable-line react/pr
     this.links = initialLinks
 
     var force = d3.layout.force() // create a force layout
-        .size([dimensions.width, dimensions.height]) // of the given width/height
+        .size([_this.props.dimensions.get('width'), _this.props.dimensions.get('height')]) // of the given width/height
         .nodes(this.nodes) // initialize with a single node - ???
         .links(this.links)
         .linkDistance(150) // how far the nodes are away from eachother
@@ -114,8 +110,8 @@ export class Graph extends React.PureComponent { // eslint-disable-line react/pr
     // init svg
     var svg = d3.select('#graph')
         .append('svg')
-        .attr('width', dimensions.width)
-        .attr('height', dimensions.height)
+        .attr('width', _this.props.dimensions.get('width'))
+        .attr('height', _this.props.dimensions.get('height'))
         .on('click', onSvgClick)
         .on('mouseup', mouseup)
         .append('g')
@@ -841,6 +837,7 @@ Graph.propTypes = {
   isListening: PropTypes.bool,
   selectedNode: PropTypes.object,
   onStoryUpdate: PropTypes.func,
+  dimensions: PropTypes.object.isRequired,
 }
 
 const mapStateToProps = createStructuredSelector({
@@ -848,6 +845,7 @@ const mapStateToProps = createStructuredSelector({
   currentStory: getCurrentStory(),
   selectedNode: getSelectedNode(),
   isListening: isListening(),
+  dimensions: getDimensions(),
 })
 
 export function mapDispatchToProps(dispatch) {

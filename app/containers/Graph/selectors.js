@@ -15,7 +15,13 @@ const getSelectedNode = () => createSelector(
   substate => substate.get('selectedNode')
 )
 
+const getDimensions = () => createSelector(
+  selectGraphDomain(),
+  substate => substate.get('dimensions')
+)
+
 export {
   isListening,
   getSelectedNode,
+  getDimensions,
 }

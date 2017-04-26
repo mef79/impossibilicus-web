@@ -12,7 +12,11 @@ import {
 } from './constants'
 
 const initialState = fromJS({
-  isListening: true
+  isListening: true,
+  dimensions: {
+    width: 800,
+    height: 500,
+  }
 })
 
 function graphReducer(state = initialState, action) {
