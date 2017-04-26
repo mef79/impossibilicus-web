@@ -20,7 +20,7 @@ class TempButton extends React.PureComponent { // eslint-disable-line react/pref
   render() {
     return (
       <Button
-        className={ this.props.isActive ? `button ${this.props.className} active` : `button ${this.props.className}`}
+        className={ this.props.isActive ? `button ${this.props.className} active` : `button ${this.props.className} disabled`}
         onClick={this.props.onClickFunc }
       >
         {this.props.buttonText}

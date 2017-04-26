@@ -177,7 +177,7 @@ input.invalid:focus {
   outline-color: #fb9797;
 }
 
-div.button {
+div.button.disabled {
   color: #ccc;
 }
 
