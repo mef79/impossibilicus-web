@@ -264,6 +264,7 @@ export class Graph extends React.PureComponent { // eslint-disable-line react/pr
     }
 
     function resetSelected() {
+        _this.props.onSelectedNodeUpdate(null)
         selected_node = null
         selected_link = null
         linkingNode = null
@@ -858,8 +859,8 @@ export function mapDispatchToProps(dispatch) {
     onStoryUpdate: (nodes, links) => {
       dispatch(updateStory(nodes, links))
     },
-    onSelectedNodeUpdate: (node) => {
-        dispatch(setSelectedNode(node))
+    onSelectedNodeUpdate: node => {
+      dispatch(setSelectedNode(node))
     }
   }
 }
