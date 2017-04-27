@@ -3,14 +3,14 @@
  * FormPane
  *
  */
-import React, { PropTypes, } from 'react'
-import { connect, } from 'react-redux'
-import { createStructuredSelector, } from 'reselect'
-import { getContentItem, } from 'containers/HomePage/selectors'
-import { saveContentItem, } from 'containers/HomePage/actions'
-import { updateSelectedNode, } from './actions'
-import { getSelectedNode, } from 'containers/Graph/selectors'
 
+import React, { PropTypes } from 'react'
+import { connect } from 'react-redux'
+import { createStructuredSelector } from 'reselect'
+import { getContentItem } from 'containers/HomePage/selectors'
+import { saveContentItem } from 'containers/HomePage/actions'
+import { updateSelectedNode } from './actions'
+import { getSelectedNode } from 'containers/Graph/selectors'
 
 export class FormPane extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
 

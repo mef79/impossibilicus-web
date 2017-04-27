@@ -11,7 +11,7 @@ function StoryList(props) {
   let content
 
   // render the items as story list items
-  if (props.stories && props.stories.length > 0) {
+  if (props.stories && props.stories.size > 0) {
     content = props.stories.map((item, index) => (
       <StoryListItem
         key={`item-${index}`}
@@ -49,7 +49,7 @@ function StoryList(props) {
 }
 
 StoryList.propTypes = {
-  stories: PropTypes.array
+  stories: PropTypes.object
 }
 
 const mapStateToProps = createStructuredSelector({

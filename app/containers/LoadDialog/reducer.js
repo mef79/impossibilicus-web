@@ -8,7 +8,7 @@ import { fromJS } from 'immutable'
 import {
   LOAD_ALL_STORIES,
   LOAD_ALL_STORIES_SUCCESS,
-  LOAD_ALL_STORIES_ERROR
+  LOAD_ALL_STORIES_ERROR,
 } from './constants'
 
 const initialState = fromJS({
@@ -23,18 +23,18 @@ function loadDialogReducer(state = initialState, action) {
       return state
         .set('loading', true)
         .set('error', false)
-        .set('stories', [])
+        .set('stories', fromJS([]))
     case LOAD_ALL_STORIES_SUCCESS:
       return state
         .set('showLoadDialog', true)
-        .set('stories', action.stories)
+        .set('stories', fromJS(action.stories))
         .set('loading', false)
     case LOAD_ALL_STORIES_ERROR:
       return state
         .set('error', action.error)
         .set('loading', false)
     default:
-      return state;
+      return state
   }
 }
 

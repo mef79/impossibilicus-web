@@ -28,7 +28,7 @@ function graphReducer(state = initialState, action) {
         .set('listening', action.isListening)
     case SET_SELECTED_NODE:
       return state
-        .set('selectedNode', action.selectedNode)
+        .set('selectedNode', fromJS(action.selectedNode))
     default:
       return state
   }
