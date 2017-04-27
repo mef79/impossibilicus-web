@@ -58,9 +58,7 @@ export class HomePage extends React.PureComponent { // eslint-disable-line react
       </nav>
       <div className="container-fluid">
         <div className="row">
-          <div className="col-7">
-            <Graph />
-          </div>
+          <Graph />
           <FormPane />
         </div>
         <LoadDialog />
