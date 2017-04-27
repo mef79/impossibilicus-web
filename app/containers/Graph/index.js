@@ -7,6 +7,7 @@
 import React, { PropTypes } from 'react'
 import { connect } from 'react-redux'
 import { createStructuredSelector } from 'reselect'
+import { isImmutable } from 'immutable'
 import * as d3 from 'd3'
 import { getLoadedStoryData, getCurrentStory } from 'containers/HomePage/selectors'
 import { clearStoryData, updateStory } from 'containers/HomePage/actions'
@@ -27,8 +28,8 @@ export class Graph extends React.PureComponent { // eslint-disable-line react/pr
   }
 
   componentWillReceiveProps(nextProps) {
-    if (!this.props.storyData && nextProps.storyData) {
-      this.initialize(nextProps.storyData.nodes, nextProps.storyData.links)
+    if (this.props.storyData.size === 0 && nextProps.storyData.size > 0) {
+      this.initialize(nextProps.storyData.get('nodes'), nextProps.storyData.get('links'))
     }
   }
 
@@ -81,6 +82,12 @@ export class Graph extends React.PureComponent { // eslint-disable-line react/pr
     var isUndoing = false
     var isRedoing = false
 
+    if (isImmutable(initialNodes)) {
+      initialNodes = initialNodes.toJS()
+    }
+    if (isImmutable(initialLinks)) {
+      initialLinks = initialLinks.toJS()
+    }
     if (initialNodes.length < 1) {
       var midX = _this.props.dimensions.get('width') / 2
       var midY = _this.props.dimensions.get('height') / 2
@@ -819,10 +826,7 @@ export class Graph extends React.PureComponent { // eslint-disable-line react/pr
 }
 
 Graph.propTypes = {
-  storyData: PropTypes.oneOfType([
-    PropTypes.object,
-    PropTypes.bool
-  ]),
+  storyData: PropTypes.object,
   onInitialized: PropTypes.func,
   isListening: PropTypes.bool,
   selectedNode: PropTypes.object,

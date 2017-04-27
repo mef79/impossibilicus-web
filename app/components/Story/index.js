@@ -11,11 +11,11 @@ import FormattedDate from 'components/FormattedDate'
 function Story(props) {
   return (
     <tr className={props.isSelected ? 'selected' : ''}>
-      <Td onClick={ props.selectStory }>{ props.item.name }</Td>
-      <Td>{props.item.nodes.length}</Td>
-      <Td>{props.item.links.length}</Td>
-      <Td><FormattedDate date={props.item.lastModified} /></Td>
-      <Td><FormattedDate date={props.item.created} /></Td>
+      <Td onClick={ props.selectStory }>{ props.item.get('name') }</Td>
+      <Td>{props.item.get('nodes').size}</Td>
+      <Td>{props.item.get('links').size}</Td>
+      <Td><FormattedDate date={props.item.get('lastModified')} /></Td>
+      <Td><FormattedDate date={props.item.get('created')} /></Td>
     </tr>
   )
 }

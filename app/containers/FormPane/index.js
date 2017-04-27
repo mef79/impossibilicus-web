@@ -3,12 +3,12 @@
  * FormPane
  *
  */
-import React, { PropTypes, } from 'react'
-import { connect, } from 'react-redux'
-import { createStructuredSelector, } from 'reselect'
-import { getContentItem, } from 'containers/HomePage/selectors'
-import { saveContentItem, } from 'containers/HomePage/actions'
-import { getSelectedNode, } from 'containers/Graph/selectors'
+import React, { PropTypes } from 'react'
+import { connect } from 'react-redux'
+import { createStructuredSelector } from 'reselect'
+import { getContentItem } from 'containers/HomePage/selectors'
+import { saveContentItem } from 'containers/HomePage/actions'
+import { getSelectedNode } from 'containers/Graph/selectors'
 
 
 export class FormPane extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
@@ -35,7 +35,7 @@ export class FormPane extends React.PureComponent { // eslint-disable-line react
             <h2 className="card-header">Edit Content</h2>
             <form className="card-block">
               <div className="form-group">
-                <p>Id: {this.props.selectedNode ? this.props.selectedNode.id : ''}</p>
+                <p>Id: {this.props.selectedNode ? this.props.selectedNode.get('id') : ''}</p>
                 <label htmlFor="title">Title</label>
                 <input
                   type="text"

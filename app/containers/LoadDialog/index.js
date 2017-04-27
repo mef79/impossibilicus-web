@@ -33,15 +33,9 @@ export class LoadDialog extends React.PureComponent { // eslint-disable-line rea
 
 LoadDialog.propTypes = {
   close: PropTypes.func.isRequired,
-  stories: PropTypes.oneOfType([
-    PropTypes.array,
-    PropTypes.object,
-  ]),
+  stories: PropTypes.object,
   onLoadClick: PropTypes.func,
-  currentStory: PropTypes.oneOfType([
-    PropTypes.string,
-    PropTypes.bool
-  ]),
+  currentStory: PropTypes.string,
   isOpen: PropTypes.bool.isRequired,
 }
 

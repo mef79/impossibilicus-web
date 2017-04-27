@@ -68,18 +68,9 @@ export class HomePage extends React.PureComponent { // eslint-disable-line react
 }
 
 HomePage.propTypes = {
-  stories: PropTypes.oneOfType([
-    PropTypes.array,
-    PropTypes.object
-  ]),
-  currentStory: PropTypes.oneOfType([
-    PropTypes.string,
-    PropTypes.bool
-  ]),
-  storyData: PropTypes.oneOfType([
-    PropTypes.object,
-    PropTypes.bool
-  ]),
+  stories: PropTypes.object,
+  currentStory: PropTypes.string,
+  storyData: PropTypes.object,
   onLoadClick: PropTypes.func,
   onSaveClick: PropTypes.func,
 }

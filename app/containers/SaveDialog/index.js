@@ -81,14 +81,8 @@ export class SaveDialog extends React.PureComponent { // eslint-disable-line rea
 SaveDialog.propTypes = {
   close: PropTypes.func,
   save: PropTypes.func,
-  currentStory: PropTypes.oneOfType([
-    PropTypes.string,
-    PropTypes.bool
-  ]),
-  existingStories: PropTypes.oneOfType([
-    PropTypes.array,
-    PropTypes.object
-  ]),
+  currentStory: PropTypes.string,
+  existingStories: PropTypes.object,
   isValid: PropTypes.bool,
   storyName: PropTypes.string,
   onChangeStoryName: PropTypes.func,

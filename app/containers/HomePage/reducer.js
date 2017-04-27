@@ -28,7 +28,7 @@ import {
 const initialState = fromJS({
   isLoadDialogVisible: false,
   isSaveDialogVisible: false,
-  currentStory: false,
+  currentStory: '',
   stories: [],
   storyData: {
     nodes: [],
@@ -62,17 +62,17 @@ function homeReducer(state = initialState, action) {
         .set('currentStory', action.currentStory)
     case LOAD_STORY_SUCCESS:
       return state
-        .set('storyData', action.story)
+        .set('storyData', fromJS(action.story))
     case CLEAR_STORY_DATA:
       return state
-        .set('storyData', false)
+        .set('storyData', fromJS({}))
     case SAVE_CONTENT_ITEM:
       return state
         .set('contentItem', action.contentItem)
     case UPDATE_STORY:
       return state
-        .setIn(['currentData', 'nodes'], action.nodes)
-        .setIn(['currentData', 'links'], action.links)
+        .setIn(['currentData', 'nodes'], fromJS(action.nodes))
+        .setIn(['currentData', 'links'], fromJS(action.links))
     default:
       return state
   }
