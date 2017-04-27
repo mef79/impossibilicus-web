@@ -74,19 +74,10 @@ tbody tr:nth-child(odd) {
    background-color: #fff;
 }
 
-#undo,
-#redo {
-  margin-left: 5px;
-  margin-right: 5px;  ;
-  cursor: pointer;
+.navButtons {
+   display: flex;
+   justify-content: space-between;
 }
-
-.savebutton{
-    width: 100px;
-    align-self: flex-end
-}
-
-
 
 body {
   font: 13px sans-serif;

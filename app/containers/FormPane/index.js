@@ -8,6 +8,7 @@ import { connect, } from 'react-redux'
 import { createStructuredSelector, } from 'reselect'
 import { getContentItem, } from 'containers/HomePage/selectors'
 import { saveContentItem, } from 'containers/HomePage/actions'
+import { updateSelectedNode, } from './actions'
 import { getSelectedNode, } from 'containers/Graph/selectors'
 
 
@@ -23,6 +24,9 @@ export class FormPane extends React.PureComponent { // eslint-disable-line react
     const contentItem = {
       title: document.getElementById('title').value,
       content: document.getElementById('content').value,
+    }
+    if (this.props.selectedNode) {
+      contentItem.selectedNode = this.props.selectedNode;
     }
     this.props.onSaveFormClick(contentItem)
   }
@@ -63,6 +67,7 @@ export class FormPane extends React.PureComponent { // eslint-disable-line react
 FormPane.propTypes = {
   contentItem: PropTypes.object,
   onSaveFormClick: PropTypes.func,
+  onUpdateNodeClick: PropTypes.func,
   selectedNode: PropTypes.object,
 }
 
@@ -75,6 +80,7 @@ function mapDispatchToProps(dispatch) {
   return {
     onSaveFormClick: contentItem => {
       dispatch(saveContentItem(contentItem))
+      dispatch(updateSelectedNode(contentItem))
     },
   }
 }
