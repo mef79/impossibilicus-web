@@ -9,13 +9,14 @@ import {
   DEFAULT_ACTION,
   SET_LISTENING,
   SET_SELECTED_NODE,
+  SET_DIMENSIONS,
 } from './constants'
 
 const initialState = fromJS({
   isListening: true,
   dimensions: {
-    width: 800,
-    height: 500,
+    width: window.innerWidth >= 1256 ? window.innerWidth - 600 : window.innerWidth - 20,
+    height: window.innerWidth >= 1256 ? window.innerHeight - 200 : (window.innerHeight / 2) - 30,
   }
 })
 
@@ -29,6 +30,9 @@ function graphReducer(state = initialState, action) {
     case SET_SELECTED_NODE:
       return state
         .set('selectedNode', fromJS(action.selectedNode))
+    case SET_DIMENSIONS:
+      return state
+        .set('dimensions', fromJS(action.dimensions))
     default:
       return state
   }

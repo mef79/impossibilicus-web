@@ -84,8 +84,13 @@ body {
   position: relative;
 
 }
+@media screen and (max-width:475px){
+  .btn{
+    font-size:.9em;
+  }
+}
 .push-down {
-  margin-bottom: 2em;
+  margin-bottom: 3px;
 }
 
 .node {

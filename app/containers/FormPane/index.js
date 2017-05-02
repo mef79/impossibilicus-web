@@ -26,19 +26,21 @@ export class FormPane extends React.PureComponent { // eslint-disable-line react
       content: document.getElementById('content').value,
     }
     if (this.props.selectedNode) {
-      contentItem.selectedNode = this.props.selectedNode;
+      contentItem.selectedNode = this.props.selectedNode
     }
     this.props.onSaveFormClick(contentItem)
   }
 
   render() {
+    const selectedNode = this.props.selectedNode ? this.props.selectedNode.toJS() : null
+
     return (
-      <div className="col col-5">
+      <div style={{ width: 600 }}>
         <div className="card">
           <h2 className="card-header">Edit Content</h2>
           <form className="card-block">
             <div className="form-group">
-              <p>Id: {this.props.selectedNode ? this.props.selectedNode.id : ''}</p>
+              <span>{selectedNode ? `Id: ${selectedNode.id} ` : ' '}</span>
               <label htmlFor="title">Title</label>
               <input
                 type="text"

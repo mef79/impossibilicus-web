@@ -9,9 +9,10 @@ import { connect } from 'react-redux'
 import { createStructuredSelector } from 'reselect'
 import { isImmutable } from 'immutable'
 import * as d3 from 'd3'
+import * as jQuery from 'jquery'
 import { getLoadedStoryData, getCurrentStory } from 'containers/HomePage/selectors'
 import { clearStoryData, updateStory } from 'containers/HomePage/actions'
-import { setListening, setSelectedNode } from './actions'
+import { setListening, setSelectedNode, setDimensions } from './actions'
 import { isListening, getSelectedNode, getDimensions } from './selectors'
 
 /* disable a ton of linting because this uses d3 and poor linter does not understand */
@@ -21,16 +22,43 @@ export class Graph extends React.PureComponent { // eslint-disable-line react/pr
   constructor(props) {
     super(props)
     this.initialize = this.initialize.bind(this)
+    this.resizeGraph = this.resizeGraph.bind(this)
   }
-
   componentDidMount() {
+    this.resizeGraph({
+        width: window.innerWidth - 630,
+        height: window.innerHeight - 200,
+      })
     this.initialize([], [])
-  }
+    jQuery(window).resize(() => {
+        if (window.innerWidth >= 1256) {
+            this.props.onResize({
+                width: window.innerWidth - 630,
+                height: window.innerHeight - 50,
+            })
+        } else {
+            this.props.onResize({
+                width: window.innerWidth - 20,
+                height: (window.innerHeight / 2) - 30,
+            })
+        }
+    })
+}
 
   componentWillReceiveProps(nextProps) {
     if (this.props.storyData.size === 0 && nextProps.storyData.size > 0) {
       this.initialize(nextProps.storyData.get('nodes'), nextProps.storyData.get('links'))
     }
+    if (this.props.dimensions.get('height') !== nextProps.dimensions.get('height') ||
+      this.props.dimensions.get('width') !== nextProps.dimensions.get('width')) {
+        this.resizeGraph({ height: nextProps.dimensions.get('height'), width: nextProps.dimensions.get('width') })
+    }
+  }
+
+  resizeGraph(dimensions) {
+    var svg = d3.select('svg')
+        .attr('width', dimensions.width)
+        .attr('height', dimensions.height)
   }
 
   initialize(initialNodes, initialLinks) {
@@ -819,7 +847,9 @@ export class Graph extends React.PureComponent { // eslint-disable-line react/pr
 
   render() {
     return (
-      <div id="graph">
+      <div >
+        <div id="graph" style={{ height: this.props.dimensions.get('height'), width: this.props.dimensions.get('width') }}>
+        </div>
       </div>
     )
   }
@@ -832,6 +862,7 @@ Graph.propTypes = {
   selectedNode: PropTypes.object,
   onStoryUpdate: PropTypes.func,
   dimensions: PropTypes.object.isRequired,
+  onResize: PropTypes.func,
 }
 
 const mapStateToProps = createStructuredSelector({
@@ -853,6 +884,9 @@ export function mapDispatchToProps(dispatch) {
     },
     onSelectedNodeUpdate: node => {
       dispatch(setSelectedNode(node))
+    },
+    onResize: dimensions => {
+      dispatch(setDimensions(dimensions))
     }
   }
 }
