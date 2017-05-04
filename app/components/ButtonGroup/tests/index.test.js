@@ -1,9 +1,9 @@
 // import React from 'react'
 // import { shallow } from 'enzyme'
 
-// import TempButton from '../index'
+// import ButtonGroup from '../index'
 
-describe('<TempButton />', () => {
+describe('<ButtonGroup />', () => {
   it('Expect to have unit tests specified', () => {
     expect(true).toEqual(false)
   })

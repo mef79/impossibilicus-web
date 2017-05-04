@@ -19,6 +19,8 @@ import LoadDialog from 'containers/LoadDialog'
 import SaveDialog from 'containers/SaveDialog'
 import FormPane from 'containers/FormPane'
 import Graph from 'containers/Graph'
+import Button from 'components/Button'
+import ButtonGroup from 'components/ButtonGroup'
 
 import { showLoadDialog, showSaveDialog } from './actions'
 import { loadStories } from '../LoadDialog/actions'
@@ -31,29 +33,15 @@ export class HomePage extends React.PureComponent { // eslint-disable-line react
     return (<div>
       <nav className="navbar navbar-inverse bg-inverse push-down">
         <div className="navButtons">
-          <div className="btn-group" >
-            <span className="btn btn-primary" id="add-node" label="Add Node">Add Node</span>
-            <span className="btn btn-primary" id="undo" label="undo">Undo</span>
-            <span className="btn btn-primary" id="redo" label="redo">Redo</span>
-          </div>
-          <div className="btn-group" >
-            <span
-              className="btn btn-secondary"
-              label="Load"
-              id="load"
-              onClick={this.props.onLoadClick}
-            >
-            Load
-            </span>
-            <span
-              className="btn btn-secondary"
-              label="Save"
-              id="save"
-              onClick={this.props.onSaveClick}
-            >
-              Save
-            </span>
-          </div>
+          <ButtonGroup className="btn-group" >
+            <Button primary id="add-node" text="Add Node" />
+            <Button primary id="undo" text="Undo" />
+            <Button primary id="redo" text="Redo" />
+          </ButtonGroup>
+          <ButtonGroup>
+            <Button id="load" text="Load" onClick={this.props.onLoadClick} />
+            <Button id="save" text="Save" onClick={this.props.onSaveClick} />
+          </ButtonGroup>
         </div>
       </nav>
       <div className="container-fluid">

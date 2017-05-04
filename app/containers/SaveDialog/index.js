@@ -12,7 +12,8 @@ import styled from 'styled-components'
 
 import ModalHeader from 'components/ModalHeader'
 import ModalClose from 'components/ModalClose'
-import TempButton from 'components/TempButton'
+import Button from 'components/Button'
+import ButtonGroup from 'components/ButtonGroup'
 
 import { getValid, getStoryName } from './selectors'
 import { getCurrentStory, getCurrentData, getSaveDialogVisibility } from 'containers/HomePage/selectors'
@@ -54,6 +55,7 @@ export class SaveDialog extends React.PureComponent { // eslint-disable-line rea
 
   render() {
     const isCurrentStory = this.props.currentStory || false
+    const canSaveNew = !isCurrentStory && !!this.props.storyName && this.props.isValid
     return (
       <Modal isOpen={this.props.isOpen} contentLabel="Dialog" style={modalStyle}>
         <ModalHeader>Save Story</ModalHeader>
@@ -63,16 +65,20 @@ export class SaveDialog extends React.PureComponent { // eslint-disable-line rea
           defaultValue={this.props.currentStory || ''}
           onChange={this.onChangeInput}
         />
-        <TempButton
-          buttonText="Update Story"
-          isActive={isCurrentStory}
-          onClickFunc={this.props.onSaveStory}
-        />
-        <TempButton
-          buttonText="New Story"
-          isActive={!isCurrentStory && !!this.props.storyName && this.props.isValid}
-          onClickFunc={this.props.onSaveStory}
-        />
+        <ButtonGroup>
+          <Button
+            primary
+            text="Update Story"
+            disabled={!isCurrentStory}
+            onClick={this.props.onSaveStory}
+          />
+          <Button
+            primary
+            text="New Story"
+            disabled={!canSaveNew}
+            onClick={this.props.onSaveStory}
+          />
+        </ButtonGroup>
       </Modal>
     )
   }

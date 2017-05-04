@@ -11,6 +11,7 @@ import { getContentItem } from 'containers/HomePage/selectors'
 import { saveContentItem } from 'containers/HomePage/actions'
 import { updateSelectedNode } from './actions'
 import { getSelectedNode } from 'containers/Graph/selectors'
+import Button from 'components/Button'
 
 export class FormPane extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
 
@@ -56,7 +57,7 @@ export class FormPane extends React.PureComponent { // eslint-disable-line react
               <textarea className="form-control" id="content" aria-describedby="contentHelp" rows="6" placeholder="Enter your content here..."></textarea>
               <small id="contentHelp" className="form-text text-muted">Get writing</small>
             </div>
-            <button className="btn btn-primary" label="Save" onClick={this.saveForm}>Save</button>
+            <Button primary onClick={this.saveForm} text="Save" />
           </form>
         </div>
       </div>
