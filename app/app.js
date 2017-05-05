@@ -14,8 +14,8 @@ import ReactDOM from 'react-dom'
 
 // bootstrap and support for bootstrap
 import 'jquery'
-import tether from 'tether';
-global.Tether = tether;
+import tether from 'tether'
+global.Tether = tether
 import '!!style-loader!css-loader!./bootstrap/css/bootstrap-reboot.css'
 import '!!style-loader!css-loader!./bootstrap/css/bootstrap.css'
 import '!!style-loader!css-loader!./bootstrap/css/bootstrap-grid.css'
@@ -49,32 +49,32 @@ import configureStore from './store'
 import { translationMessages } from './i18n'
 
 // Import CSS reset and Global Styles
-import './global-styles';
+import './global-styles'
 
 // Import root routes
-import createRoutes from './routes';
+import createRoutes from './routes'
 
 // Create redux store with history
 // this uses the singleton browserHistory provided by react-router
 // Optionally, this could be changed to leverage a created history
-// e.g. `const browserHistory = useRouterHistory(createBrowserHistory)();`
-const initialState = {};
-const store = configureStore(initialState, browserHistory);
+// e.g. `const browserHistory = useRouterHistory(createBrowserHistory)()`
+const initialState = {}
+const store = configureStore(initialState, browserHistory)
 
 // Sync history and store, as the react-router-redux reducer
 // is under the non-default key ("routing"), selectLocationState
 // must be provided for resolving how to retrieve the "route" in the state
 const history = syncHistoryWithStore(browserHistory, store, {
   selectLocationState: makeSelectLocationState(),
-});
+})
 
 // Set up the router, wrapping all Routes in the App component
 const rootRoute = {
   component: App,
   childRoutes: createRoutes(store),
-};
+}
 
-const render = (messages) => {
+const render = messages => {
   ReactDOM.render(
     <Provider store={store}>
       <LanguageProvider messages={messages}>
@@ -90,41 +90,41 @@ const render = (messages) => {
       </LanguageProvider>
     </Provider>,
     document.getElementById('app')
-  );
-};
+  )
+}
 
 // Hot reloadable translation json files
 if (module.hot) {
   // modules.hot.accept does not accept dynamic dependencies,
   // have to be constants at compile-time
   module.hot.accept('./i18n', () => {
-    render(translationMessages);
-  });
+    render(translationMessages)
+  })
 }
 
 // Needed for onTouchTap
 // http://stackoverflow.com/a/34015469/988941
-injectTapEventPlugin();
+injectTapEventPlugin()
 
 // Chunked polyfill for browsers without Intl support
 if (!window.Intl) {
-  (new Promise((resolve) => {
-    resolve(import('intl'));
+  (new Promise(resolve => {
+    resolve(import('intl'))
   }))
     .then(() => Promise.all([
       import('intl/locale-data/jsonp/en.js'),
     ]))
     .then(() => render(translationMessages))
-    .catch((err) => {
-      throw err;
-    });
+    .catch(err => {
+      throw err
+    })
 } else {
-  render(translationMessages);
+  render(translationMessages)
 }
 
 // Install ServiceWorker and AppCache in the end since
 // it's not most important operation and if main code fails,
 // we do not want it installed
 if (process.env.NODE_ENV === 'production') {
-  require('offline-plugin/runtime').install(); // eslint-disable-line global-require
+  require('offline-plugin/runtime').install() // eslint-disable-line global-require
 }

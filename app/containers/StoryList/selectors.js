@@ -3,9 +3,7 @@ import { createSelector } from 'reselect'
 /**
  * Direct selector to the storyList state domain
  */
-const selectStoryListDomain = () => (state) => {
-  return state.get('storyList')
-}
+const selectStoryListDomain = () => state => state.get('storyList')
 
 /**
  * Other specific selectors
@@ -18,7 +16,7 @@ const selectStoryListDomain = () => (state) => {
 
 const makeSelectStoryList = () => createSelector(
   selectStoryListDomain(),
-  (substate) => substate.toJS()
+  substate => substate.toJS()
 )
 
 export {

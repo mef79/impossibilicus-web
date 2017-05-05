@@ -2,10 +2,10 @@
  * COMMON WEBPACK CONFIGURATION
  */
 
-const path = require('path');
-const webpack = require('webpack');
+const path = require('path')
+const webpack = require('webpack')
 
-module.exports = (options) => ({
+module.exports = options => ({
   entry: options.entry,
   output: Object.assign({ // Compile into js/build.js
     path: path.resolve(process.cwd(), 'build'),
@@ -66,14 +66,14 @@ module.exports = (options) => ({
       fetch: 'exports-loader?self.fetch!whatwg-fetch',
     }),
     new webpack.ProvidePlugin({
-      $: "jquery",
-      jQuery: "jquery",
+      $: 'jquery',
+      jQuery: 'jquery',
       Tether: 'tether',
-      'window.Tether' : 'tether'
+      'window.Tether': 'tether'
     }),
 
     // Always expose NODE_ENV to webpack, in order to use `process.env.NODE_ENV`
-    // inside your code for any environment checks; UglifyJS will automatically
+    // inside your code for any environment checks UglifyJS will automatically
     // drop any unreachable code.
     new webpack.DefinePlugin({
       'process.env': {
@@ -99,4 +99,4 @@ module.exports = (options) => ({
   devtool: options.devtool,
   target: 'web', // Make web variables accessible to webpack, e.g. window
   performance: options.performance || {},
-});
+})

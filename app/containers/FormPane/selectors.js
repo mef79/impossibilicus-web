@@ -1,9 +1,9 @@
-import { createSelector } from 'reselect';
+import { createSelector } from 'reselect'
 
 /**
  * Direct selector to the formPane state domain
  */
-const selectFormPaneDomain = () => (state) => state.get('formPane');
+const selectFormPaneDomain = () => state => state.get('formPane')
 
 /**
  * Other specific selectors
@@ -16,10 +16,10 @@ const selectFormPaneDomain = () => (state) => state.get('formPane');
 
 const makeSelectFormPane = () => createSelector(
   selectFormPaneDomain(),
-  (substate) => substate.toJS()
-);
+  substate => substate.toJS()
+)
 
-export default makeSelectFormPane;
+export default makeSelectFormPane
 export {
   selectFormPaneDomain,
-};
+}
