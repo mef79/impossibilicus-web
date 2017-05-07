@@ -23,7 +23,7 @@ import {
   LOAD_STORY,
   LOAD_STORY_SUCCESS,
   LOAD_STORY_ERROR,
-  CLEAR_STORY_DATA,
+  CLEAR_LOADED_STORY,
   SAVE_CONTENT_ITEM,
   UPDATE_STORY,
 } from './constants'
@@ -72,9 +72,9 @@ export function storyLoadError(error) {
   }
 }
 
-export function clearStoryData() {
+export function clearLoadedStory() {
   return {
-    type: CLEAR_STORY_DATA,
+    type: CLEAR_LOADED_STORY,
   }
 }
 

@@ -22,7 +22,7 @@ const getCurrentStory = () => createSelector(
 
 const getLoadedStoryData = () => createSelector(
   selectHome,
-  homeState => homeState.get('storyData'))
+  homeState => homeState.get('loadedStory'))
 
 const getContentItem = () => createSelector(
   selectHome,

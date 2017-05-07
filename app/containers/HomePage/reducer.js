@@ -18,7 +18,7 @@ import {
   HIDE_SAVE_DIALOG,
   LOAD_STORY,
   LOAD_STORY_SUCCESS,
-  CLEAR_STORY_DATA,
+  CLEAR_LOADED_STORY,
   SAVE_CONTENT_ITEM,
   UPDATE_STORY,
 } from './constants'
@@ -29,10 +29,7 @@ const initialState = fromJS({
   isSaveDialogVisible: false,
   currentStory: '',
   stories: [],
-  storyData: {
-    nodes: [],
-    links: [],
-  },
+  loadedStory: {},
   currentData: {
     nodes: [],
     links: [],
@@ -55,16 +52,17 @@ function homeReducer(state = initialState, action) {
       return state
         .set('isSaveDialogVisible', false)
 
-    case LOAD_STORY:
+    // loading an individual story
+    case LOAD_STORY: // fire off event to make request for story
       return state
         .set('loadStory', action.story)
-    case LOAD_STORY_SUCCESS:
+    case LOAD_STORY_SUCCESS: // story loaded: put the data into the store
       return state
-        .set('storyData', fromJS(action.story))
+        .set('loadedStory', fromJS(action.story))
+    case CLEAR_LOADED_STORY: // loaded story has been processed: clear from the store
+      return state
+        .set('loadedStory', fromJS({}))
 
-    case CLEAR_STORY_DATA:
-      return state
-        .set('storyData', fromJS({}))
     case SAVE_CONTENT_ITEM:
       return state
         .set('contentItem', action.contentItem)

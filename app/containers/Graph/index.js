@@ -11,7 +11,7 @@ import { isImmutable } from 'immutable'
 import * as d3 from 'd3'
 import * as jQuery from 'jquery'
 import { getLoadedStoryData, getCurrentStory } from 'containers/HomePage/selectors'
-import { clearStoryData, updateStory } from 'containers/HomePage/actions'
+import { clearLoadedStory, updateStory } from 'containers/HomePage/actions'
 import { setListening, setSelectedNode, setDimensions } from './actions'
 import { isListening, getSelectedNode, getDimensions } from './selectors'
 
@@ -875,8 +875,8 @@ const mapStateToProps = createStructuredSelector({
 
 export function mapDispatchToProps(dispatch) {
   return {
-    onInitialized: () => {
-      dispatch(clearStoryData())
+    onInitialized: () => { // done creating the graph
+      dispatch(clearLoadedStory()) // remove the loaded story data
       dispatch(setListening(true)) // update store when things happen
     },
     onStoryUpdate: (nodes, links) => {
