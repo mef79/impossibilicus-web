@@ -27,10 +27,10 @@ import {
 const initialState = fromJS({
   isLoadDialogVisible: false,
   isSaveDialogVisible: false,
-  currentStory: '',
-  stories: [],
+  currentStoryName: '',
   loadedStory: {},
   currentData: {
+    storyName: '',
     nodes: [],
     links: [],
   },
@@ -59,6 +59,7 @@ function homeReducer(state = initialState, action) {
     case LOAD_STORY_SUCCESS: // story loaded: put the data into the store
       return state
         .set('loadedStory', fromJS(action.story))
+        .set('currentStoryName', action.story.name)
     case CLEAR_LOADED_STORY: // loaded story has been processed: clear from the store
       return state
         .set('loadedStory', fromJS({}))

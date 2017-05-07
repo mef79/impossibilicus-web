@@ -878,6 +878,7 @@ export function mapDispatchToProps(dispatch) {
     onInitialized: () => { // done creating the graph
       dispatch(clearLoadedStory()) // remove the loaded story data
       dispatch(setListening(true)) // update store when things happen
+      // dispatch(setCurrentStoryName())
     },
     onStoryUpdate: (nodes, links) => {
       dispatch(updateStory(nodes, links))
