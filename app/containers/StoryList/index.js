@@ -16,7 +16,6 @@ function StoryList(props) {
       <StoryListItem
         key={`item-${index}`}
         item={item}
-        selected={false}
       />
     ))
   }
@@ -49,11 +48,12 @@ function StoryList(props) {
 }
 
 StoryList.propTypes = {
-  stories: PropTypes.object
+  stories: PropTypes.object,
+  selected: PropTypes.string,
 }
 
 const mapStateToProps = createStructuredSelector({
-  stories: getLoadedStories()
+  stories: getLoadedStories(),
 })
 
 export default connect(mapStateToProps)(StoryList)

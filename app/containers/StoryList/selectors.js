@@ -3,23 +3,13 @@ import { createSelector } from 'reselect'
 /**
  * Direct selector to the storyList state domain
  */
-const selectStoryListDomain = () => state => state.get('storyList')
+const selectStoryListDomain = state => state.get('storyList')
 
-/**
- * Other specific selectors
- */
-
-
-/**
- * Default selector used by StoryList
- */
-
-const makeSelectStoryList = () => createSelector(
-  selectStoryListDomain(),
-  substate => substate.toJS()
+const getSelectedStoryName = () => createSelector(
+  selectStoryListDomain,
+  substate => substate.get('selectedStoryName')
 )
 
 export {
-  selectStoryListDomain,
-  makeSelectStoryList
+  getSelectedStoryName,
 }

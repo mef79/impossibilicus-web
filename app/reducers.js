@@ -13,6 +13,7 @@ import saveDialogReducer from 'containers/SaveDialog/reducer'
 import homeReducer from 'containers/HomePage/reducer'
 import formPaneReducer from 'containers/FormPane/reducer'
 import graphReducer from 'containers/Graph/reducer'
+import storyListReducer from 'containers/StoryList/reducer'
 
 /*
  * routeReducer
@@ -54,6 +55,7 @@ export default function createReducer(asyncReducers) {
     saveDialog: saveDialogReducer,
     formPane: formPaneReducer,
     graph: graphReducer,
+    storyList: storyListReducer,
     ...asyncReducers
   })
 }

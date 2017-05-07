@@ -23,7 +23,6 @@ import {
   LOAD_STORY,
   LOAD_STORY_SUCCESS,
   LOAD_STORY_ERROR,
-  SET_CURRENT_STORY,
   CLEAR_STORY_DATA,
   SAVE_CONTENT_ITEM,
   UPDATE_STORY,
@@ -70,13 +69,6 @@ export function storyLoadError(error) {
   return {
     type: LOAD_STORY_ERROR,
     error,
-  }
-}
-
-export function setCurrentStory(currentStory) {
-  return {
-    type: SET_CURRENT_STORY,
-    currentStory,
   }
 }
 

@@ -18,7 +18,6 @@ import {
   HIDE_SAVE_DIALOG,
   LOAD_STORY,
   LOAD_STORY_SUCCESS,
-  SET_CURRENT_STORY,
   CLEAR_STORY_DATA,
   SAVE_CONTENT_ITEM,
   UPDATE_STORY,
@@ -42,6 +41,7 @@ const initialState = fromJS({
 
 function homeReducer(state = initialState, action) {
   switch (action.type) {
+    // showing/hiding dialogs
     case SHOW_LOAD_DIALOG:
       return state
         .set('isLoadDialogVisible', true)
@@ -54,15 +54,14 @@ function homeReducer(state = initialState, action) {
     case HIDE_SAVE_DIALOG:
       return state
         .set('isSaveDialogVisible', false)
+
     case LOAD_STORY:
       return state
         .set('loadStory', action.story)
-    case SET_CURRENT_STORY:
-      return state
-        .set('currentStory', action.currentStory)
     case LOAD_STORY_SUCCESS:
       return state
         .set('storyData', fromJS(action.story))
+
     case CLEAR_STORY_DATA:
       return state
         .set('storyData', fromJS({}))

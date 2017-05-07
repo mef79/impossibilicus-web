@@ -41,7 +41,7 @@ export class FormPane extends React.PureComponent { // eslint-disable-line react
           <h2 className="card-header">Edit Content</h2>
           <form className="card-block">
             <div className="form-group">
-              <span>{selectedNode ? `Id: ${selectedNode.id} ` : ' '}</span>
+              <div>ID: {selectedNode ? `${selectedNode.id}` : ' '}</div>
               <label htmlFor="title">Title</label>
               <input
                 type="text"
