@@ -4,7 +4,7 @@
  *
  */
 
-export const DEFAULT_ACTION = 'app/Graph/DEFAULT_ACTION'
-export const SET_LISTENING = 'app/Graph/SET_LISTENING'
-export const SET_SELECTED_NODE = 'app/Graph/SET_SELECTED_NODE'
-export const SET_DIMENSIONS = 'app/Graph/SET_DIMENSIONS'
+export const DEFAULT_ACTION = 'Graph/DEFAULT_ACTION'
+export const SET_LISTENING = 'Graph/SET_LISTENING'
+export const SET_SELECTED_NODE = 'Graph/SET_SELECTED_NODE'
+export const SET_DIMENSIONS = 'Graph/SET_DIMENSIONS'

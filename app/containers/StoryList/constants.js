@@ -1,1 +1,1 @@
-export const SET_SELECTED_STORY = 'app/StoryList/SET_SELECTED_STORY'
+export const SET_SELECTED_STORY = 'StoryList/SET_SELECTED_STORY'
