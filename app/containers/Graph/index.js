@@ -10,10 +10,10 @@ import { createStructuredSelector } from 'reselect'
 import { isImmutable } from 'immutable'
 import * as d3 from 'd3'
 import * as jQuery from 'jquery'
-import { getLoadedStoryData, getCurrentStory } from 'containers/HomePage/selectors'
+import { getLoadedStoryData, getCurrentData } from 'containers/HomePage/selectors'
 import { clearLoadedStory, updateStory } from 'containers/HomePage/actions'
 import { setListening, setSelectedNode, setDimensions } from './actions'
-import { isListening, getSelectedNode, getDimensions } from './selectors'
+import { isListening, getSelectedNodeId, getDimensions } from './selectors'
 
 /* disable a ton of linting because this uses d3 and poor linter does not understand */
 /* eslint no-unused-vars: 0, indent: 0, no-param-reassign:0, no-var: 0, camelcase: 0, prefer-arrow-callback: 0, no-shadow: 0, no-mixed-operators: 0 */
@@ -46,8 +46,8 @@ export class Graph extends React.PureComponent { // eslint-disable-line react/pr
 }
 
   componentWillReceiveProps(nextProps) {
-    if (this.props.storyData.size === 0 && nextProps.storyData.size > 0) {
-      this.initialize(nextProps.storyData.get('nodes'), nextProps.storyData.get('links'))
+    if (this.props.loadedData.size === 0 && nextProps.loadedData.size > 0) {
+      this.initialize(nextProps.loadedData.get('nodes'), nextProps.loadedData.get('links'))
     }
     if (this.props.dimensions.get('height') !== nextProps.dimensions.get('height') ||
       this.props.dimensions.get('width') !== nextProps.dimensions.get('width')) {
@@ -643,7 +643,7 @@ export class Graph extends React.PureComponent { // eslint-disable-line react/pr
             linkingNode = null
         }
         else {
-            _this.props.onSelectedNodeUpdate(d)
+            _this.props.onSelectedNodeUpdate(d.id)
             selected_node = d
             mousedown_node = d
             selected_link = null
@@ -859,16 +859,17 @@ Graph.propTypes = {
   storyData: PropTypes.object,
   onInitialized: PropTypes.func,
   isListening: PropTypes.bool,
-  selectedNode: PropTypes.object,
+  selectedNodeId: PropTypes.string,
   onStoryUpdate: PropTypes.func,
   dimensions: PropTypes.object.isRequired,
   onResize: PropTypes.func,
+  loadedData: PropTypes.object,
 }
 
 const mapStateToProps = createStructuredSelector({
-  storyData: getLoadedStoryData(),
-  currentStory: getCurrentStory(),
-  selectedNode: getSelectedNode(),
+  loadedData: getLoadedStoryData(),
+  storyData: getCurrentData(),
+  selectedNodeId: getSelectedNodeId(),
   isListening: isListening(),
   dimensions: getDimensions(),
 })
@@ -883,8 +884,8 @@ export function mapDispatchToProps(dispatch) {
     onStoryUpdate: (nodes, links) => {
       dispatch(updateStory(nodes, links))
     },
-    onSelectedNodeUpdate: node => {
-      dispatch(setSelectedNode(node))
+    onSelectedNodeUpdate: nodeId => {
+      dispatch(setSelectedNode(nodeId))
     },
     onResize: dimensions => {
       dispatch(setDimensions(dimensions))

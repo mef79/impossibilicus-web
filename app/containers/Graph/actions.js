@@ -23,10 +23,10 @@ export function setListening() {
   }
 }
 
-export function setSelectedNode(selectedNode) {
+export function setSelectedNode(selectedNodeId) {
   return {
     type: SET_SELECTED_NODE,
-    selectedNode,
+    selectedNodeId,
   }
 }
 

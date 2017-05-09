@@ -3,25 +3,25 @@ import { createSelector } from 'reselect'
 /**
  * Direct selector to the graph state domain
  */
-const selectGraphDomain = () => state => state.get('graph')
+const selectGraphDomain = state => state.get('graph')
 
 const isListening = () => createSelector(
-  selectGraphDomain(),
+  selectGraphDomain,
   substate => substate.get('isListening')
 )
 
-const getSelectedNode = () => createSelector(
-  selectGraphDomain(),
-  substate => substate.get('selectedNode')
+const getSelectedNodeId = () => createSelector(
+  selectGraphDomain,
+  substate => substate.get('selectedNodeId')
 )
 
 const getDimensions = () => createSelector(
-  selectGraphDomain(),
+  selectGraphDomain,
   substate => substate.get('dimensions')
 )
 
 export {
   isListening,
-  getSelectedNode,
+  getSelectedNodeId,
   getDimensions,
 }

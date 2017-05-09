@@ -17,7 +17,8 @@ const initialState = fromJS({
   dimensions: {
     width: window.innerWidth >= 1256 ? window.innerWidth - 600 : window.innerWidth - 20,
     height: window.innerWidth >= 1256 ? window.innerHeight - 200 : (window.innerHeight / 2) - 30,
-  }
+  },
+  selectedNodeId: null,
 })
 
 function graphReducer(state = initialState, action) {
@@ -29,7 +30,7 @@ function graphReducer(state = initialState, action) {
         .set('listening', action.isListening)
     case SET_SELECTED_NODE:
       return state
-        .set('selectedNode', fromJS(action.selectedNode))
+        .set('selectedNodeId', fromJS(action.selectedNodeId))
     case SET_DIMENSIONS:
       return state
         .set('dimensions', fromJS(action.dimensions))

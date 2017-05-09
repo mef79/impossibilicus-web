@@ -7,10 +7,9 @@
 import React, { PropTypes } from 'react'
 import { connect } from 'react-redux'
 import { createStructuredSelector } from 'reselect'
-import { getContentItem } from 'containers/HomePage/selectors'
+import { getContentItem, getSelectedNode } from 'containers/HomePage/selectors'
 import { saveContentItem } from 'containers/HomePage/actions'
 import { updateSelectedNode } from './actions'
-import { getSelectedNode } from 'containers/Graph/selectors'
 import Button from 'components/Button'
 
 export class FormPane extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
@@ -25,6 +24,7 @@ export class FormPane extends React.PureComponent { // eslint-disable-line react
     const contentItem = {
       title: document.getElementById('title').value,
       content: document.getElementById('content').value,
+      id: this.props.selectedNode.get('id'),
     }
     if (this.props.selectedNode) {
       contentItem.selectedNode = this.props.selectedNode
@@ -35,6 +35,18 @@ export class FormPane extends React.PureComponent { // eslint-disable-line react
   render() {
     const selectedNode = this.props.selectedNode ? this.props.selectedNode.toJS() : null
 
+    if (!selectedNode) {
+      return (
+        <div style={{ width: 600 }}>
+          <div className="card">
+            <h2 className="card-header">Nothing selected</h2>
+            <form className="card-block">
+              No content
+            </form>
+          </div>
+        </div>
+      )
+    }
     return (
       <div style={{ width: 600 }}>
         <div className="card">
@@ -49,12 +61,20 @@ export class FormPane extends React.PureComponent { // eslint-disable-line react
                 id="title"
                 aria-describedby="titleHelp"
                 placeholder="Enter title"
+                value={selectedNode.title}
               />
               <small id="titleHelp" className="form-text text-muted">Name your content</small>
             </div>
             <div className="form-group">
               <label htmlFor="content">Content</label>
-              <textarea className="form-control" id="content" aria-describedby="contentHelp" rows="6" placeholder="Enter your content here..."></textarea>
+              <textarea
+                className="form-control"
+                id="content"
+                aria-describedby="contentHelp"
+                rows="6"
+                placeholder="Enter your content here..."
+                value={selectedNode.content}
+              />
               <small id="contentHelp" className="form-text text-muted">Get writing</small>
             </div>
             <Button primary onClick={this.saveForm} text="Save" />
