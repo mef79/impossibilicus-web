@@ -36,20 +36,26 @@ export function* postUpdatedStory() {
 
   if (changed) {
     const requestURL = `${process.env.API_HOST}/story`
-    yield call(request, requestURL, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        name: current.get('name'),
-        nodes: current.get('nodes').toJS(),
-        links: current.get('links').toJS(),
+    try {
+      yield call(request, requestURL, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          name: current.get('name'),
+          nodes: current.get('nodes').toJS(),
+          links: current.get('links').toJS(),
+        })
       })
-    })
-    // make API call
-    // update lastSaved in state
-    yield put(updateLastSaved(current))
+      // make API call
+      // update lastSaved in state
+      yield put(updateLastSaved(current))
+    }
+    catch (err) {
+      // todo: some form of feedback
+      // console.log('update failed')
+    }
   }
 }
 
