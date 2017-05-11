@@ -102,6 +102,7 @@ export class Graph extends React.PureComponent { // eslint-disable-line react/pr
 
     // used to assign ids to nodes
     var node_counter = 0
+    var link_counter = 0
 
     // temporary placeholder to determine whether to show the tooltip
     var should_show_info = true
@@ -661,10 +662,13 @@ export class Graph extends React.PureComponent { // eslint-disable-line react/pr
 
     // create a link object: links have a source and a target
     function createLink(source, target) {
-        return {
+        var link = {
+            id: `link-${link_counter}`,
             source: getNode(source),
             target: getNode(target)
         }
+        link_counter++
+        return link
     }
 
     // create and insert a node
