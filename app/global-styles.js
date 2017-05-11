@@ -161,7 +161,7 @@ body {
 }
 
 tr.selected {
-  background: #dbe8fc;
+  background: #dbe8fc !important;
 }
 
 input.invalid {
