@@ -9,7 +9,6 @@ import { connect } from 'react-redux'
 import { createStructuredSelector } from 'reselect'
 import { getContentItem, getSelectedNode } from 'containers/HomePage/selectors'
 import { saveContentItem } from 'containers/HomePage/actions'
-import { updateSelectedNode } from './actions'
 import Button from 'components/Button'
 
 export class FormPane extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
@@ -101,7 +100,6 @@ function mapDispatchToProps(dispatch) {
   return {
     onSaveFormClick: contentItem => {
       dispatch(saveContentItem(contentItem))
-      dispatch(updateSelectedNode(contentItem))
     },
   }
 }
