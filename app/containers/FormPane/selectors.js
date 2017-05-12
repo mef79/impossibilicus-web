@@ -18,8 +18,14 @@ const makeSelectFormPane = () => createSelector(
   selectFormPaneDomain(),
   substate => substate.toJS()
 )
+const getFormValues = () => createSelector(
+  selectFormPaneDomain(),
+  substate => substate.get('formValues')
+)
 
 export default makeSelectFormPane
 export {
+  getFormValues,
   selectFormPaneDomain,
+
 }
