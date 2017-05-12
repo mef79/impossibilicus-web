@@ -35,6 +35,10 @@ const getCurrentData = () => createSelector(
   selectHome,
   homeState => homeState.get('currentData'))
 
+const getCurrentName = () => createSelector(
+  selectHome,
+  homeState => homeState.get('currentData').get('name'))
+
 const getLastSavedData = () => createSelector(
   selectHome,
   homeState => homeState.get('lastSavedData'))
@@ -52,6 +56,7 @@ export {
   getLoadedStoryData,
   getContentItem,
   getCurrentData,
+  getCurrentName,
   getSelectedNode,
   getLastSavedData,
 }
