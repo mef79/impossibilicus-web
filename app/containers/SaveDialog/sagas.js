@@ -35,10 +35,10 @@ export function* postUpdatedStory() {
     linksChanged(current.get('links'), lastSaved.get('links'))
 
   if (changed) {
-    const requestURL = `${process.env.API_HOST}/story`
+    const requestURL = `${process.env.API_HOST}/story/${current.get('name')}`
     try {
       yield call(request, requestURL, {
-        method: 'POST',
+        method: 'PUT',
         headers: {
           'Content-Type': 'application/json'
         },
