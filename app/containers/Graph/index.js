@@ -102,6 +102,7 @@ export class Graph extends React.PureComponent { // eslint-disable-line react/pr
 
     // used to assign ids to nodes
     var node_counter = 0
+    var link_counter = 0
 
     // temporary placeholder to determine whether to show the tooltip
     var should_show_info = true
@@ -260,6 +261,7 @@ export class Graph extends React.PureComponent { // eslint-disable-line react/pr
     var link = container.append('g').attr('class', 'link-group').selectAll('path')
         .data(this.links)
         .enter().append('svg:path')
+        .on('click', onLinkClick)
         .attr('class', d => `link ${d.type}`)
         .attr('marker-end', d => selected_link === d ? 'url(#end-selected)' : 'url(#end)')
 
@@ -343,14 +345,7 @@ export class Graph extends React.PureComponent { // eslint-disable-line react/pr
 
         link.enter().insert('path', '.node')
             .attr('class', 'link')
-            .on('mousedown',
-            d => {
-                d3.event.stopPropagation()
-                mousedown_link = d
-                selected_link = d
-                selected_node = null
-                redraw()
-            })
+            .on('click', onLinkClick)
 
         link.exit().remove()
 
@@ -469,13 +464,22 @@ export class Graph extends React.PureComponent { // eslint-disable-line react/pr
         removeElementsByClass('mf-tooltip')
         var div = document.createElement('div')
         div.className = 'mf-tooltip'
-        var xSource, ySource, xTarget, yTarget
 
         var t = d3.transform(d3.select('.transformer').attr('transform'))
 
+        var x, y
+        if (isNode) {
+            x = Math.round(selected.x)
+            y = Math.round(selected.y)
+        }
+        else {
+            x = (Math.round(selected.start.x) + Math.round(selected.end.x)) / 2
+            y = (Math.round(selected.start.y) + Math.round(selected.end.y)) / 2
+        }
+
         // start with just positioning it based on the current scale
-        var tooltipLeft = Math.round(selected.x) * t.scale[0]
-        var tooltipTop = Math.round(selected.y) * t.scale[1]
+        var tooltipLeft = x * t.scale[0]
+        var tooltipTop = y * t.scale[1]
 
         // then account for the current translate
         tooltipLeft += t.translate[0]
@@ -483,31 +487,25 @@ export class Graph extends React.PureComponent { // eslint-disable-line react/pr
 
         // THEN, account for the size of the node (since x/y are at the center)
         tooltipLeft -= t.scale[0] * nodeSize.width / 2
-        tooltipTop -= t.scale[1] * nodeSize.height / 2
+        if (isNode) {
+            tooltipTop -= t.scale[1] * nodeSize.height / 2
+        }
 
         // finally, account for the size of the tooltip
         tooltipLeft -= 60
         tooltipTop -= 50
 
         // ok, FINALLY finally, account for the page offset
-        if (isNode) {
-            var test = document.getElementById('graph')
-            var dimensions = test.getBoundingClientRect()
-            var offsetTop = dimensions.top
-            var offsetLeft = dimensions.left
+        var test = document.getElementById('graph')
+        var dimensions = test.getBoundingClientRect()
+        var offsetTop = dimensions.top
+        var offsetLeft = dimensions.left
 
-            div.style.left = `${tooltipLeft + offsetLeft}px`
-            div.style.top = `${tooltipTop + offsetTop}px`
-        }
+        div.style.left = `${tooltipLeft + offsetLeft}px`
+        div.style.top = `${tooltipTop + offsetTop}px`
 
-        else {
-            xSource = Math.round(selected.source.x)
-            ySource = Math.round(selected.source.y)
-            xTarget = Math.round(selected.target.x)
-            yTarget = Math.round(selected.target.y)
-            tooltipContent = 'link selected'
-            div.style.left = (xSource + xTarget) / 2 - 100
-            div.style.top = (ySource + yTarget) / 2 - 25
+        if (!isNode) {
+            tooltipContent = selected.id
         }
 
         if (showTooltip) {
@@ -651,6 +649,13 @@ export class Graph extends React.PureComponent { // eslint-disable-line react/pr
         redraw()
     }
 
+    function onLinkClick(d) {
+        mousedown_link = d
+        selected_link = d
+        selected_node = null
+        redraw()
+    }
+
     // actions -------------------------------------------------------------------------------------//
     // create a node object nodes have an x, y, and index
     function createNode(x, y) {
@@ -661,10 +666,13 @@ export class Graph extends React.PureComponent { // eslint-disable-line react/pr
 
     // create a link object: links have a source and a target
     function createLink(source, target) {
-        return {
+        var link = {
+            id: `link-${link_counter}`,
             source: getNode(source),
             target: getNode(target)
         }
+        link_counter++
+        return link
     }
 
     // create and insert a node

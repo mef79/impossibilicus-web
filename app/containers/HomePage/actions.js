@@ -26,6 +26,7 @@ import {
   CLEAR_LOADED_STORY,
   SAVE_CONTENT_ITEM,
   UPDATE_STORY,
+  UPDATE_LAST_SAVED,
 } from './constants'
 
 export function showLoadDialog() {
@@ -90,5 +91,12 @@ export function updateStory(nodes, links) {
     type: UPDATE_STORY,
     nodes,
     links
+  }
+}
+
+export function updateLastSaved(story) {
+  return {
+    type: UPDATE_LAST_SAVED,
+    story
   }
 }

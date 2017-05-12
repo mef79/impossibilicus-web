@@ -144,7 +144,7 @@ body {
 
 /* this border color controls the color of the triangle (what looks like the fill of the triangle) */
 .mf-tooltip:after {
-    top: 37px;
+    top: 36px;
     left: 101px;
     border-top: 10px solid #F5F5F5;
     border-left: 10px solid transparent;
@@ -155,13 +155,13 @@ body {
 .mf-tooltip:before {
     top: 37px;
     left: 100px;
-    border-top: 11px solid #858585;
+    border-top: 10px solid #858585;
     border-left: 11px solid transparent;
-    border-right:11px solid transparent;
+    border-right: 10px solid transparent;
 }
 
 tr.selected {
-  background: #dbe8fc;
+  background: #dbe8fc !important;
 }
 
 input.invalid {

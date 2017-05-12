@@ -21,19 +21,19 @@ import {
   CLEAR_LOADED_STORY,
   SAVE_CONTENT_ITEM,
   UPDATE_STORY,
+  UPDATE_LAST_SAVED,
 } from './constants'
 
 // The initial state of the App
 const initialState = fromJS({
   isLoadDialogVisible: false,
   isSaveDialogVisible: false,
-  currentStoryNameg: '',
   loadedStory: {},
   currentData: {
-    storyName: '',
     nodes: [],
     links: [],
   },
+  lastSavedData: {},
 })
 
 function homeReducer(state = initialState, action) {
@@ -59,7 +59,9 @@ function homeReducer(state = initialState, action) {
     case LOAD_STORY_SUCCESS: // story loaded: put the data into the store
       return state
         .set('loadedStory', fromJS(action.story))
-        .set('currentStoryName', action.story.name)
+        .set('lastSavedData', fromJS(action.story))
+        .setIn(['currentData', 'name'], action.story.name)
+        .setIn(['currentData', '_id'], action.story._id)
     case CLEAR_LOADED_STORY: // loaded story has been processed: clear from the store
       return state
         .set('loadedStory', fromJS({}))
@@ -75,6 +77,10 @@ function homeReducer(state = initialState, action) {
       return state
         .setIn(['currentData', 'nodes'], state.get('currentData').get('nodes').mergeDeep(fromJS(action.nodes)))
         .setIn(['currentData', 'links'], state.get('currentData').get('links').mergeDeep(fromJS(action.links)))
+
+    case UPDATE_LAST_SAVED:
+      return state
+        .set('lastSavedData', fromJS(action.story))
     default:
       return state
   }

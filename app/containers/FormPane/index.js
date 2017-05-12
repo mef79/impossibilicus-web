@@ -10,7 +10,7 @@ import { createStructuredSelector } from 'reselect'
 import { getFormValues } from './selectors'
 import { getContentItem, getSelectedNode } from 'containers/HomePage/selectors'
 import { saveContentItem } from 'containers/HomePage/actions'
-import { updateFormValues, updateSelectedNode } from './actions'
+import { updateFormValues } from './actions'
 import Button from 'components/Button'
 import TextInput from 'components/TextInput'
 import TextArea from 'components/TextArea'
@@ -113,7 +113,6 @@ function mapDispatchToProps(dispatch) {
     },
     onSaveFormClick: contentItem => {
       dispatch(saveContentItem(contentItem))
-      dispatch(updateSelectedNode(contentItem))
     },
   }
 }
