@@ -15,8 +15,8 @@ import ModalClose from 'components/ModalClose'
 import Button from 'components/Button'
 import ButtonGroup from 'components/ButtonGroup'
 
-import { getValid, getStoryName } from './selectors'
-import { getCurrentStory, getCurrentData, getSaveDialogVisibility } from 'containers/HomePage/selectors'
+import { getValid } from './selectors'
+import { getCurrentStory, getCurrentData, getSaveDialogVisibility, getCurrentName } from 'containers/HomePage/selectors'
 import { getLoadedStories } from 'containers/LoadDialog/selectors'
 
 import { changeStoryName, setValid, saveStory } from './actions'
@@ -101,9 +101,9 @@ const mapStateToProps = createStructuredSelector({
   defaultValue: getCurrentStory(),
   existingStories: getLoadedStories(),
   isValid: getValid(),
-  storyName: getStoryName(),
   storyData: getCurrentData(),
   isOpen: getSaveDialogVisibility(),
+  currentStory: getCurrentName(),
 })
 
 function mapDispatchToProps(dispatch) {

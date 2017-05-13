@@ -10,11 +10,6 @@ const makeSelectSaveDialog = () => createSelector(
   substate => substate.toJS()
 )
 
-const getStoryName = () => createSelector(
-  selectSaveDialogDomain(),
-  substate => substate.get('storyName')
-)
-
 const getValid = () => createSelector(
   selectSaveDialogDomain(),
   substate => substate.get('isValid')
@@ -23,6 +18,5 @@ const getValid = () => createSelector(
 export default makeSelectSaveDialog
 export {
   selectSaveDialogDomain,
-  getStoryName,
   getValid,
 }

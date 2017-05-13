@@ -2,7 +2,6 @@ import request from 'utils/request'
 import { call, put, select, takeEvery, takeLatest } from 'redux-saga/effects'
 
 import { SAVE_STORY } from './constants'
-import { getStoryName } from './selectors'
 import { hideSaveDialog, updateLastSaved } from 'containers/HomePage/actions'
 import { UPDATE_STORY, SAVE_CONTENT_ITEM } from 'containers/HomePage/constants'
 import { getCurrentData, getLastSavedData } from 'containers/HomePage/selectors'
@@ -13,8 +12,8 @@ import { getCurrentData, getLastSavedData } from 'containers/HomePage/selectors'
 export function* postNewStory() {
   const requestURL = `${process.env.API_HOST}/story`
   // Call our request helper (see 'utils/request')
-  const name = yield select(getStoryName())
   const data = yield select(getCurrentData())
+  const name = data.get('name')
   const { nodes, links } = data.toJS()
   yield call(request, requestURL, {
     method: 'POST',
