@@ -14,6 +14,7 @@ import { getLoadedStoryData, getCurrentData } from 'containers/HomePage/selector
 import { clearLoadedStory, updateStory } from 'containers/HomePage/actions'
 import { setListening, setSelectedNode, setDimensions } from './actions'
 import { isListening, getSelectedNodeId, getDimensions } from './selectors'
+import { LOCK } from 'utils/icons'
 
 /* disable a ton of linting because this uses d3 and poor linter does not understand */
 /* eslint no-unused-vars: 0, indent: 0, no-param-reassign:0, no-var: 0, camelcase: 0, prefer-arrow-callback: 0, no-shadow: 0, no-mixed-operators: 0 */
@@ -43,7 +44,7 @@ export class Graph extends React.PureComponent { // eslint-disable-line react/pr
             })
         }
     })
-}
+  }
 
   componentWillReceiveProps(nextProps) {
     if (this.props.loadedData.size === 0 && nextProps.loadedData.size > 0) {
@@ -179,7 +180,7 @@ export class Graph extends React.PureComponent { // eslint-disable-line react/pr
         .attr('class', d => d)
         .append('svg:path')
         .attr('d', 'M0,-5L10,0L0,5')
-        .attr('fill', d => d === 'end-selected' ? '#ff7f0e' : '#000')
+        .attr('fill', d => d === 'end-selected' ? '#ff7f0e' : '#555555')
 
     // create filter with id #drop-shadow
     // height=130% so that the shadow is not clipped
@@ -265,6 +266,12 @@ export class Graph extends React.PureComponent { // eslint-disable-line react/pr
         .attr('class', d => `link ${d.type}`)
         .attr('marker-end', d => selected_link === d ? 'url(#end-selected)' : 'url(#end)')
 
+    var lock = container.append('g').attr('class', 'lock-group').selectAll('path')
+        .data(this.links.filter(e => e.locked))
+        .enter().append('path')
+        .attr('d', LOCK)
+        .attr('class', 'link-lock')
+
     var node = container.selectAll('.node')
         .data(this.nodes)
         .enter().append('rect')
@@ -318,10 +325,16 @@ export class Graph extends React.PureComponent { // eslint-disable-line react/pr
             const prevEnd = d.end ? d.end : d.target
             const start = getClosestMidpointOnRect(d.target, d.source)
             const end = getClosestPointOnRect(prevStart, d.target)
+            d.midX = (start.x + end.x) / 2
+            d.midY = (start.y + end.y) / 2
             d.start = start
             d.end = end
             return `M${start.x},${start.y}L${end.x},${end.y}`
         })
+
+        lock.attr('x', d => d.midX)
+            .attr('y', d => d.midY)
+            .attr('transform', d => `translate(${d.midX - 8},${d.midY - 10})scale(.7,.7)`)
 
         // redraw the ndes at their new position
         node.attr('x', d => d.x - nodeSize.width / 2)
@@ -340,6 +353,17 @@ export class Graph extends React.PureComponent { // eslint-disable-line react/pr
         if (_this.props.isListening) {
           _this.props.onStoryUpdate(_this.nodes, _this.links)
         }
+
+        lock = lock.data(_this.links.filter(e => e.locked))
+
+        lock.enter()
+            .insert('path')
+            .attr('class', 'link-lock')
+            .attr('d', LOCK)
+            .attr('x', d => d.midX)
+            .attr('y', d => d.midY)
+            .attr('transform', d => `translate(${d.midX - 8},${d.midY - 10})scale(.7,.7)`)
+        lock.exit().remove()
 
         link = link.data(_this.links)
 
@@ -532,6 +556,16 @@ export class Graph extends React.PureComponent { // eslint-disable-line react/pr
             unlockButton.innerHTML = 'unlock'
             unlockButton.onclick = onUnlockClick
 
+            var lockLink = document.createElement('div')
+            lockLink.className = 'button'
+            lockLink.innerHTML = 'lock'
+            lockLink.onclick = onLockLinkClick
+
+            var unlockLink = document.createElement('div')
+            unlockLink.className = 'button'
+            unlockLink.innerHTML = 'unlock'
+            unlockLink.onclick = onUnlockLinkClick
+
             document.body.appendChild(div)
             div.innerHTML = tooltipContent
             div.appendChild(delButton)
@@ -542,6 +576,12 @@ export class Graph extends React.PureComponent { // eslint-disable-line react/pr
                 if (selected_node.fixed) {
                     div.appendChild(unlockButton)
                 }
+            }
+            else if (selected_link.locked) {
+                div.appendChild(unlockLink)
+            }
+            else {
+                div.appendChild(lockLink)
             }
         }
     }
@@ -602,6 +642,16 @@ export class Graph extends React.PureComponent { // eslint-disable-line react/pr
     function onUnlockClick() {
         selected_node.fixed = false
         selected_node = null
+        redraw()
+    }
+
+    function onLockLinkClick() {
+        selected_link.locked = true
+        redraw()
+    }
+
+    function onUnlockLinkClick() {
+        selected_link.locked = false
         redraw()
     }
 
@@ -669,7 +719,8 @@ export class Graph extends React.PureComponent { // eslint-disable-line react/pr
         var link = {
             id: `link-${link_counter}`,
             source: getNode(source),
-            target: getNode(target)
+            target: getNode(target),
+            locked: false,
         }
         link_counter++
         return link

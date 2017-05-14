@@ -105,9 +105,13 @@ body {
 }
 
 .link {
-  stroke: #000;
+  stroke: #555555;
   stroke-width: 2;
   cursor: pointer;
+}
+
+.link-lock {
+  fill: #000;
 }
 
 .link_selected {
