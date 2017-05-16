@@ -81,12 +81,16 @@ export class FormPane extends React.PureComponent { // eslint-disable-line react
     }
     return (
       <div key={this.props.selectedNode} style={{ width: 600 }}>
-        <select id="nodeSelect" onChange={this.changeSelected} value={this.props.selectedNode ? selectedNode.title || selectedNode.id : null}>
-          {
-            nodeNameArray
-          }
-        </select>
+
         <div className="card">
+          <div className="form-group col-6">
+            <select id="nodeSelect" className="form-control" onChange={this.changeSelected} value={this.props.selectedNode ? selectedNode.title || selectedNode.id : null}>
+              {
+                nodeNameArray
+              }
+
+            </select>
+          </div>
           <h2 className="card-header">Edit Content</h2>
           <form className="card-block">
             <TextInput
