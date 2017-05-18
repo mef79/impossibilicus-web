@@ -19,9 +19,7 @@ import LoadDialog from 'containers/LoadDialog'
 import SaveDialog from 'containers/SaveDialog'
 import FormPane from 'containers/FormPane'
 import Graph from 'containers/Graph'
-import Button from 'components/Button'
-import ButtonGroup from 'components/ButtonGroup'
-
+import NavigationBar from 'components/NavigationBar'
 import { showLoadDialog, showSaveDialog } from './actions'
 import { loadStories } from '../LoadDialog/actions'
 
@@ -31,19 +29,7 @@ import { getCurrentStory, getLoadedStoryData } from './selectors'
 export class HomePage extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   render() {
     return (<div>
-      <nav className="navbar navbar-inverse bg-inverse push-down">
-        <div className="navButtons">
-          <ButtonGroup className="btn-group" >
-            <Button primary id="add-node" text="Add Node" />
-            <Button primary id="undo" text="Undo" />
-            <Button primary id="redo" text="Redo" />
-          </ButtonGroup>
-          <ButtonGroup>
-            <Button id="load" text="Load" onClick={this.props.onLoadClick} />
-            <Button id="save" text="Save" onClick={this.props.onSaveClick} />
-          </ButtonGroup>
-        </div>
-      </nav>
+      <NavigationBar onLoadClick={this.props.onLoadClick} onSaveClick={this.props.onSaveClick} />
       <div className="container-fluid">
         <div className="row justify-content-around align-self-start">
           <Graph />
