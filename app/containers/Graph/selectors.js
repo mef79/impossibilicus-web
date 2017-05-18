@@ -15,6 +15,11 @@ const getSelectedNodeId = () => createSelector(
   substate => substate.get('selectedNodeId')
 )
 
+const getSelectedLinkId = () => createSelector(
+  selectGraphDomain,
+  substate => substate.get('selectedLinkId')
+)
+
 const getDimensions = () => createSelector(
   selectGraphDomain,
   substate => substate.get('dimensions')
@@ -23,5 +28,6 @@ const getDimensions = () => createSelector(
 export {
   isListening,
   getSelectedNodeId,
+  getSelectedLinkId,
   getDimensions,
 }

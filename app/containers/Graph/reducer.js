@@ -9,6 +9,7 @@ import {
   DEFAULT_ACTION,
   SET_LISTENING,
   SET_SELECTED_NODE,
+  SET_SELECTED_LINK,
   SET_DIMENSIONS,
 } from './constants'
 
@@ -19,6 +20,7 @@ const initialState = fromJS({
     height: window.innerWidth >= 1256 ? window.innerHeight - 200 : (window.innerHeight / 2) - 30,
   },
   selectedNodeId: null,
+  selectedLinkId: null,
 })
 
 function graphReducer(state = initialState, action) {
@@ -31,6 +33,9 @@ function graphReducer(state = initialState, action) {
     case SET_SELECTED_NODE:
       return state
         .set('selectedNodeId', fromJS(action.selectedNodeId))
+    case SET_SELECTED_LINK:
+      return state
+        .set('selectedLinkId', fromJS(action.selectedLinkId))
     case SET_DIMENSIONS:
       return state
         .set('dimensions', fromJS(action.dimensions))

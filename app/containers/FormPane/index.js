@@ -8,7 +8,7 @@ import React, { PropTypes } from 'react'
 import { connect } from 'react-redux'
 import { createStructuredSelector } from 'reselect'
 import { getFormValues } from './selectors'
-import { getContentItem, getSelectedNode, getAllNodes } from 'containers/HomePage/selectors'
+import { getContentItem, getSelectedNode, getSelectedLink, getAllNodes } from 'containers/HomePage/selectors'
 import { saveContentItem } from 'containers/HomePage/actions'
 import { updateFormValues } from './actions'
 import { setSelectedNode } from 'containers/Graph/actions'
@@ -92,6 +92,7 @@ export class FormPane extends React.PureComponent { // eslint-disable-line react
             </select>
           </div>
           <h2 className="card-header">Edit Content</h2>
+          <h4>{this.props.selectedLink ? this.props.selectedLink.get('id') : ''}</h4>
           <form className="card-block">
             <TextInput
               label="Title"
@@ -125,6 +126,7 @@ FormPane.propTypes = {
   onSaveFormClick: PropTypes.func,
   onUpdateNodeClick: PropTypes.func,
   selectedNode: PropTypes.object,
+  selectedLink: PropTypes.object,
   formValues: PropTypes.object,
   onFormUpdate: PropTypes.func,
   allGraphNodes: PropTypes.object,
@@ -134,6 +136,7 @@ FormPane.propTypes = {
 const mapStateToProps = createStructuredSelector({
   contentItem: getContentItem(),
   selectedNode: getSelectedNode(),
+  selectedLink: getSelectedLink(),
   formValues: getFormValues(),
   allGraphNodes: getAllNodes(),
 })

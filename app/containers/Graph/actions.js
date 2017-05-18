@@ -9,6 +9,7 @@ import {
   SET_LISTENING,
   SET_SELECTED_NODE,
   SET_DIMENSIONS,
+  SET_SELECTED_LINK,
 } from './constants'
 
 export function defaultAction() {
@@ -26,7 +27,14 @@ export function setListening() {
 export function setSelectedNode(selectedNodeId) {
   return {
     type: SET_SELECTED_NODE,
-    selectedNodeId,
+    selectedNodeId
+  }
+}
+
+export function setSelectedLink(selectedLinkId) {
+  return {
+    type: SET_SELECTED_LINK,
+    selectedLinkId
   }
 }
 

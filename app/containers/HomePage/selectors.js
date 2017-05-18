@@ -8,6 +8,7 @@ const selectHome = state => state.get('home')
 
 // todo: figure out how to get this from an import from graph
 const selectCurrentNodeId = state => state.get('graph').get('selectedNodeId')
+const selectCurrentLinkId = state => state.get('graph').get('selectedLinkId')
 
 const getLoadDialogVisibility = () => createSelector(
   selectHome,
@@ -52,6 +53,11 @@ const getSelectedNode = () => createSelector(
   selectCurrentNodeId,
   (homeState, selectedNodeId) => homeState.get('currentData').get('nodes').find(e => e.get('id') === selectedNodeId))
 
+const getSelectedLink = () => createSelector(
+  selectHome,
+  selectCurrentLinkId,
+  (homeState, selectedLinkId) => homeState.get('currentData').get('links').find(e => e.get('id') === selectedLinkId))
+
 export {
   selectHome,
   getLoadDialogVisibility,
@@ -64,4 +70,5 @@ export {
   getAllNodes,
   getSelectedNode,
   getLastSavedData,
+  getSelectedLink,
 }

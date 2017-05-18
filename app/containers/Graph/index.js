@@ -12,7 +12,7 @@ import * as d3 from 'd3'
 import * as jQuery from 'jquery'
 import { getLoadedStoryData, getCurrentData } from 'containers/HomePage/selectors'
 import { clearLoadedStory, updateStory } from 'containers/HomePage/actions'
-import { setListening, setSelectedNode, setDimensions } from './actions'
+import { setListening, setSelectedNode, setSelectedLink, setDimensions } from './actions'
 import { isListening, getSelectedNodeId, getDimensions } from './selectors'
 import { LOCK } from 'utils/icons'
 
@@ -305,6 +305,7 @@ export class Graph extends React.PureComponent { // eslint-disable-line react/pr
 
     function resetSelected() {
         _this.props.onSelectedNodeUpdate(null)
+        _this.props.onSelectedLinkUpdate(null)
         selected_node = null
         selected_link = null
         linkingNode = null
@@ -700,6 +701,7 @@ export class Graph extends React.PureComponent { // eslint-disable-line react/pr
     }
 
     function onLinkClick(d) {
+        _this.props.onSelectedLinkUpdate(d.id)
         mousedown_link = d
         selected_link = d
         selected_node = null
@@ -948,7 +950,10 @@ export function mapDispatchToProps(dispatch) {
     },
     onResize: dimensions => {
       dispatch(setDimensions(dimensions))
-    }
+    },
+    onSelectedLinkUpdate: linkId => {
+        dispatch(setSelectedLink(linkId))
+    },
   }
 }
 
