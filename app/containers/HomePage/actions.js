@@ -27,6 +27,8 @@ import {
   SAVE_CONTENT_ITEM,
   UPDATE_STORY,
   UPDATE_LAST_SAVED,
+  LOCK_LINK,
+  UNLOCK_LINK,
 } from './constants'
 
 export function showLoadDialog() {
@@ -98,5 +100,19 @@ export function updateLastSaved(story) {
   return {
     type: UPDATE_LAST_SAVED,
     story
+  }
+}
+
+export function lockLink(linkId) {
+  return {
+    type: LOCK_LINK,
+    linkId
+  }
+}
+
+export function unlockLink(linkId) {
+  return {
+    type: UNLOCK_LINK,
+    linkId
   }
 }

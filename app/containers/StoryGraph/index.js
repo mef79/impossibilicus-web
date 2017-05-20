@@ -11,12 +11,7 @@ import { createStructuredSelector } from 'reselect'
 import { getDimensions } from 'containers/Graph/selectors'
 
 export class StoryGraph extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
-  constructor(props) {
-    super(props)
-    this.createDefaultStructure = this.createDefaultStructure.bind(this)
-  }
-
-  createDefaultStructure(createNode) {
+  createDefaultStructure = createNode => {
     const midX = this.props.dimensions.get('width') / 2
     const midY = this.props.dimensions.get('height') / 2
     return {

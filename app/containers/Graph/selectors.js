@@ -15,8 +15,7 @@ const getSelectedNodeId = () => createSelector(
 
 const getSelectedLinkId = () => createSelector(
   selectGraphDomain,
-  substate => substate.get('selectedLinkId')
-)
+  substate => substate.get('selectedLinkId'))
 
 const getDimensions = () => createSelector(
   selectGraphDomain,

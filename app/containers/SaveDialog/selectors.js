@@ -5,18 +5,15 @@ import { createSelector } from 'reselect'
  */
 const selectSaveDialogDomain = () => state => state.get('saveDialog')
 
-const makeSelectSaveDialog = () => createSelector(
-  selectSaveDialogDomain(),
-  substate => substate.toJS()
-)
-
 const getValid = () => createSelector(
   selectSaveDialogDomain(),
-  substate => substate.get('isValid')
-)
+  substate => substate.get('isValid'))
 
-export default makeSelectSaveDialog
+const getEnteredName = () => createSelector(
+  selectSaveDialogDomain(),
+  substate => substate.get('storyName'))
+
 export {
-  selectSaveDialogDomain,
   getValid,
+  getEnteredName,
 }
