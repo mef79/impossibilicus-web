@@ -18,7 +18,7 @@ import { createStructuredSelector } from 'reselect'
 import LoadDialog from 'containers/LoadDialog'
 import SaveDialog from 'containers/SaveDialog'
 import FormPane from 'containers/FormPane'
-import Graph from 'containers/Graph'
+import StoryGraph from 'containers/StoryGraph'
 import Button from 'components/Button'
 import ButtonGroup from 'components/ButtonGroup'
 
@@ -46,7 +46,7 @@ export class HomePage extends React.PureComponent { // eslint-disable-line react
       </nav>
       <div className="container-fluid">
         <div className="row justify-content-around align-self-start">
-          <Graph />
+          <StoryGraph />
           <FormPane />
         </div>
         <LoadDialog />

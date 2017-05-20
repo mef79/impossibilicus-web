@@ -34,6 +34,7 @@ const initialState = fromJS({
     links: [],
   },
   lastSavedData: {},
+  selectedNode: {},
 })
 
 function homeReducer(state = initialState, action) {

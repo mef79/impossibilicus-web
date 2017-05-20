@@ -10,10 +10,33 @@ import { createStructuredSelector } from 'reselect'
 import { isImmutable } from 'immutable'
 import * as d3 from 'd3'
 import * as jQuery from 'jquery'
-import { getLoadedStoryData, getCurrentData } from 'containers/HomePage/selectors'
+import {
+  getLoadedStoryData,
+  getCurrentData,
+  getSelectedNode,
+  getSelectedLink,
+} from 'containers/HomePage/selectors'
 import { clearLoadedStory, updateStory } from 'containers/HomePage/actions'
-import { setListening, setSelectedNode, setDimensions } from './actions'
-import { isListening, getSelectedNodeId, getDimensions } from './selectors'
+import {
+  setListening,
+  setSelectedNode,
+  setSelectedLink,
+  setDimensions,
+  incrementNodeCounter,
+  incrementLinkCounter,
+  setLinkingNode,
+  setMousedownNode,
+  setMousedownLink,
+} from './actions'
+import {
+  isListening,
+  getDimensions,
+  getNodeCount,
+  getLinkCount,
+  getLinkingNode,
+  getMousedownNode,
+  getMousedownLink,
+} from './selectors'
 import { LOCK } from 'utils/icons'
 
 /* disable a ton of linting because this uses d3 and poor linter does not understand */
@@ -24,42 +47,627 @@ export class Graph extends React.PureComponent { // eslint-disable-line react/pr
     super(props)
     this.initialize = this.initialize.bind(this)
     this.resizeGraph = this.resizeGraph.bind(this)
+    this.createNode = this.createNode.bind(this)
+    this.insertNewNode = this.insertNewNode.bind(this)
+    this.onAddNodeClick = this.onAddNodeClick.bind(this)
+    this.getClosestMidpointOnRect = this.getClosestMidpointOnRect.bind(this)
+    this.getClosestPointOnRect = this.getClosestPointOnRect.bind(this)
+    this.distance = this.distance.bind(this)
+    this.getNode = this.getNode.bind(this)
+    this.removeLink = this.removeLink.bind(this)
+    this.updateUndo = this.updateUndo.bind(this)
+    this.redraw = this.redraw.bind(this)
+    this.updateStyle = this.updateStyle.bind(this)
+    this.setMotion = this.setMotion.bind(this)
+    this.showAddingStyle = this.showAddingStyle.bind(this)
+    this.onLinkClick = this.onLinkClick.bind(this)
+    this.onNodeClick = this.onNodeClick.bind(this)
+    this.updateInfo = this.updateInfo.bind(this)
+    this.fillInfo = this.fillInfo.bind(this)
+    this.clearInfo = this.clearInfo.bind(this)
+    this.removeElementsByClass = this.removeElementsByClass.bind(this)
+    this.onSvgClick = this.onSvgClick.bind(this)
+    this.onUndoClick = this.onUndoClick.bind(this)
+    this.onRedoClick = this.onRedoClick.bind(this)
+    this.onUnlockClick = this.onUnlockClick.bind(this)
+    this.onLockLinkClick = this.onLockLinkClick.bind(this)
+    this.onUnlockLinkClick = this.onUnlockLinkClick.bind(this)
+    this.onAddLinkClick = this.onAddLinkClick.bind(this)
+    this.onAddLinkedNodeClick = this.onAddLinkedNodeClick.bind(this)
+    this.onDelClick = this.onDelClick.bind(this)
+    this.resetSelected = this.resetSelected.bind(this)
+    this.insertNewLink = this.insertNewLink.bind(this)
+    this.createLink = this.createLink.bind(this)
+    this.deleteLink = this.deleteLink.bind(this)
+    this.deleteNode = this.deleteNode.bind(this)
+    this.removeNode = this.removeNode.bind(this)
+    this.insertLink = this.insertLink.bind(this)
+    this.insertLinks = this.insertLinks.bind(this)
+    this.insertNode = this.insertNode.bind(this)
   }
+
   componentDidMount() {
+    document.getElementById('add-node').onclick = this.onAddNodeClick
     this.resizeGraph({
-        width: window.innerWidth - 630,
-        height: window.innerHeight - 200,
-      })
+      width: window.innerWidth - 630,
+      height: window.innerHeight - 200,
+    })
+
     this.initialize([], [])
+
     jQuery(window).resize(() => {
-        if (window.innerWidth >= 1256) {
-            this.props.onResize({
-                width: window.innerWidth - 630,
-                height: window.innerHeight - 50,
-            })
-        } else {
-            this.props.onResize({
-                width: window.innerWidth - 20,
-                height: (window.innerHeight / 2) - 30,
-            })
-        }
+      if (window.innerWidth >= 1256) {
+        this.props.onResize({
+            width: window.innerWidth - 630,
+            height: window.innerHeight - 50,
+        })
+      }
+      else {
+        this.props.onResize({
+          width: window.innerWidth - 20,
+          height: (window.innerHeight / 2) - 30,
+        })
+      }
     })
   }
 
   componentWillReceiveProps(nextProps) {
+    // if there is new data to load in
     if (this.props.loadedData.size === 0 && nextProps.loadedData.size > 0) {
-      this.initialize(nextProps.loadedData.get('nodes'), nextProps.loadedData.get('links'))
+      // re-initialize the graph
+      this.initialize(nextProps.loadedData.get('nodes').toJS(),
+        nextProps.loadedData.get('links').toJS())
     }
-    if (this.props.dimensions.get('height') !== nextProps.dimensions.get('height') ||
-      this.props.dimensions.get('width') !== nextProps.dimensions.get('width')) {
-        this.resizeGraph({ height: nextProps.dimensions.get('height'), width: nextProps.dimensions.get('width') })
+
+    // if the size of the graph has changed
+    if (!this.props.dimensions.equals(nextProps.dimensions)) {
+      // then resize the graph with the new dimensions
+      this.resizeGraph(nextProps.dimensions.toJS())
     }
+  }
+
+  onSvgClick() {
+    console.log('svg click')
+    if (!this.props.mousedownNode && !this.props.mousedownLink) {
+      console.log('no mousedown, resetting')
+      this.resetSelected()
+    }
+  }
+
+  onUndoClick() {
+    var latestAction = this.undoStack.pop()
+    this.undoneStack.push(latestAction)
+    this.isUndoing = true
+    latestAction()
+    this.isUndoing = false
+    this.redraw()
+  }
+
+  onRedoClick() {
+    var latestAction = this.redoStack.pop()
+    this.undoStack.push(this.undoneStack.pop())
+    this.isRedoing = true
+    latestAction()
+    this.isRedoing = false
+    this.redraw()
+  }
+
+  onUnlockClick() {
+    this.props.selectedNode.fixed = false
+    this.props.onSelectedNodeUpdate(null)
+    this.redraw()
+  }
+
+  onLockLinkClick() {
+    this.props.selectedLink.locked = true
+    this.redraw()
+  }
+
+  onUnlockLinkClick() {
+    this.props.selectedLink.locked = false
+    this.redraw()
+  }
+
+  onAddLinkClick() {
+    this.props.onLinkingNodeChange(this.props.selectedNode)
+    this.redraw()
+  }
+
+  onAddLinkedNodeClick() {
+    var x = this.props.selectedNode.get('x') - 100
+    var y = this.props.selectedNode.get('y') - 100
+    this.insertNewNode(x, y, this.props.selectedNode.toJS())
+    this.props.onSelectedNodeUpdate(null)
+    this.redraw()
+  }
+
+  onDelClick() {
+    if (this.props.selectedLink) {
+      this.deleteLink(this.props.selectedLink.toJS())
+    }
+    else {
+      this.deleteNode(this.props.selectedNode.toJS())
+    }
+    this.resetSelected()
+    this.redraw()
+  }
+
+  onAddNodeClick() {
+    this.insertNewNode(0, 0)
+    this.redraw()
+  }
+
+  onLinkClick(d) {
+    this.props.onMousedownLinkUpdate(d)
+    this.props.onSelectedLinkUpdate(d)
+    this.props.onSelectedNodeUpdate(null)
+    this.redraw()
+  }
+
+  onNodeClick(d) {
+    if (this.props.linkingNode) {
+      // create a link from selected to this node
+      this.insertNewLink(this.props.linkingNode.toJS(), d)
+      this.props.onLinkingNodeChange(null)
+    }
+    else {
+      this.props.onSelectedNodeUpdate(d.id)
+      this.props.onMousedownNodeUpdate(d)
+      this.props.onSelectedLinkUpdate(null)
+    }
+    this.redraw()
+  }
+
+  // given a starting point, find the closest point along the perimeter of the
+  // given rectangle to that point
+  getClosestPointOnRect(from, rect) {
+    // bounds of the rectangle (with rounded edges)
+    var xmin = rect.x - this.props.nodeSize.width / 2 + 3
+    var ymin = rect.y - this.props.nodeSize.height / 2 + 3
+    var xmax = rect.x + this.props.nodeSize.width / 2 - 3
+    var ymax = rect.y + this.props.nodeSize.height / 2 - 3
+    return {
+      x: Math.min(xmax, Math.max(xmin, from.x)),
+      y: Math.min(ymax, Math.max(ymin, from.y))
+    }
+  }
+
+  // similar to getClosestPoint, but it will only return a corner or a midpoint
+  getClosestMidpointOnRect(from, rect) {
+    var xmin = rect.x - this.props.nodeSize.width / 2
+    var ymin = rect.y - this.props.nodeSize.height / 2
+    var xmax = rect.x + this.props.nodeSize.width / 2
+    var ymax = rect.y + this.props.nodeSize.height / 2
+
+    var points = [
+      { x: xmin, y: rect.y }, // mid left
+      { x: rect.x, y: ymin }, // top center
+      { x: rect.x, y: ymax }, // bottom center
+      { x: xmax, y: rect.y }  // mid right
+    ]
+
+    points.map(point => {
+        point.dist = this.distance(from, point)
+        return point
+    })
+
+    points.sort((a, b) => a.dist - b.dist)
+    return points[0]
+  }
+
+  // stop the animation if anything is selected
+  setMotion() {
+    if (this.props.selectedLink || this.props.selectedNode) {
+      this.force.stop()
+    }
+    else {
+      this.force.start()
+    }
+  }
+
+  // find a node by its index
+  getNode(node) {
+    return this.nodes.find(e => e.id === node.id)
+  }
+
+  // insert an already created node
+  insertNode(node) {
+    this.nodes.push(node)
+  }
+
+  // safe way to re-insert links whose nodes may have been deleted in the past
+  insertLinks(links) {
+    this.links.forEach(link => { this.insertLink(link) })
+  }
+
+  insertLink(link) {
+    this.links.push(this.createLink(link.source, link.target))
+  }
+
+  deleteNode(node) {
+    this.removeNode(node)
+
+    // save links that have been deleted so that they can be stored in undo
+    var deleted = this.links.filter(link =>
+      link.source === node || link.target === node)
+
+    // remove the deleted links
+    deleted.forEach(link => { this.removeLink(link) })
+
+    // undo action inserts the deleted node and all the associated links
+    if (!this.isUndoing) {
+      this.redoStack = []
+      this.undoStack.push(() => {
+        this.insertNode(node)
+        this.insertLinks(deleted)
+        this.redoStack.push(() => {
+          this.deleteNode(node)
+        })
+      })
+    }
+  }
+
+  // remove a node from the list
+  removeNode(node) {
+    this.nodes.splice(this.nodes.indexOf(node), 1)
+  }
+
+  // create and insert a link
+  insertNewLink(source, target) {
+    var newlink = this.createLink(source, target)
+    this.links.push(newlink)
+    if (!this.isUndoing) {
+      this.redoStack = []
+      this.undoStack.push(() => {
+        this.deleteLink(newlink)
+        this.redoStack.push(() => {
+          this.links.push(newlink)
+        })
+      })
+    }
+  }
+
+  // create a link object: links have a source and a target
+  createLink(source, target) {
+    var link = {
+      id: `link-${this.props.linkCounter}`,
+      source: this.getNode(source),
+      target: this.getNode(target),
+      locked: false,
+    }
+    this.props.onLinkAdded()
+    return link
+  }
+
+  // delete a link from the graph
+  deleteLink(link) {
+    this.removeLink(link)
+    if (!this.isUndoing) {
+      this.redoStack = []
+      this.undoStack.push(() => {
+        this.insertLink(link)
+        this.redoStack.push(() => {
+          this.removeLink(link)
+        })
+      })
+    }
+  }
+
+  resetSelected() {
+    this.props.onSelectedNodeUpdate(null)
+    this.props.onSelectedLinkUpdate(null)
+    this.props.onLinkingNodeChange(null)
+    this.redraw()
+  }
+
+  // remove all elements of a given class
+  removeElementsByClass(className) {
+    var elements = document.getElementsByClassName(className)
+    while (elements.length > 0) {
+      elements[0].parentNode.removeChild(elements[0])
+    }
+  }
+
+  // disable/gray out the undo button if there's nothing to undo
+  updateUndo() {
+    var undo = document.getElementById('undo')
+    if (this.undoStack.length === 0 && !undo.classList.contains('disabled')) {
+      undo.classList.add('disabled')
+      undo.onclick = null
+    }
+    else if (this.undoStack.length > 0 && undo.classList.contains('disabled')) {
+      undo.classList.remove('disabled')
+      undo.onclick = this.onUndoClick
+    }
+    var redo = document.getElementById('redo')
+    if (this.redoStack.length === 0 && !redo.classList.contains('disabled')) {
+      redo.classList.add('disabled')
+      redo.onclick = null
+    }
+    else if (this.redoStack.length > 0 && redo.classList.contains('disabled')) {
+      redo.classList.remove('disabled')
+      redo.onclick = this.onRedoClick
+    }
+  }
+
+  updateStyle() {
+    // apply style to indicate that the user is currently adding a link
+    if (this.props.linkingNode) {
+      this.showAddingStyle('adding link')
+    }
+    else {
+      this.showAddingStyle(false)
+    }
+  }
+
+  showAddingStyle(text) {
+    // style to make it v clear that adding a link is currently what is happening
+    if (text) {
+      this.svg.append('text')
+          .text(text)
+          .attr('x', '50px')
+          .attr('y', '50px')
+          .attr('font-size', '50px')
+          .attr('font-weight', 'bold')
+          .attr('fill', '#ffe3e3')
+          .attr('class', 'top-label')
+
+      this.rect.attr('stroke', 'red')
+          .attr('stroke-dasharray', '10,10')
+          .attr('stroke-width', '6px')
+    }
+
+    // go back to the original style
+    else {
+      this.svg.selectAll('.top-label').remove()
+      this.rect.attr('stroke', 'black')
+          .attr('stroke-width', '1px')
+          .attr('stroke-dasharray', null)
+    }
+  }
+
+  // update the tooltip and the bottom section of the page
+  updateInfo() {
+    const showTooltip = !this.props.linkingNode && !this.dragged && this.should_show_info
+    if (this.props.selectedNode) {
+      this.fillInfo(this.props.selectedNode.toJS(), true, showTooltip)
+    }
+    else if (this.props.selectedLink) {
+      console.log('filling link info')
+      this.fillInfo(this.props.selectedLink, false, showTooltip)
+    }
+    else {
+      console.log('not filling info')
+      this.clearInfo()
+    }
+  }
+
+  clearInfo() {
+    this.removeElementsByClass('mf-tooltip')
+  }
+
+  fillInfo(selected, isNode, showTooltip) {
+    var tooltipContent = ''
+    this.removeElementsByClass('mf-tooltip')
+    var div = document.createElement('div')
+    div.className = 'mf-tooltip'
+
+    var t = d3.transform(d3.select('.transformer').attr('transform'))
+
+    var x, y
+    if (isNode) {
+      x = Math.round(selected.x)
+      y = Math.round(selected.y)
+    }
+    else {
+      x = (Math.round(selected.start.x) + Math.round(selected.end.x)) / 2
+      y = (Math.round(selected.start.y) + Math.round(selected.end.y)) / 2
+    }
+
+    // start with just positioning it based on the current scale
+    var tooltipLeft = x * t.scale[0]
+    var tooltipTop = y * t.scale[1]
+
+    // then account for the current translate
+    tooltipLeft += t.translate[0]
+    tooltipTop += t.translate[1]
+
+    // THEN, account for the size of the node (since x/y are at the center)
+    tooltipLeft -= t.scale[0] * this.props.nodeSize.width / 2
+    if (isNode) {
+      tooltipTop -= t.scale[1] * this.props.nodeSize.height / 2
+    }
+
+    // finally, account for the size of the tooltip
+    tooltipLeft -= 60
+    tooltipTop -= 50
+
+    // ok, FINALLY finally, account for the page offset
+    var test = document.getElementById('graph')
+    var dimensions = test.getBoundingClientRect()
+    var offsetTop = dimensions.top
+    var offsetLeft = dimensions.left
+
+    div.style.left = `${tooltipLeft + offsetLeft}px`
+    div.style.top = `${tooltipTop + offsetTop}px`
+
+    if (!isNode) {
+      tooltipContent = selected.id
+    }
+
+    if (showTooltip) {
+      var delButton = this.makeTooltipButton('del', 'x', this.onDelClick)
+      var nodeButton = this.makeTooltipButton('add', 'node+', this.onAddLinkedNodeClick)
+      var linkButton = this.makeTooltipButton('add', 'link+', this.onAddLinkClick)
+      var unlockButton = this.makeTooltipButton(null, 'unlock', this.onUnlockClick)
+      var lockLink = this.makeTooltipButton(null, 'lock', this.onLockLinkClick)
+      var unlockLink = this.makeTooltipButton(null, 'unlock', this.onUnlockLinkClick)
+
+      // make the tooltip
+      document.body.appendChild(div)
+      div.innerHTML = tooltipContent
+
+      // always add delete button
+      div.appendChild(delButton)
+
+      if (isNode) {
+        // add a linked node or a link
+        div.appendChild(nodeButton)
+        div.appendChild(linkButton)
+
+        // un-fix the node position
+        if (this.props.selectedNode.fixed) {
+          div.appendChild(unlockButton)
+        }
+      }
+      // link has a lock on it: add unlock button
+      else if (this.props.selectedLink.locked) {
+        div.appendChild(unlockLink)
+      }
+      // link does not have a lock: add lock button
+      else {
+        div.appendChild(lockLink)
+      }
+    }
+  }
+
+  makeTooltipButton(extraClass, text, click) {
+    var button = document.createElement('div')
+    button.className = 'button'
+    if (extraClass) {
+      button.className = `button ${extraClass}`
+    }
+    button.innerHTML = text
+    button.onclick = click
+    return button
+  }
+
+  // redraw force layout
+  redraw() {
+    this.updateUndo() // set the style/action of the undo button
+    this.updateStyle() // update the overall style of the container
+    this.setMotion() // pause the graph when some element is selected
+
+    if (this.props.isListening) {
+      this.props.onStoryUpdate(this.nodes, this.links)
+    }
+
+    this.lock = this.lock.data(this.links.filter(e => e.locked))
+
+    this.lock.enter()
+        .insert('path')
+        .attr('class', 'link-lock')
+        .attr('d', LOCK)
+        .attr('x', d => d.midX)
+        .attr('y', d => d.midY)
+        .attr('transform', d => `translate(${d.midX - 8},${d.midY - 10})scale(.7,.7)`)
+    this.lock.exit().remove()
+
+    this.link = this.link.data(this.links)
+
+    this.link.enter().insert('path', '.node')
+        .attr('class', 'link')
+        .on('click', this.onLinkClick)
+
+    this.link.exit().remove()
+
+    this.link.classed('link_selected', d => d === this.props.selectedLink)
+        .attr('marker-end', d => d === this.props.selectedLink ? 'url(#end-selected' : 'url(#end)')
+
+    this.node = this.node.data(this.nodes)
+
+    this.node.enter().insert('rect')
+        .attr('class', 'node')
+        .attr('height', this.props.nodeSize.height)
+        .attr('width', this.props.nodeSize.width)
+        .attr('rx', this.props.nodeSize.rx)
+        .attr('ry', this.props.nodeSize.ry)
+        .style('filter', 'url(#drop-shadow)')
+        .on('click', this.onNodeClick)
+        .call(this.node_drag)
+        .transition()
+        .duration(750)
+        .ease('elastic')
+        .attr('height', this.props.nodeSize.height)
+        .attr('width', this.props.nodeSize.width)
+        .attr('rx', this.props.nodeSize.rx)
+        .attr('ry', this.props.nodeSize.ry)
+
+    this.node.exit().transition()
+        .attr('height', 0)
+        .attr('width', 0)
+        .remove()
+
+    this.node.classed('node_selected', d => {
+      if (this.props.selectedNode) {
+        return d.id === this.props.selectedNode.get('id')
+      }
+      return false
+    })
+
+    this.nodelabels = this.nodelabels.data(this.nodes)
+
+    this.nodelabels.enter()
+        .insert('text')
+        .on('click', this.onNodeClick)
+        .attr('x', d => d.x)
+        .attr('y', d => d.y)
+        .attr('class', 'nodelabel')
+        .text(d => d.id)
+
+    this.nodelabels.exit().transition()
+        .attr('font-size', '0px')
+        .remove()
+
+    this.updateInfo()
+
+    if (this.dragged) {
+        this.dragged = false
+    }
+  }
+
+  // remove a link from the list
+  removeLink(link) {
+    this.links.splice(this.nodes.indexOf(link), 1)
   }
 
   resizeGraph(dimensions) {
     var svg = d3.select('svg')
-        .attr('width', dimensions.width)
-        .attr('height', dimensions.height)
+      .attr('width', dimensions.width)
+      .attr('height', dimensions.height)
+  }
+
+  distance(start, end) {
+    return Math.sqrt((end.x - start.x) ** 2 + (end.y - start.y) ** 2)
+  }
+
+  insertNewNode(x, y, linkedFrom) {
+    var link
+    var node = this.createNode(x, y)
+    this.nodes.push(node)
+    if (linkedFrom) {
+      link = this.createLink(linkedFrom, node)
+      this.links.push(link)
+    }
+    if (!this.isUndoing) {
+      this.redoStack = []
+      this.undoStack.push(() => {
+        this.deleteNode(node)
+        this.redoStack.push(() => {
+          this.insertNode(node)
+          if (linkedFrom) {
+            this.insertLink(link)
+          }
+        })
+      })
+    }
+  }
+
+  // create a node object nodes have an x, y, and index
+  createNode(x, y) {
+    var node = { x, y, id: `node-${this.props.nodeCounter}` }
+    this.props.onNodeAdded()
+    return node
   }
 
   initialize(initialNodes, initialLinks) {
@@ -67,71 +675,41 @@ export class Graph extends React.PureComponent { // eslint-disable-line react/pr
     // remove the svg if there already is one
     d3.select('svg').remove()
 
-    // size of the nodes
-    var nodeSize = {
-        width: 100,
-        height: 30,
-        rx: 5,
-        ry: 5
-    }
+    // the most recently taken/undone actions
+    _this.undoStack = []
+    _this.redoStack = []
+    _this.undoneStack = []
 
-    // stacks of the most recently taken/undone actions
-    var undoStack = []
-    var redoStack = []
-    var undoneStack = []
-
-    // currently selected node
-    var selected_node = null
-
-    // currently selected link
-    var selected_link = null
-
-    // the link that has been mousedown'd on
-    var mousedown_link = null
-
-    // the node that has been mousedown'd on
-    var mousedown_node = null
-
-    // the node we're currently creating a link to
-    var linkingNode = false
-
-    // whether a node was just dragged
-    var dragged = false
+    // whether a node was just dragged - indicates whether redraw() is necessary
+    _this.dragged = false
 
     // the starting position of the latest node drag
     var dragstart_position = null
 
     // used to assign ids to nodes
-    var node_counter = 0
     var link_counter = 0
 
     // temporary placeholder to determine whether to show the tooltip
-    var should_show_info = true
+    _this.should_show_info = true
 
     // whether or not we are in the 'undoing'/'redoing' state
-    var isUndoing = false
-    var isRedoing = false
+    _this.isUndoing = false
+    _this.isRedoing = false
 
-    if (isImmutable(initialNodes)) {
-      initialNodes = initialNodes.toJS()
+    // create the initial set of data if nothing is passed in
+    if (initialNodes.length === 0) {
+      ({ initialNodes, initialLinks } = this.props.createDefaultStructure(this.createNode))
     }
-    if (isImmutable(initialLinks)) {
-      initialLinks = initialLinks.toJS()
-    }
-    if (initialNodes.length < 1) {
-      var midX = _this.props.dimensions.get('width') / 2
-      var midY = _this.props.dimensions.get('height') / 2
-      initialNodes = [createNode(midX, midY)]
-    }
+
     this.nodes = initialNodes
 
     initialLinks.forEach(link => {
-      link.source = getNode(link.source)
-      link.target = getNode(link.target)
+      link.source = _this.getNode(link.source)
+      link.target = _this.getNode(link.target)
     })
     this.links = initialLinks
 
-    var force = d3.layout.force() // create a force layout
+    _this.force = d3.layout.force() // create a force layout
         .size([_this.props.dimensions.get('width'), _this.props.dimensions.get('height')]) // of the given width/height
         .nodes(this.nodes) // initialize with a single node - ???
         .links(this.links)
@@ -145,26 +723,26 @@ export class Graph extends React.PureComponent { // eslint-disable-line react/pr
         .on('zoom', zoomed) // call the zoom function when zooming
 
     // init svg
-    var svg = d3.select('#graph')
+    _this.svg = d3.select('#graph')
         .append('svg')
         .attr('width', _this.props.dimensions.get('width'))
         .attr('height', _this.props.dimensions.get('height'))
-        .on('click', onSvgClick)
-        .on('mouseup', mouseup)
+        .on('click', _this.onSvgClick)
+        // .on('mouseup', mouseup)
         .append('g')
         .call(zoom)
 
-    var rect = svg.append('rect')
+    _this.rect = _this.svg.append('rect')
         .attr('width', '100%')
         .attr('height', '100%')
         .attr('fill', 'none')
         .attr('stroke', 'black')
         .style('pointer-events', 'all')
 
-    var container = svg.append('g').attr('class', 'transformer')
+    var container = _this.svg.append('g').attr('class', 'transformer')
 
     // build the arrow
-    var defs = svg.append('defs')
+    var defs = _this.svg.append('defs')
 
     defs.selectAll('marker').append('marker')
         .data(['end', 'end-selected'])
@@ -221,9 +799,9 @@ export class Graph extends React.PureComponent { // eslint-disable-line react/pr
     function dragStart(d) {
         d3.event.sourceEvent.stopPropagation()
         dragstart_position = { x: d.x, y: d.y }
-        selected_node = d
-        redraw()
-        force.stop()
+        _this.props.onSelectedNodeUpdate(d.id)
+        _this.redraw()
+        _this.force.stop()
     }
 
     function dragMove(d) {
@@ -232,9 +810,9 @@ export class Graph extends React.PureComponent { // eslint-disable-line react/pr
         d.x += d3.event.dx
         d.y += d3.event.dy
         if (distance(dragstart_position, { x: d.x, y: d.y }) > 5) {
-            clearInfo()
-            dragged = true
-            should_show_info = false
+            _this.clearInfo()
+            _this.dragged = true
+            _this.should_show_info = false
         }
         tick()
     }
@@ -244,87 +822,73 @@ export class Graph extends React.PureComponent { // eslint-disable-line react/pr
     }
 
     function dragEnd(d) {
-        if (dragged) {
+        if (_this.dragged) {
             d.fixed = true
             dragstart_position = null
-            should_show_info = true
+            _this.should_show_info = true
         }
         tick()
-        force.resume()
-        redraw()
+        _this.force.resume()
+        _this.redraw()
     }
 
-    var node_drag = d3.behavior.drag()
+    _this.node_drag = d3.behavior.drag()
         .on('dragstart', dragStart)
         .on('drag', dragMove)
         .on('dragend', dragEnd)
 
-    var link = container.append('g').attr('class', 'link-group').selectAll('path')
+    _this.link = container.append('g').attr('class', 'link-group').selectAll('path')
         .data(this.links)
         .enter().append('svg:path')
-        .on('click', onLinkClick)
+        .on('click', _this.onLinkClick)
         .attr('class', d => `link ${d.type}`)
-        .attr('marker-end', d => selected_link === d ? 'url(#end-selected)' : 'url(#end)')
+        .attr('marker-end', d => _this.props.selectedLink === d ? 'url(#end-selected)' : 'url(#end)')
 
-    var lock = container.append('g').attr('class', 'lock-group').selectAll('path')
+    _this.lock = container.append('g').attr('class', 'lock-group').selectAll('path')
         .data(this.links.filter(e => e.locked))
         .enter().append('path')
         .attr('d', LOCK)
         .attr('class', 'link-lock')
 
-    var node = container.selectAll('.node')
+    _this.node = container.selectAll('.node')
         .data(this.nodes)
         .enter().append('rect')
-        .on('click', onNodeClick)
-        .attr('width', nodeSize.width)
-        .attr('height', nodeSize.height)
-        .attr('rx', nodeSize.rx)
-        .attr('ry', nodeSize.ry)
+        .on('click', this.onNodeClick)
+        .attr('width', this.props.nodeSize.width)
+        .attr('height', this.props.nodeSize.height)
+        .attr('rx', this.props.nodeSize.rx)
+        .attr('ry', this.props.nodeSize.ry)
         .attr('class', 'node')
         .style('filter', 'url(#drop-shadow)')
-        .call(node_drag)
+        .call(_this.node_drag)
 
-    var nodelabels = container.selectAll('.nodelabel')
+    _this.nodelabels = container.selectAll('.nodelabel')
         .data(this.nodes)
         .enter()
         .append('text')
-        .on('click', onNodeClick)
+        .on('click', this.onNodeClick)
         .attr('x', d => d.x)
         .attr('y', d => d.y)
         .attr('class', 'nodelabel')
         .text(d => d.id)
 
-    redraw()
-    initTopBar()
-
-    function initTopBar() {
-        // just 'add node' for now
-        var addNode = document.getElementById('add-node')
-        addNode.onclick = onAddNodeClick
-    }
-
-    function resetSelected() {
-        _this.props.onSelectedNodeUpdate(null)
-        selected_node = null
-        selected_link = null
-        linkingNode = null
-        redraw()
-    }
+    _this.redraw()
 
     // indicate there is no element currently being clicked on
     function mouseup() {
-        mousedown_node = null
-        mousedown_link = null
+        console.log('mouseup')
+        _this.props.onMousedownNodeUpdate(null)
+        _this.props.onMousedownLinkUpdate(null)
     }
 
     // called by the d3 force graph every time a frame is redrawn
     function tick() {
         // redraw the path of the links given their source/target node positions
-        link.attr('d', d => {
+        _this.link.attr('d', d => {
             const prevStart = d.start ? d.start : d.source
             const prevEnd = d.end ? d.end : d.target
-            const start = getClosestMidpointOnRect(d.target, d.source)
-            const end = getClosestPointOnRect(prevStart, d.target)
+            const start = _this.getClosestMidpointOnRect(d.target, d.source)
+            const end = _this.getClosestPointOnRect(prevStart, d.target)
             d.midX = (start.x + end.x) / 2
             d.midY = (start.y + end.y) / 2
             d.start = start
@@ -332,572 +896,16 @@ export class Graph extends React.PureComponent { // eslint-disable-line react/pr
             return `M${start.x},${start.y}L${end.x},${end.y}`
         })
 
-        lock.attr('x', d => d.midX)
+        _this.lock.attr('x', d => d.midX)
             .attr('y', d => d.midY)
             .attr('transform', d => `translate(${d.midX - 8},${d.midY - 10})scale(.7,.7)`)
 
         // redraw the ndes at their new position
-        node.attr('x', d => d.x - nodeSize.width / 2)
-            .attr('y', d => d.y - nodeSize.height / 2)
+        _this.node.attr('x', d => d.x - _this.props.nodeSize.width / 2)
+            .attr('y', d => d.y - _this.props.nodeSize.height / 2)
 
-        nodelabels.attr('x', d => d.x - nodeSize.width / 2 + 6)
+        _this.nodelabels.attr('x', d => d.x - _this.props.nodeSize.width / 2 + 6)
             .attr('y', d => d.y + 4)
-    }
-
-    // redraw force layout
-    function redraw() {
-        updateUndo() // set the style/action of the undo button
-        updateStyle() // update the overall style of the container
-        setMotion() // pause the graph when some element is selected
-
-        if (_this.props.isListening) {
-          _this.props.onStoryUpdate(_this.nodes, _this.links)
-        }
-
-        lock = lock.data(_this.links.filter(e => e.locked))
-
-        lock.enter()
-            .insert('path')
-            .attr('class', 'link-lock')
-            .attr('d', LOCK)
-            .attr('x', d => d.midX)
-            .attr('y', d => d.midY)
-            .attr('transform', d => `translate(${d.midX - 8},${d.midY - 10})scale(.7,.7)`)
-        lock.exit().remove()
-
-        link = link.data(_this.links)
-
-        link.enter().insert('path', '.node')
-            .attr('class', 'link')
-            .on('click', onLinkClick)
-
-        link.exit().remove()
-
-        link
-            .classed('link_selected', d => d === selected_link)
-            .attr('marker-end', d => d === selected_link ? 'url(#end-selected' : 'url(#end)')
-
-        node = node.data(_this.nodes)
-
-        node.enter().insert('rect')
-            .attr('class', 'node')
-            .attr('height', nodeSize.height)
-            .attr('width', nodeSize.width)
-            .attr('rx', nodeSize.rx)
-            .attr('ry', nodeSize.ry)
-            .style('filter', 'url(#drop-shadow)')
-            .on('click', onNodeClick)
-            .call(node_drag)
-            .transition()
-            .duration(750)
-            .ease('elastic')
-            .attr('height', nodeSize.height)
-            .attr('width', nodeSize.width)
-            .attr('rx', nodeSize.rx)
-            .attr('ry', nodeSize.ry)
-
-        node.exit().transition()
-            .attr('height', 0)
-            .attr('width', 0)
-            .remove()
-
-        node.classed('node_selected', d => d === selected_node)
-
-        nodelabels = nodelabels.data(_this.nodes)
-        nodelabels
-            .enter()
-            .insert('text')
-            .on('click', onNodeClick)
-            .attr('x', d => d.x)
-            .attr('y', d => d.y)
-            .attr('class', 'nodelabel')
-            .text(d => d.id)
-
-        nodelabels.exit().transition()
-            .attr('font-size', '0px')
-            .remove()
-
-        updateInfo()
-
-        if (dragged) {
-            dragged = false
-        }
-    }
-
-    // stop the animation if anything is selected
-    function setMotion() {
-        if (selected_link || selected_node) {
-            force.stop()
-        }
-        else {
-            force.start()
-        }
-    }
-
-    // disable/gray out the undo button if there's nothing to undo
-    function updateUndo() {
-        var undo = document.getElementById('undo')
-        if (undoStack.length === 0 && !undo.classList.contains('disabled')) {
-            undo.classList.add('disabled')
-            undo.onclick = null
-        }
-        else if (undoStack.length > 0 && undo.classList.contains('disabled')) {
-            undo.classList.remove('disabled')
-            undo.onclick = onUndoClick
-        }
-        var redo = document.getElementById('redo')
-        if (redoStack.length === 0 && !redo.classList.contains('disabled')) {
-            redo.classList.add('disabled')
-            redo.onclick = null
-        }
-        else if (redoStack.length > 0 && redo.classList.contains('disabled')) {
-            redo.classList.remove('disabled')
-            redo.onclick = onRedoClick
-        }
-    }
-
-    function updateStyle() {
-        // apply style to indicate that the user is currently adding a link
-        if (linkingNode) {
-            showAddingStyle('adding link')
-        }
-        else {
-            showAddingStyle(false)
-        }
-    }
-
-    // update the tooltip and the bottom section of the page
-    function updateInfo() {
-        if (selected_node) {
-            fillInfo(selected_node, true, !linkingNode && !dragged && should_show_info)
-        }
-        else if (selected_link) {
-            fillInfo(selected_link, false, !linkingNode && !dragged && should_show_info)
-        }
-        else {
-            clearInfo()
-        }
-    }
-
-    function clearInfo() {
-        removeElementsByClass('mf-tooltip')
-    }
-
-    function fillInfo(selected, isNode, showTooltip) {
-        var tooltipContent = ''
-        removeElementsByClass('mf-tooltip')
-        var div = document.createElement('div')
-        div.className = 'mf-tooltip'
-
-        var t = d3.transform(d3.select('.transformer').attr('transform'))
-
-        var x, y
-        if (isNode) {
-            x = Math.round(selected.x)
-            y = Math.round(selected.y)
-        }
-        else {
-            x = (Math.round(selected.start.x) + Math.round(selected.end.x)) / 2
-            y = (Math.round(selected.start.y) + Math.round(selected.end.y)) / 2
-        }
-
-        // start with just positioning it based on the current scale
-        var tooltipLeft = x * t.scale[0]
-        var tooltipTop = y * t.scale[1]
-
-        // then account for the current translate
-        tooltipLeft += t.translate[0]
-        tooltipTop += t.translate[1]
-
-        // THEN, account for the size of the node (since x/y are at the center)
-        tooltipLeft -= t.scale[0] * nodeSize.width / 2
-        if (isNode) {
-            tooltipTop -= t.scale[1] * nodeSize.height / 2
-        }
-
-        // finally, account for the size of the tooltip
-        tooltipLeft -= 60
-        tooltipTop -= 50
-
-        // ok, FINALLY finally, account for the page offset
-        var test = document.getElementById('graph')
-        var dimensions = test.getBoundingClientRect()
-        var offsetTop = dimensions.top
-        var offsetLeft = dimensions.left
-
-        div.style.left = `${tooltipLeft + offsetLeft}px`
-        div.style.top = `${tooltipTop + offsetTop}px`
-
-        if (!isNode) {
-            tooltipContent = selected.id
-        }
-
-        if (showTooltip) {
-            // add delete button
-            var delButton = document.createElement('div')
-            delButton.className = 'del button'
-            delButton.innerHTML = 'x'
-            delButton.onclick = onDelClick
-
-            // add link button
-            var nodeButton = document.createElement('div')
-            nodeButton.className = 'add button'
-            nodeButton.innerHTML = 'node+'
-            nodeButton.onclick = onAddLinkedNodeClick
-
-            // add node button
-            var linkButton = document.createElement('div')
-            linkButton.className = 'add button'
-            linkButton.innerHTML = 'link+'
-            linkButton.onclick = onAddLinkClick
-
-            var unlockButton = document.createElement('div')
-            unlockButton.className = 'button'
-            unlockButton.innerHTML = 'unlock'
-            unlockButton.onclick = onUnlockClick
-
-            var lockLink = document.createElement('div')
-            lockLink.className = 'button'
-            lockLink.innerHTML = 'lock'
-            lockLink.onclick = onLockLinkClick
-
-            var unlockLink = document.createElement('div')
-            unlockLink.className = 'button'
-            unlockLink.innerHTML = 'unlock'
-            unlockLink.onclick = onUnlockLinkClick
-
-            document.body.appendChild(div)
-            div.innerHTML = tooltipContent
-            div.appendChild(delButton)
-
-            if (isNode) {
-                div.appendChild(nodeButton)
-                div.appendChild(linkButton)
-                if (selected_node.fixed) {
-                    div.appendChild(unlockButton)
-                }
-            }
-            else if (selected_link.locked) {
-                div.appendChild(unlockLink)
-            }
-            else {
-                div.appendChild(lockLink)
-            }
-        }
-    }
-
-    function showAddingStyle(text) {
-        // style to make it v clear that adding a link is currently what is happening
-        if (text) {
-            svg.append('text')
-                .text(text)
-                .attr('x', '50px')
-                .attr('y', '50px')
-                .attr('font-size', '50px')
-                .attr('font-weight', 'bold')
-                .attr('fill', '#ffe3e3')
-                .attr('class', 'top-label')
-
-            rect
-                .attr('stroke', 'red')
-                .attr('stroke-dasharray', '10,10')
-                .attr('stroke-width', '6px')
-        }
-
-        // go back to the original style
-        else {
-            svg.selectAll('.top-label').remove()
-            rect
-                .attr('stroke', 'black')
-                .attr('stroke-width', '1px')
-                .attr('stroke-dasharray', null)
-        }
-    }
-
-    // onClicks ------------------------------------------------------------------------------------//
-    function onSvgClick() {
-        if (!mousedown_node && !mousedown_link) {
-            resetSelected()
-        }
-    }
-
-    function onUndoClick() {
-        var latestAction = undoStack.pop()
-        undoneStack.push(latestAction)
-        isUndoing = true
-        latestAction()
-        isUndoing = false
-        redraw()
-    }
-
-    function onRedoClick() {
-        var latestAction = redoStack.pop()
-        undoStack.push(undoneStack.pop())
-        isRedoing = true
-        latestAction()
-        isRedoing = false
-        redraw()
-    }
-
-    function onUnlockClick() {
-        selected_node.fixed = false
-        selected_node = null
-        redraw()
-    }
-
-    function onLockLinkClick() {
-        selected_link.locked = true
-        redraw()
-    }
-
-    function onUnlockLinkClick() {
-        selected_link.locked = false
-        redraw()
-    }
-
-    function onAddLinkClick() {
-        linkingNode = selected_node
-        redraw()
-    }
-
-    function onAddLinkedNodeClick() {
-        var x = selected_node.x - 100
-        var y = selected_node.y - 100
-        insertNewNode(x, y, selected_node)
-        selected_node = null
-        redraw()
-    }
-
-    function onDelClick() {
-        if (selected_link) {
-            deleteLink(selected_link)
-        }
-        else {
-            deleteNode(selected_node)
-        }
-        resetSelected()
-        redraw()
-    }
-
-    function onAddNodeClick() {
-        insertNewNode(0, 0)
-        resetSelected()
-    }
-
-    function onNodeClick(d) {
-        if (linkingNode) {
-            // create a link from selected to this node
-            insertNewLink(linkingNode, d)
-            linkingNode = null
-        }
-        else {
-            _this.props.onSelectedNodeUpdate(d.id)
-            selected_node = d
-            mousedown_node = d
-            selected_link = null
-        }
-        redraw()
-    }
-
-    function onLinkClick(d) {
-        mousedown_link = d
-        selected_link = d
-        selected_node = null
-        redraw()
-    }
-
-    // actions -------------------------------------------------------------------------------------//
-    // create a node object nodes have an x, y, and index
-    function createNode(x, y) {
-        var node = { x, y, id: `node-${node_counter}` }
-        node_counter++
-        return node
-    }
-
-    // create a link object: links have a source and a target
-    function createLink(source, target) {
-        var link = {
-            id: `link-${link_counter}`,
-            source: getNode(source),
-            target: getNode(target),
-            locked: false,
-        }
-        link_counter++
-        return link
-    }
-
-    // create and insert a node
-    function insertNewNode(x, y, linkedFrom) {
-        var link
-        var node = createNode(x, y)
-        _this.nodes.push(node)
-        if (linkedFrom) {
-            link = createLink(linkedFrom, node)
-            _this.links.push(link)
-        }
-        if (!isUndoing) {
-            redoStack = []
-            undoStack.push(() => {
-                deleteNode(node)
-                redoStack.push(() => {
-                    insertNode(node)
-                    if (linkedFrom) {
-                        insertLink(link)
-                    }
-                })
-            })
-        }
-    }
-
-    // insert an already created node
-    function insertNode(node) {
-        _this.nodes.push(node)
-    }
-
-    // create and insert a link
-    function insertNewLink(source, target) {
-        var newlink = createLink(source, target)
-        _this.links.push(newlink)
-        if (!isUndoing) {
-            redoStack = []
-            undoStack.push(() => {
-                deleteLink(newlink)
-                redoStack.push(() => {
-                    _this.links.push(newlink)
-                })
-            })
-        }
-    }
-
-    // safe way to re-insert links whose nodes may have been deleted in the past
-    function insertLinks(links) {
-        _this.links.forEach(link => { insertLink(link) })
-    }
-
-    function insertLink(link) {
-        _this.links.push(createLink(link.source, link.target))
-    }
-
-    // delete a node from the graph
-    function deleteNode(node) {
-        removeNode(node)
-
-        // store the links that have been deleted so that they can be stored in the undo action
-        var deleted = _this.links.filter(link => link.source === node || link.target === node)
-
-        // remove the deleted links
-        deleted.forEach(link => { removeLink(link) })
-
-        // undo action is to insert the deleted node and all the links that were associated with it
-        if (!isUndoing) {
-            redoStack = []
-            undoStack.push(() => {
-                insertNode(node)
-                insertLinks(deleted)
-                redoStack.push(() => {
-                    deleteNode(node)
-                })
-            })
-        }
-    }
-
-    // delete a link from the graph
-    function deleteLink(link) {
-        removeLink(link)
-        if (!isUndoing) {
-            redoStack = []
-            undoStack.push(() => {
-                insertLink(link)
-                redoStack.push(() => {
-                    removeLink(link)
-                })
-            })
-        }
-    }
-
-    // remove a node from the list
-    function removeNode(node) {
-        _this.nodes.splice(_this.nodes.indexOf(node), 1)
-    }
-
-    // remove a link from the list
-    function removeLink(link) {
-        _this.links.splice(_this.nodes.indexOf(link), 1)
-    }
-
-    // util ----------------------------------------------------------------------------------------//
-    // find a node by its index
-    function getNode(node) {
-        return _this.nodes.find(e => e.id === node.id)
-    }
-
-    // remove all elements of a given class
-    function removeElementsByClass(className) {
-        var elements = document.getElementsByClassName(className)
-        while (elements.length > 0) {
-            elements[0].parentNode.removeChild(elements[0])
-        }
-    }
-
-    // given a starting point, find the closest point along the perimeter of the given
-    // rectangle to that point
-    function getClosestPointOnRect(from, rect) {
-        var xmin = rect.x - nodeSize.width / 2
-        var ymin = rect.y - nodeSize.height / 2
-        var xmax = rect.x + nodeSize.width / 2
-        var ymax = rect.y + nodeSize.height / 2
-
-        var point = {
-            x: null,
-            y: null
-        }
-
-        if (from.x < xmin) {
-            point.x = xmin + 3
-        }
-        if (from.x > xmax) {
-            point.x = xmax - 3
-        }
-
-        if (from.y < ymin) {
-            point.y = ymin + 3
-        }
-        if (from.y > ymax) {
-            point.y = ymax - 3
-        }
-
-        // if either x or y was within the bounds
-        if (!point.x) {
-            point.x = from.x
-        }
-        if (!point.y) {
-            point.y = from.y
-        }
-
-        return point
-    }
-
-    // similar to getClosestPoint, but it will only return a corner or a midpoint
-    function getClosestMidpointOnRect(from, rect) {
-        var xmin = rect.x - nodeSize.width / 2
-        var ymin = rect.y - nodeSize.height / 2
-        var xmax = rect.x + nodeSize.width / 2
-        var ymax = rect.y + nodeSize.height / 2
-
-        var points = [
-            { x: xmin, y: rect.y }, // mid left
-            { x: rect.x, y: ymin }, // top center
-            { x: rect.x, y: ymax }, // bottom center
-            { x: xmax, y: rect.y }  // mid right
-        ]
-
-        points.map(point => {
-            point.dist = distance(from, point)
-            return point
-        })
-
-        points.sort((a, b) => a.dist - b.dist)
-        return points[0]
     }
 
     // clear the story data so that this won't be called again unnecessarily
@@ -907,8 +915,13 @@ export class Graph extends React.PureComponent { // eslint-disable-line react/pr
   render() {
     return (
       <div >
-        <div id="graph" style={{ height: this.props.dimensions.get('height'), width: this.props.dimensions.get('width') }}>
-        </div>
+        <div
+          id="graph"
+          style={{
+            height: this.props.dimensions.get('height'),
+            width: this.props.dimensions.get('width')
+          }}
+        />
       </div>
     )
   }
@@ -918,19 +931,40 @@ Graph.propTypes = {
   storyData: PropTypes.object,
   onInitialized: PropTypes.func,
   isListening: PropTypes.bool,
-  selectedNodeId: PropTypes.string,
   onStoryUpdate: PropTypes.func,
   dimensions: PropTypes.object.isRequired,
   onResize: PropTypes.func,
   loadedData: PropTypes.object,
+  nodeSize: PropTypes.object,
+  nodeCounter: PropTypes.number,
+  linkCounter: PropTypes.number,
+  mousedownNode: PropTypes.object,
+  mousedownLink: PropTypes.object,
+  linkingNode: PropTypes.object,
+  selectedNode: PropTypes.object,
+  selectedLink: PropTypes.object,
+  onSelectedLinkUpdate: PropTypes.func,
+  onSelectedNodeUpdate: PropTypes.func,
+  onMousedownNodeUpdate: PropTypes.func,
+  onMousedownLinkUpdate: PropTypes.func,
+  onNodeAdded: PropTypes.func,
+  onLinkAdded: PropTypes.func,
+  onLinkingNodeChange: PropTypes.func,
+  createDefaultStructure: PropTypes.func.isRequired,
 }
 
 const mapStateToProps = createStructuredSelector({
   loadedData: getLoadedStoryData(),
   storyData: getCurrentData(),
-  selectedNodeId: getSelectedNodeId(),
+  selectedNode: getSelectedNode(),
+  selectedLink: getSelectedLink(),
   isListening: isListening(),
   dimensions: getDimensions(),
+  nodeCounter: getNodeCount(),
+  linkCounter: getLinkCount(),
+  linkingNode: getLinkingNode(),
+  mousedownNode: getMousedownNode(),
+  mousedownLink: getMousedownLink(),
 })
 
 export function mapDispatchToProps(dispatch) {
@@ -946,9 +980,27 @@ export function mapDispatchToProps(dispatch) {
     onSelectedNodeUpdate: nodeId => {
       dispatch(setSelectedNode(nodeId))
     },
+    onSelectedLinkUpdate: linkId => {
+      dispatch(setSelectedLink(linkId))
+    },
     onResize: dimensions => {
       dispatch(setDimensions(dimensions))
-    }
+    },
+    onNodeAdded: () => {
+      dispatch(incrementNodeCounter())
+    },
+    onLinkAdded: () => {
+      dispatch(incrementLinkCounter())
+    },
+    onLinkingNodeChange: node => {
+      dispatch(setLinkingNode(node))
+    },
+    onMousedownNodeUpdate: node => {
+      dispatch(setMousedownNode(node))
+    },
+    onMousedownLinkUpdate: link => {
+      dispatch(setMousedownLink(link))
+    },
   }
 }
 

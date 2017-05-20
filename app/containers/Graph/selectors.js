@@ -7,21 +7,43 @@ const selectGraphDomain = state => state.get('graph')
 
 const isListening = () => createSelector(
   selectGraphDomain,
-  substate => substate.get('isListening')
-)
+  substate => substate.get('isListening'))
 
 const getSelectedNodeId = () => createSelector(
   selectGraphDomain,
-  substate => substate.get('selectedNodeId')
-)
+  substate => substate.get('selectedNodeId'))
 
 const getDimensions = () => createSelector(
   selectGraphDomain,
-  substate => substate.get('dimensions')
-)
+  substate => substate.get('dimensions'))
+
+const getNodeCount = () => createSelector(
+  selectGraphDomain,
+  substate => substate.get('nodeCounter'))
+
+const getLinkCount = () => createSelector(
+  selectGraphDomain,
+  substate => substate.get('linkCounter'))
+
+const getLinkingNode = () => createSelector(
+  selectGraphDomain,
+  substate => substate.get('linkingNode'))
+
+const getMousedownNode = () => createSelector(
+  selectGraphDomain,
+  substate => substate.get('mousedownNode'))
+
+const getMousedownLink = () => createSelector(
+  selectGraphDomain,
+  substate => substate.get('mousedownLink'))
 
 export {
   isListening,
   getSelectedNodeId,
   getDimensions,
+  getNodeCount,
+  getLinkCount,
+  getLinkingNode,
+  getMousedownNode,
+  getMousedownLink,
 }
