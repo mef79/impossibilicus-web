@@ -71,4 +71,5 @@ export {
   getSelectedNode,
   getSelectedLink,
   getLastSavedData,
+  getSelectedLink,
 }

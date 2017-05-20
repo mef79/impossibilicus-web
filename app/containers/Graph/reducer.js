@@ -31,6 +31,7 @@ const initialState = fromJS({
   linkingNode: null,
   mousedownNode: null,
   mousedownLink: null,
+  selectedLinkId: null,
 })
 
 function graphReducer(state = initialState, action) {

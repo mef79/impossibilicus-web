@@ -19,13 +19,13 @@ import {
 
 export function defaultAction() {
   return {
-    type: DEFAULT_ACTION
+    type: DEFAULT_ACTION,
   }
 }
 
 export function setListening() {
   return {
-    type: SET_LISTENING
+    type: SET_LISTENING,
   }
 }
 
@@ -52,13 +52,13 @@ export function setDimensions(dimensions) {
 
 export function incrementNodeCounter() {
   return {
-    type: INCREMENT_NODE_COUNTER
+    type: INCREMENT_NODE_COUNTER,
   }
 }
 
 export function incrementLinkCounter() {
   return {
-    type: INCREMENT_LINK_COUNTER
+    type: INCREMENT_LINK_COUNTER,
   }
 }
 

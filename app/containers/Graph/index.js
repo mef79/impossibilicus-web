@@ -16,7 +16,12 @@ import {
   getSelectedNode,
   getSelectedLink,
 } from 'containers/HomePage/selectors'
-import { clearLoadedStory, updateStory } from 'containers/HomePage/actions'
+import {
+  clearLoadedStory,
+  updateStory,
+  lockLink,
+  unlockLink,
+} from 'containers/HomePage/actions'
 import {
   setListening,
   setSelectedNode,
@@ -36,6 +41,8 @@ import {
   getLinkingNode,
   getMousedownNode,
   getMousedownLink,
+  getSelectedNodeId,
+  getSelectedLinkId,
 } from './selectors'
 import { LOCK } from 'utils/icons'
 
@@ -43,48 +50,6 @@ import { LOCK } from 'utils/icons'
 /* eslint no-unused-vars: 0, indent: 0, no-param-reassign:0, no-var: 0, camelcase: 0, prefer-arrow-callback: 0, no-shadow: 0, no-mixed-operators: 0 */
 
 export class Graph extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
-  constructor(props) {
-    super(props)
-    this.initialize = this.initialize.bind(this)
-    this.resizeGraph = this.resizeGraph.bind(this)
-    this.createNode = this.createNode.bind(this)
-    this.insertNewNode = this.insertNewNode.bind(this)
-    this.onAddNodeClick = this.onAddNodeClick.bind(this)
-    this.getClosestMidpointOnRect = this.getClosestMidpointOnRect.bind(this)
-    this.getClosestPointOnRect = this.getClosestPointOnRect.bind(this)
-    this.distance = this.distance.bind(this)
-    this.getNode = this.getNode.bind(this)
-    this.removeLink = this.removeLink.bind(this)
-    this.updateUndo = this.updateUndo.bind(this)
-    this.redraw = this.redraw.bind(this)
-    this.updateStyle = this.updateStyle.bind(this)
-    this.setMotion = this.setMotion.bind(this)
-    this.showAddingStyle = this.showAddingStyle.bind(this)
-    this.onLinkClick = this.onLinkClick.bind(this)
-    this.onNodeClick = this.onNodeClick.bind(this)
-    this.updateInfo = this.updateInfo.bind(this)
-    this.fillInfo = this.fillInfo.bind(this)
-    this.clearInfo = this.clearInfo.bind(this)
-    this.removeElementsByClass = this.removeElementsByClass.bind(this)
-    this.onSvgClick = this.onSvgClick.bind(this)
-    this.onUndoClick = this.onUndoClick.bind(this)
-    this.onRedoClick = this.onRedoClick.bind(this)
-    this.onUnlockClick = this.onUnlockClick.bind(this)
-    this.onLockLinkClick = this.onLockLinkClick.bind(this)
-    this.onUnlockLinkClick = this.onUnlockLinkClick.bind(this)
-    this.onAddLinkClick = this.onAddLinkClick.bind(this)
-    this.onAddLinkedNodeClick = this.onAddLinkedNodeClick.bind(this)
-    this.onDelClick = this.onDelClick.bind(this)
-    this.resetSelected = this.resetSelected.bind(this)
-    this.insertNewLink = this.insertNewLink.bind(this)
-    this.createLink = this.createLink.bind(this)
-    this.deleteLink = this.deleteLink.bind(this)
-    this.deleteNode = this.deleteNode.bind(this)
-    this.removeNode = this.removeNode.bind(this)
-    this.insertLink = this.insertLink.bind(this)
-    this.insertLinks = this.insertLinks.bind(this)
-    this.insertNode = this.insertNode.bind(this)
-  }
 
   componentDidMount() {
     document.getElementById('add-node').onclick = this.onAddNodeClick
@@ -126,15 +91,13 @@ export class Graph extends React.PureComponent { // eslint-disable-line react/pr
     }
   }
 
-  onSvgClick() {
-    console.log('svg click')
+  onSvgClick = () => {
     if (!this.props.mousedownNode && !this.props.mousedownLink) {
-      console.log('no mousedown, resetting')
       this.resetSelected()
     }
   }
 
-  onUndoClick() {
+  onUndoClick = () => {
     var latestAction = this.undoStack.pop()
     this.undoneStack.push(latestAction)
     this.isUndoing = true
@@ -143,7 +106,7 @@ export class Graph extends React.PureComponent { // eslint-disable-line react/pr
     this.redraw()
   }
 
-  onRedoClick() {
+  onRedoClick = () => {
     var latestAction = this.redoStack.pop()
     this.undoStack.push(this.undoneStack.pop())
     this.isRedoing = true
@@ -152,28 +115,28 @@ export class Graph extends React.PureComponent { // eslint-disable-line react/pr
     this.redraw()
   }
 
-  onUnlockClick() {
-    this.props.selectedNode.fixed = false
+  onUnlockClick = () => {
+    this.getNode(this.props.selectedNode.toJS()).fixed = false
     this.props.onSelectedNodeUpdate(null)
     this.redraw()
   }
 
-  onLockLinkClick() {
-    this.props.selectedLink.locked = true
+  onLockLinkClick = () => {
+    this.getLink(this.props.selectedLink.toJS()).locked = true
     this.redraw()
   }
 
-  onUnlockLinkClick() {
-    this.props.selectedLink.locked = false
+  onUnlockLinkClick = () => {
+    this.getLink(this.props.selectedLink.toJS()).locked = false
     this.redraw()
   }
 
-  onAddLinkClick() {
+  onAddLinkClick = () => {
     this.props.onLinkingNodeChange(this.props.selectedNode)
     this.redraw()
   }
 
-  onAddLinkedNodeClick() {
+  onAddLinkedNodeClick = () => {
     var x = this.props.selectedNode.get('x') - 100
     var y = this.props.selectedNode.get('y') - 100
     this.insertNewNode(x, y, this.props.selectedNode.toJS())
@@ -181,7 +144,7 @@ export class Graph extends React.PureComponent { // eslint-disable-line react/pr
     this.redraw()
   }
 
-  onDelClick() {
+  onDelClick = () => {
     if (this.props.selectedLink) {
       this.deleteLink(this.props.selectedLink.toJS())
     }
@@ -192,19 +155,19 @@ export class Graph extends React.PureComponent { // eslint-disable-line react/pr
     this.redraw()
   }
 
-  onAddNodeClick() {
+  onAddNodeClick = () => {
     this.insertNewNode(0, 0)
     this.redraw()
   }
 
-  onLinkClick(d) {
+  onLinkClick = d => {
     this.props.onMousedownLinkUpdate(d)
-    this.props.onSelectedLinkUpdate(d)
+    this.props.onSelectedLinkUpdate(d.id)
     this.props.onSelectedNodeUpdate(null)
     this.redraw()
   }
 
-  onNodeClick(d) {
+  onNodeClick = d => {
     if (this.props.linkingNode) {
       // create a link from selected to this node
       this.insertNewLink(this.props.linkingNode.toJS(), d)
@@ -220,7 +183,7 @@ export class Graph extends React.PureComponent { // eslint-disable-line react/pr
 
   // given a starting point, find the closest point along the perimeter of the
   // given rectangle to that point
-  getClosestPointOnRect(from, rect) {
+  getClosestPointOnRect = (from, rect) => {
     // bounds of the rectangle (with rounded edges)
     var xmin = rect.x - this.props.nodeSize.width / 2 + 3
     var ymin = rect.y - this.props.nodeSize.height / 2 + 3
@@ -233,7 +196,7 @@ export class Graph extends React.PureComponent { // eslint-disable-line react/pr
   }
 
   // similar to getClosestPoint, but it will only return a corner or a midpoint
-  getClosestMidpointOnRect(from, rect) {
+  getClosestMidpointOnRect = (from, rect) => {
     var xmin = rect.x - this.props.nodeSize.width / 2
     var ymin = rect.y - this.props.nodeSize.height / 2
     var xmax = rect.x + this.props.nodeSize.width / 2
@@ -256,7 +219,7 @@ export class Graph extends React.PureComponent { // eslint-disable-line react/pr
   }
 
   // stop the animation if anything is selected
-  setMotion() {
+  setMotion = () => {
     if (this.props.selectedLink || this.props.selectedNode) {
       this.force.stop()
     }
@@ -266,25 +229,25 @@ export class Graph extends React.PureComponent { // eslint-disable-line react/pr
   }
 
   // find a node by its index
-  getNode(node) {
-    return this.nodes.find(e => e.id === node.id)
-  }
+  getNode = node => this.nodes.find(e => e.id === node.id)
+
+  getLink = link => this.links.find(e => e.id === link.id)
 
   // insert an already created node
-  insertNode(node) {
+  insertNode = node => {
     this.nodes.push(node)
   }
 
   // safe way to re-insert links whose nodes may have been deleted in the past
-  insertLinks(links) {
+  insertLinks = links => {
     this.links.forEach(link => { this.insertLink(link) })
   }
 
-  insertLink(link) {
+  insertLink = link => {
     this.links.push(this.createLink(link.source, link.target))
   }
 
-  deleteNode(node) {
+  deleteNode = node => {
     this.removeNode(node)
 
     // save links that have been deleted so that they can be stored in undo
@@ -308,12 +271,12 @@ export class Graph extends React.PureComponent { // eslint-disable-line react/pr
   }
 
   // remove a node from the list
-  removeNode(node) {
+  removeNode = node => {
     this.nodes.splice(this.nodes.indexOf(node), 1)
   }
 
   // create and insert a link
-  insertNewLink(source, target) {
+  insertNewLink = (source, target) => {
     var newlink = this.createLink(source, target)
     this.links.push(newlink)
     if (!this.isUndoing) {
@@ -328,7 +291,7 @@ export class Graph extends React.PureComponent { // eslint-disable-line react/pr
   }
 
   // create a link object: links have a source and a target
-  createLink(source, target) {
+  createLink = (source, target) => {
     var link = {
       id: `link-${this.props.linkCounter}`,
       source: this.getNode(source),
@@ -340,7 +303,7 @@ export class Graph extends React.PureComponent { // eslint-disable-line react/pr
   }
 
   // delete a link from the graph
-  deleteLink(link) {
+  deleteLink = link => {
     this.removeLink(link)
     if (!this.isUndoing) {
       this.redoStack = []
@@ -353,7 +316,7 @@ export class Graph extends React.PureComponent { // eslint-disable-line react/pr
     }
   }
 
-  resetSelected() {
+  resetSelected = () => {
     this.props.onSelectedNodeUpdate(null)
     this.props.onSelectedLinkUpdate(null)
     this.props.onLinkingNodeChange(null)
@@ -361,7 +324,7 @@ export class Graph extends React.PureComponent { // eslint-disable-line react/pr
   }
 
   // remove all elements of a given class
-  removeElementsByClass(className) {
+  removeElementsByClass = className => {
     var elements = document.getElementsByClassName(className)
     while (elements.length > 0) {
       elements[0].parentNode.removeChild(elements[0])
@@ -369,7 +332,7 @@ export class Graph extends React.PureComponent { // eslint-disable-line react/pr
   }
 
   // disable/gray out the undo button if there's nothing to undo
-  updateUndo() {
+  updateUndo = () => {
     var undo = document.getElementById('undo')
     if (this.undoStack.length === 0 && !undo.classList.contains('disabled')) {
       undo.classList.add('disabled')
@@ -390,7 +353,7 @@ export class Graph extends React.PureComponent { // eslint-disable-line react/pr
     }
   }
 
-  updateStyle() {
+  updateStyle = () => {
     // apply style to indicate that the user is currently adding a link
     if (this.props.linkingNode) {
       this.showAddingStyle('adding link')
@@ -400,7 +363,7 @@ export class Graph extends React.PureComponent { // eslint-disable-line react/pr
     }
   }
 
-  showAddingStyle(text) {
+  showAddingStyle = text => {
     // style to make it v clear that adding a link is currently what is happening
     if (text) {
       this.svg.append('text')
@@ -427,26 +390,24 @@ export class Graph extends React.PureComponent { // eslint-disable-line react/pr
   }
 
   // update the tooltip and the bottom section of the page
-  updateInfo() {
+  updateInfo = () => {
     const showTooltip = !this.props.linkingNode && !this.dragged && this.should_show_info
     if (this.props.selectedNode) {
       this.fillInfo(this.props.selectedNode.toJS(), true, showTooltip)
     }
     else if (this.props.selectedLink) {
-      console.log('filling link info')
-      this.fillInfo(this.props.selectedLink, false, showTooltip)
+      this.fillInfo(this.props.selectedLink.toJS(), false, showTooltip)
     }
     else {
-      console.log('not filling info')
       this.clearInfo()
     }
   }
 
-  clearInfo() {
+  clearInfo = () => {
     this.removeElementsByClass('mf-tooltip')
   }
 
-  fillInfo(selected, isNode, showTooltip) {
+  fillInfo = (selected, isNode, showTooltip) => {
     var tooltipContent = ''
     this.removeElementsByClass('mf-tooltip')
     var div = document.createElement('div')
@@ -516,12 +477,12 @@ export class Graph extends React.PureComponent { // eslint-disable-line react/pr
         div.appendChild(linkButton)
 
         // un-fix the node position
-        if (this.props.selectedNode.fixed) {
+        if (this.props.selectedNode.get('fixed')) {
           div.appendChild(unlockButton)
         }
       }
       // link has a lock on it: add unlock button
-      else if (this.props.selectedLink.locked) {
+      else if (this.props.selectedLink.get('locked')) {
         div.appendChild(unlockLink)
       }
       // link does not have a lock: add lock button
@@ -531,7 +492,7 @@ export class Graph extends React.PureComponent { // eslint-disable-line react/pr
     }
   }
 
-  makeTooltipButton(extraClass, text, click) {
+  makeTooltipButton = (extraClass, text, click) => {
     var button = document.createElement('div')
     button.className = 'button'
     if (extraClass) {
@@ -543,7 +504,7 @@ export class Graph extends React.PureComponent { // eslint-disable-line react/pr
   }
 
   // redraw force layout
-  redraw() {
+  redraw = () => {
     this.updateUndo() // set the style/action of the undo button
     this.updateStyle() // update the overall style of the container
     this.setMotion() // pause the graph when some element is selected
@@ -571,8 +532,20 @@ export class Graph extends React.PureComponent { // eslint-disable-line react/pr
 
     this.link.exit().remove()
 
-    this.link.classed('link_selected', d => d === this.props.selectedLink)
-        .attr('marker-end', d => d === this.props.selectedLink ? 'url(#end-selected' : 'url(#end)')
+    this.link.classed('link_selected', d => {
+      if (this.props.selectedLink) {
+        return d.id === this.props.selectedLink.get('id')
+      }
+    }).attr('marker-end', d => {
+      let result
+      if (this.props.selectedLink) {
+        result = d.id === this.props.selectedLink.get('id') ? 'url(#end-selected)' : 'url(#end)'
+      }
+      else {
+        result = 'url(#end)'
+      }
+      return result
+    })
 
     this.node = this.node.data(this.nodes)
 
@@ -627,21 +600,19 @@ export class Graph extends React.PureComponent { // eslint-disable-line react/pr
   }
 
   // remove a link from the list
-  removeLink(link) {
+  removeLink = link => {
     this.links.splice(this.nodes.indexOf(link), 1)
   }
 
-  resizeGraph(dimensions) {
+  resizeGraph = dimensions => {
     var svg = d3.select('svg')
       .attr('width', dimensions.width)
       .attr('height', dimensions.height)
   }
 
-  distance(start, end) {
-    return Math.sqrt((end.x - start.x) ** 2 + (end.y - start.y) ** 2)
-  }
+  distance = (start, end) => Math.sqrt((end.x - start.x) ** 2 + (end.y - start.y) ** 2)
 
-  insertNewNode(x, y, linkedFrom) {
+  insertNewNode = (x, y, linkedFrom) => {
     var link
     var node = this.createNode(x, y)
     this.nodes.push(node)
@@ -664,13 +635,13 @@ export class Graph extends React.PureComponent { // eslint-disable-line react/pr
   }
 
   // create a node object nodes have an x, y, and index
-  createNode(x, y) {
+  createNode = (x, y) => {
     var node = { x, y, id: `node-${this.props.nodeCounter}` }
     this.props.onNodeAdded()
     return node
   }
 
-  initialize(initialNodes, initialLinks) {
+  initialize = (initialNodes, initialLinks) => {
     var _this = this
     // remove the svg if there already is one
     d3.select('svg').remove()
@@ -728,7 +699,7 @@ export class Graph extends React.PureComponent { // eslint-disable-line react/pr
         .attr('width', _this.props.dimensions.get('width'))
         .attr('height', _this.props.dimensions.get('height'))
         .on('click', _this.onSvgClick)
-        // .on('mouseup', mouseup)
+        .on('mouseup', mouseup)
         .append('g')
         .call(zoom)
 
@@ -874,9 +845,9 @@ export class Graph extends React.PureComponent { // eslint-disable-line react/pr
 
     _this.redraw()
 
+
     // indicate there is no element currently being clicked on
     function mouseup() {
-        console.log('mouseup')
         _this.props.onMousedownNodeUpdate(null)
         _this.props.onMousedownLinkUpdate(null)
     }
