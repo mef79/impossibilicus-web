@@ -41,6 +41,10 @@ const getMousedownLink = () => createSelector(
   selectGraphDomain,
   substate => substate.get('mousedownLink'))
 
+const getShouldRedraw = () => createSelector(
+  selectGraphDomain,
+  substate => substate.get('shouldRedraw'))
+
 export {
   isListening,
   getSelectedNodeId,
@@ -51,4 +55,5 @@ export {
   getLinkingNode,
   getMousedownNode,
   getMousedownLink,
+  getShouldRedraw,
 }

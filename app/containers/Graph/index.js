@@ -32,6 +32,7 @@ import {
   setLinkingNode,
   setMousedownNode,
   setMousedownLink,
+  setShouldRedraw,
 } from './actions'
 import {
   isListening,
@@ -43,13 +44,13 @@ import {
   getMousedownLink,
   getSelectedNodeId,
   getSelectedLinkId,
+  getShouldRedraw,
 } from './selectors'
 import { LOCK } from 'utils/icons'
 
-/* disable a ton of linting because this uses d3 and poor linter does not understand */
-/* eslint no-unused-vars: 0, indent: 0, no-param-reassign:0, no-var: 0, camelcase: 0, prefer-arrow-callback: 0, no-shadow: 0, no-mixed-operators: 0 */
-
-export class Graph extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
+/* disable linting that is incompatible with d3 */
+/* eslint no-unused-vars: 0, no-param-reassign:0, no-var: 0*/
+export class Graph extends React.PureComponent {
 
   componentDidMount() {
     document.getElementById('add-node').onclick = this.onAddNodeClick
@@ -63,8 +64,8 @@ export class Graph extends React.PureComponent { // eslint-disable-line react/pr
     jQuery(window).resize(() => {
       if (window.innerWidth >= 1256) {
         this.props.onResize({
-            width: window.innerWidth - 630,
-            height: window.innerHeight - 50,
+          width: window.innerWidth - 630,
+          height: window.innerHeight - 50,
         })
       }
       else {
@@ -88,6 +89,12 @@ export class Graph extends React.PureComponent { // eslint-disable-line react/pr
     if (!this.props.dimensions.equals(nextProps.dimensions)) {
       // then resize the graph with the new dimensions
       this.resizeGraph(nextProps.dimensions.toJS())
+    }
+  }
+
+  componentDidUpdate() {
+    if (this.props.shouldRedraw) {
+      this.redraw()
     }
   }
 
@@ -210,8 +217,8 @@ export class Graph extends React.PureComponent { // eslint-disable-line react/pr
     ]
 
     points.map(point => {
-        point.dist = this.distance(from, point)
-        return point
+      point.dist = this.distance(from, point)
+      return point
     })
 
     points.sort((a, b) => a.dist - b.dist)
@@ -364,7 +371,7 @@ export class Graph extends React.PureComponent { // eslint-disable-line react/pr
   }
 
   showAddingStyle = text => {
-    // style to make it v clear that adding a link is currently what is happening
+    // style to make it v clear that adding a link is what's currently happening
     if (text) {
       this.svg.append('text')
           .text(text)
@@ -391,7 +398,9 @@ export class Graph extends React.PureComponent { // eslint-disable-line react/pr
 
   // update the tooltip and the bottom section of the page
   updateInfo = () => {
-    const showTooltip = !this.props.linkingNode && !this.dragged && this.should_show_info
+    const showTooltip = !this.props.linkingNode && !this.dragged &&
+      this.should_show_info
+
     if (this.props.selectedNode) {
       this.fillInfo(this.props.selectedNode.toJS(), true, showTooltip)
     }
@@ -458,11 +467,16 @@ export class Graph extends React.PureComponent { // eslint-disable-line react/pr
 
     if (showTooltip) {
       var delButton = this.makeTooltipButton('del', 'x', this.onDelClick)
-      var nodeButton = this.makeTooltipButton('add', 'node+', this.onAddLinkedNodeClick)
-      var linkButton = this.makeTooltipButton('add', 'link+', this.onAddLinkClick)
-      var unlockButton = this.makeTooltipButton(null, 'unlock', this.onUnlockClick)
-      var lockLink = this.makeTooltipButton(null, 'lock', this.onLockLinkClick)
-      var unlockLink = this.makeTooltipButton(null, 'unlock', this.onUnlockLinkClick)
+      var nodeButton = this.makeTooltipButton('add', 'node+',
+        this.onAddLinkedNodeClick)
+      var linkButton = this.makeTooltipButton('add', 'link+',
+        this.onAddLinkClick)
+      var unlockButton = this.makeTooltipButton(null, 'unlock',
+        this.onUnlockClick)
+      var lockLinkButton = this.makeTooltipButton(null, 'lock',
+        this.onLockLinkClick)
+      var unlockLinkButton = this.makeTooltipButton(null, 'unlock',
+        this.onUnlockLinkClick)
 
       // make the tooltip
       document.body.appendChild(div)
@@ -483,11 +497,11 @@ export class Graph extends React.PureComponent { // eslint-disable-line react/pr
       }
       // link has a lock on it: add unlock button
       else if (this.props.selectedLink.get('locked')) {
-        div.appendChild(unlockLink)
+        div.appendChild(unlockLinkButton)
       }
       // link does not have a lock: add lock button
       else {
-        div.appendChild(lockLink)
+        div.appendChild(lockLinkButton)
       }
     }
   }
@@ -509,6 +523,12 @@ export class Graph extends React.PureComponent { // eslint-disable-line react/pr
     this.updateStyle() // update the overall style of the container
     this.setMotion() // pause the graph when some element is selected
 
+    this.props.storyData.toJS().nodes.forEach(node => {
+      if (node.title) {
+        this.getNode(node).title = node.title
+      }
+    })
+
     if (this.props.isListening) {
       this.props.onStoryUpdate(this.nodes, this.links)
     }
@@ -521,7 +541,8 @@ export class Graph extends React.PureComponent { // eslint-disable-line react/pr
         .attr('d', LOCK)
         .attr('x', d => d.midX)
         .attr('y', d => d.midY)
-        .attr('transform', d => `translate(${d.midX - 8},${d.midY - 10})scale(.7,.7)`)
+        .attr('transform', d =>
+          `translate(${d.midX - 8},${d.midY - 10})scale(.7,.7)`)
     this.lock.exit().remove()
 
     this.link = this.link.data(this.links)
@@ -539,7 +560,8 @@ export class Graph extends React.PureComponent { // eslint-disable-line react/pr
     }).attr('marker-end', d => {
       let result
       if (this.props.selectedLink) {
-        result = d.id === this.props.selectedLink.get('id') ? 'url(#end-selected)' : 'url(#end)'
+        result = d.id === this.props.selectedLink.get('id') ?
+          'url(#end-selected)' : 'url(#end)'
       }
       else {
         result = 'url(#end)'
@@ -580,13 +602,23 @@ export class Graph extends React.PureComponent { // eslint-disable-line react/pr
 
     this.nodelabels = this.nodelabels.data(this.nodes)
 
-    this.nodelabels.enter()
-        .insert('text')
+    this.nodelabels.enter().insert('foreignObject')
+        .attr('height', this.props.nodeSize.height - 8)
+        .attr('width', this.props.nodeSize.width - 12)
         .on('click', this.onNodeClick)
-        .attr('x', d => d.x)
-        .attr('y', d => d.y)
+        .call(this.node_drag)
+        // .attr('clip-path', 'url(#clip-path)')
+        .attr('x', d => d.x - this.props.nodeSize.width / 2 + 6)
+        .attr('y', d => d.y - this.props.nodeSize.height / 2 + 4)
         .attr('class', 'nodelabel')
-        .text(d => d.id)
+        .append('xhtml')
+        .append('div')
+        .attr('style',
+          `height:${this.labelHeight}px;width:${this.labelWidth}px;`)
+        .html(d => d.title ? `<p>${d.title}</p>` : `<p>${d.id}</p>`)
+
+    this.nodelabels.selectAll('div').html(d =>
+      d.title ? `<p>${d.title}</p>` : `<p>${d.id}</p>`)
 
     this.nodelabels.exit().transition()
         .attr('font-size', '0px')
@@ -595,8 +627,10 @@ export class Graph extends React.PureComponent { // eslint-disable-line react/pr
     this.updateInfo()
 
     if (this.dragged) {
-        this.dragged = false
+      this.dragged = false
     }
+
+    this.props.onRedrawn()
   }
 
   // remove a link from the list
@@ -610,7 +644,7 @@ export class Graph extends React.PureComponent { // eslint-disable-line react/pr
       .attr('height', dimensions.height)
   }
 
-  distance = (start, end) => Math.sqrt((end.x - start.x) ** 2 + (end.y - start.y) ** 2)
+  distance = (p1, p2) => Math.sqrt((p1.x - p2.x) ** 2 + (p1.y - p2.y) ** 2)
 
   insertNewNode = (x, y, linkedFrom) => {
     var link
@@ -655,10 +689,7 @@ export class Graph extends React.PureComponent { // eslint-disable-line react/pr
     _this.dragged = false
 
     // the starting position of the latest node drag
-    var dragstart_position = null
-
-    // used to assign ids to nodes
-    var link_counter = 0
+    var dragstartPosition = null
 
     // temporary placeholder to determine whether to show the tooltip
     _this.should_show_info = true
@@ -669,7 +700,8 @@ export class Graph extends React.PureComponent { // eslint-disable-line react/pr
 
     // create the initial set of data if nothing is passed in
     if (initialNodes.length === 0) {
-      ({ initialNodes, initialLinks } = this.props.createDefaultStructure(this.createNode))
+      ({ initialNodes, initialLinks } =
+        this.props.createDefaultStructure(this.createNode))
     }
 
     this.nodes = initialNodes
@@ -680,13 +712,15 @@ export class Graph extends React.PureComponent { // eslint-disable-line react/pr
     })
     this.links = initialLinks
 
+    const dimensions = _this.props.dimensions.toJS()
+
     _this.force = d3.layout.force() // create a force layout
-        .size([_this.props.dimensions.get('width'), _this.props.dimensions.get('height')]) // of the given width/height
-        .nodes(this.nodes) // initialize with a single node - ???
+        .size([dimensions.width, dimensions.height])
+        .nodes(this.nodes)
         .links(this.links)
         .linkDistance(150) // how far the nodes are away from eachother
         .charge(-500) // how strongly the nodes repel eachother
-        .on('tick', tick.bind(this)) // call the 'tick' function when drawing frames
+        .on('tick', tick.bind(this)) // call 'tick' function when drawing frames
 
     // defines the zoom behavior
     var zoom = d3.behavior.zoom()
@@ -731,6 +765,12 @@ export class Graph extends React.PureComponent { // eslint-disable-line react/pr
         .attr('d', 'M0,-5L10,0L0,5')
         .attr('fill', d => d === 'end-selected' ? '#ff7f0e' : '#555555')
 
+    var clipPath = defs.append('clipPath')
+        .attr('id', 'clip-path')
+        .append('rect')
+        .attr('width', this.props.nodeSize.width - 12)
+        .attr('height', 30)
+
     // create filter with id #drop-shadow
     // height=130% so that the shadow is not clipped
     var filter = defs.append('filter')
@@ -738,9 +778,9 @@ export class Graph extends React.PureComponent { // eslint-disable-line react/pr
         .attr('y', '-20%')
         .attr('height', '150%')
 
-    // SourceAlpha refers to opacity of graphic that this filter will be applied to
-    // convolve that with a Gaussian with standard deviation 3 and store result
-    // in blur
+    // SourceAlpha refers to opacity of graphic that this filter will be applied
+    // to convolve that with a Gaussian with standard deviation 3 and store
+    // result in blur
     filter.append('feGaussianBlur')
         .attr('in', 'SourceAlpha')
         .attr('stdDeviation', 2)
@@ -764,43 +804,44 @@ export class Graph extends React.PureComponent { // eslint-disable-line react/pr
         .attr('in', 'SourceGraphic')
 
     function zoomed() {
-        container.attr('transform', `translate(${d3.event.translate})scale(${d3.event.scale})`)
+      container.attr('transform',
+        `translate(${d3.event.translate})scale(${d3.event.scale})`)
     }
 
     function dragStart(d) {
-        d3.event.sourceEvent.stopPropagation()
-        dragstart_position = { x: d.x, y: d.y }
-        _this.props.onSelectedNodeUpdate(d.id)
-        _this.redraw()
-        _this.force.stop()
+      d3.event.sourceEvent.stopPropagation()
+      dragstartPosition = { x: d.x, y: d.y }
+      _this.props.onSelectedNodeUpdate(d.id)
+      _this.redraw()
+      _this.force.stop()
     }
 
     function dragMove(d) {
-        d.px += d3.event.dx
-        d.py += d3.event.dy
-        d.x += d3.event.dx
-        d.y += d3.event.dy
-        if (distance(dragstart_position, { x: d.x, y: d.y }) > 5) {
-            _this.clearInfo()
-            _this.dragged = true
-            _this.should_show_info = false
-        }
-        tick()
+      d.px += d3.event.dx
+      d.py += d3.event.dy
+      d.x += d3.event.dx
+      d.y += d3.event.dy
+      if (distance(dragstartPosition, { x: d.x, y: d.y }) > 5) {
+        _this.clearInfo()
+        _this.dragged = true
+        _this.should_show_info = false
+      }
+      tick()
     }
 
     function distance(start, end) {
-        return Math.sqrt((end.x - start.x) ** 2 + (end.y - start.y) ** 2)
+      return Math.sqrt((end.x - start.x) ** 2 + (end.y - start.y) ** 2)
     }
 
     function dragEnd(d) {
-        if (_this.dragged) {
-            d.fixed = true
-            dragstart_position = null
-            _this.should_show_info = true
-        }
-        tick()
-        _this.force.resume()
-        _this.redraw()
+      if (_this.dragged) {
+        d.fixed = true
+        dragstartPosition = null
+        _this.should_show_info = true
+      }
+      tick()
+      _this.force.resume()
+      _this.redraw()
     }
 
     _this.node_drag = d3.behavior.drag()
@@ -808,14 +849,19 @@ export class Graph extends React.PureComponent { // eslint-disable-line react/pr
         .on('drag', dragMove)
         .on('dragend', dragEnd)
 
-    _this.link = container.append('g').attr('class', 'link-group').selectAll('path')
+    _this.link = container.append('g')
+        .attr('class', 'link-group')
+        .selectAll('path')
         .data(this.links)
         .enter().append('svg:path')
         .on('click', _this.onLinkClick)
         .attr('class', d => `link ${d.type}`)
-        .attr('marker-end', d => _this.props.selectedLink === d ? 'url(#end-selected)' : 'url(#end)')
+        .attr('marker-end', d =>
+          _this.props.selectedLink === d ? 'url(#end-selected)' : 'url(#end)')
 
-    _this.lock = container.append('g').attr('class', 'lock-group').selectAll('path')
+    _this.lock = container.append('g')
+        .attr('class', 'lock-group')
+        .selectAll('path')
         .data(this.links.filter(e => e.locked))
         .enter().append('path')
         .attr('d', LOCK)
@@ -836,47 +882,61 @@ export class Graph extends React.PureComponent { // eslint-disable-line react/pr
     _this.nodelabels = container.selectAll('.nodelabel')
         .data(this.nodes)
         .enter()
-        .append('text')
+        .append('foreignObject')
+        .attr('height', this.props.nodeSize.height - 8)
+        .attr('width', this.props.nodeSize.width - 12)
         .on('click', this.onNodeClick)
-        .attr('x', d => d.x)
-        .attr('y', d => d.y)
+        // .attr('clip-path', 'url(#clip-path)')
+        .attr('x', d => d.x - this.props.nodeSize.width / 2 + 6)
+        .attr('y', d => d.y - this.props.nodeSize.height + 4)
         .attr('class', 'nodelabel')
-        .text(d => d.id)
+        .call(_this.node_drag)
+
+    _this.labelHeight = this.props.nodeSize.height - 8
+    _this.labelWidth = this.props.nodeSize.width - 12
+    _this.labelStyle =
+      `height:${_this.labelHeight}px;width:${_this.labelWidth}px`
+    _this.nodelabels.append('xhtml')
+        .append('div')
+        .attr('style', _this.labelStyle)
+        .html(d => d.title ? `<p>${d.title}</p>` : `<p>${d.id}</p>`)
 
     _this.redraw()
 
 
     // indicate there is no element currently being clicked on
     function mouseup() {
-        _this.props.onMousedownNodeUpdate(null)
-        _this.props.onMousedownLinkUpdate(null)
+      _this.props.onMousedownNodeUpdate(null)
+      _this.props.onMousedownLinkUpdate(null)
     }
 
     // called by the d3 force graph every time a frame is redrawn
     function tick() {
-        // redraw the path of the links given their source/target node positions
-        _this.link.attr('d', d => {
-            const prevStart = d.start ? d.start : d.source
-            const prevEnd = d.end ? d.end : d.target
-            const start = _this.getClosestMidpointOnRect(d.target, d.source)
-            const end = _this.getClosestPointOnRect(prevStart, d.target)
-            d.midX = (start.x + end.x) / 2
-            d.midY = (start.y + end.y) / 2
-            d.start = start
-            d.end = end
-            return `M${start.x},${start.y}L${end.x},${end.y}`
-        })
+      // redraw the path of the links given their source/target node positions
+      _this.link.attr('d', d => {
+        const prevStart = d.start ? d.start : d.source
+        const prevEnd = d.end ? d.end : d.target
+        const start = _this.getClosestMidpointOnRect(d.target, d.source)
+        const end = _this.getClosestPointOnRect(prevStart, d.target)
+        d.midX = (start.x + end.x) / 2
+        d.midY = (start.y + end.y) / 2
+        d.start = start
+        d.end = end
+        return `M${start.x},${start.y}L${end.x},${end.y}`
+      })
 
-        _this.lock.attr('x', d => d.midX)
-            .attr('y', d => d.midY)
-            .attr('transform', d => `translate(${d.midX - 8},${d.midY - 10})scale(.7,.7)`)
+      _this.lock.attr('x', d => d.midX)
+          .attr('y', d => d.midY)
+          .attr('transform', d =>
+            `translate(${d.midX - 8},${d.midY - 10})scale(.7,.7)`)
 
-        // redraw the ndes at their new position
-        _this.node.attr('x', d => d.x - _this.props.nodeSize.width / 2)
-            .attr('y', d => d.y - _this.props.nodeSize.height / 2)
+      // redraw the ndes at their new position
+      _this.node.attr('x', d => d.x - _this.props.nodeSize.width / 2)
+          .attr('y', d => d.y - _this.props.nodeSize.height / 2)
 
-        _this.nodelabels.attr('x', d => d.x - _this.props.nodeSize.width / 2 + 6)
-            .attr('y', d => d.y + 4)
+      _this.nodelabels
+          .attr('x', d => d.x - _this.props.nodeSize.width / 2 + 6)
+          .attr('y', d => d.y - _this.props.nodeSize.height / 2 + 4)
     }
 
     // clear the story data so that this won't be called again unnecessarily
@@ -922,6 +982,8 @@ Graph.propTypes = {
   onLinkAdded: PropTypes.func,
   onLinkingNodeChange: PropTypes.func,
   createDefaultStructure: PropTypes.func.isRequired,
+  shouldRedraw: PropTypes.bool,
+  onRedrawn: PropTypes.func,
 }
 
 const mapStateToProps = createStructuredSelector({
@@ -936,6 +998,7 @@ const mapStateToProps = createStructuredSelector({
   linkingNode: getLinkingNode(),
   mousedownNode: getMousedownNode(),
   mousedownLink: getMousedownLink(),
+  shouldRedraw: getShouldRedraw(),
 })
 
 export function mapDispatchToProps(dispatch) {
@@ -972,6 +1035,9 @@ export function mapDispatchToProps(dispatch) {
     onMousedownLinkUpdate: link => {
       dispatch(setMousedownLink(link))
     },
+    onRedrawn: () => {
+      dispatch(setShouldRedraw(false))
+    }
   }
 }
 

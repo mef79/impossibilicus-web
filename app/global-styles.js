@@ -119,9 +119,14 @@ body {
 }
 
 .nodelabel {
-  fill: #fff;
+  color: #fff;
+  background: transparent;
   stroke-width: 0px;
   cursor: pointer;
+}
+
+.nodelabel div {
+  overflow: hidden;
 }
 
 .mf-tooltip {

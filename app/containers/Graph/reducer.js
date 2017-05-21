@@ -16,7 +16,7 @@ import {
   SET_LINKING_NODE,
   SET_MOUSEDOWN_NODE,
   SET_MOUSEDOWN_LINK,
-
+  SET_SHOULD_REDRAW,
 } from './constants'
 
 const initialState = fromJS({
@@ -32,6 +32,7 @@ const initialState = fromJS({
   mousedownNode: null,
   mousedownLink: null,
   selectedLinkId: null,
+  shouldRedraw: false,
 })
 
 function graphReducer(state = initialState, action) {
@@ -65,6 +66,9 @@ function graphReducer(state = initialState, action) {
     case SET_MOUSEDOWN_LINK:
       return state
         .set('mousedownLink', action.link)
+    case SET_SHOULD_REDRAW:
+      return state
+        .set('shouldRedraw', action.shouldRedraw)
     default:
       return state
   }
