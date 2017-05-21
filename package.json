@@ -146,6 +146,7 @@
       "no-case-declarations": 0,
       "no-confusing-arrow": 0,
       "no-console": 1,
+      "no-mixed-operators": 0,
       "no-plusplus": 0,
       "no-underscore-dangle": 0,
       "no-unneeded-ternary": 0,

@@ -15,6 +15,7 @@ import {
   SET_LINKING_NODE,
   SET_MOUSEDOWN_NODE,
   SET_MOUSEDOWN_LINK,
+  SET_SHOULD_REDRAW,
 } from './constants'
 
 export function defaultAction() {
@@ -80,5 +81,12 @@ export function setMousedownLink(link) {
   return {
     type: SET_MOUSEDOWN_LINK,
     link,
+  }
+}
+
+export function setShouldRedraw(shouldRedraw) {
+  return {
+    type: SET_SHOULD_REDRAW,
+    shouldRedraw,
   }
 }

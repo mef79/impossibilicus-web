@@ -27,16 +27,18 @@ export default function createRoutes(store) {
           import('containers/StoryList/sagas'),
           import('containers/SaveDialog/sagas'),
           import('containers/Graph/sagas'),
+          import('containers/FormPane/sagas'),
         ])
 
         const renderRoute = loadModule(cb)
 
-        importModules.then(([component, homeSagas, listSagas, saveSagas, graphSagas]) => {
+        importModules.then(([component, homeSagas, listSagas, saveSagas, graphSagas, formPaneSagas]) => {
           // injectReducer('loadDialog', loadDialogReducer.default)
           injectSagas(homeSagas.default)
           injectSagas(listSagas.default)
           injectSagas(saveSagas.default)
           injectSagas(graphSagas.default)
+          injectSagas(formPaneSagas.default)
           renderRoute(component)
         })
 

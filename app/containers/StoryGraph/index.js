@@ -23,8 +23,8 @@ export class StoryGraph extends React.PureComponent { // eslint-disable-line rea
   render() {
     // size of the nodes
     const nodeSize = {
-      width: 100,
-      height: 30,
+      width: 150,
+      height: 60,
       rx: 5,
       ry: 5
     }
