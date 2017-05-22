@@ -5,14 +5,15 @@
  */
 import { saveContentItem } from 'containers/HomePage/actions'
 import React, { PropTypes } from 'react'
+import { getFormValues } from 'containers/FormPane/selectors'
 import { connect } from 'react-redux'
 import { createStructuredSelector } from 'reselect'
 import { getContentItem, getSelectedNode } from 'containers/HomePage/selectors'
-import makeSelectNodeForm from './selectors'
+import makeSelectNodeForm from 'containers/FormPane/selectors'
 import Button from 'components/Button'
 import TextInput from 'components/TextInput'
 import TextArea from 'components/TextArea'
-import { updateFormValues } from './actions'
+import { updateFormValues } from 'containers/FormPane/actions'
 import { setSelectedNode } from 'containers/Graph/actions'
 
 
@@ -41,7 +42,7 @@ export class NodeForm extends React.PureComponent { // eslint-disable-line react
 
   render() {
     return (
-      <div>
+      <div key={this.props.selectedNode.get('id')}>
         <h2 className="card-header">Edit Content</h2>
         <form className="card-block">
           <TextInput
@@ -51,7 +52,7 @@ export class NodeForm extends React.PureComponent { // eslint-disable-line react
             helpText="Your Title Goes Here"
             onChange={this.updateForm}
             value={this.props.formValues.title}
-            defaultValue={selectedNode.title}
+            defaultValue={this.props.selectedNode.get('title')}
           />
           <TextArea
             label="Content"
@@ -61,7 +62,7 @@ export class NodeForm extends React.PureComponent { // eslint-disable-line react
             helpText="Your Content Goes Here"
             onChange={this.updateForm}
             value={this.props.formValues.content}
-            defaultValue={selectedNode.content}
+            defaultValue={this.props.selectedNode.get('content')}
           />
           <Button primary onClick={this.saveForm} text="Save" />
         </form>
@@ -71,7 +72,6 @@ export class NodeForm extends React.PureComponent { // eslint-disable-line react
 }
 
 NodeForm.propTypes = {
-  dispatch: PropTypes.func.isRequired,
   formValues: PropTypes.object,
   onFormUpdate: PropTypes.func,
   selectedNode: PropTypes.object,
