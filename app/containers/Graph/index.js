@@ -46,7 +46,7 @@ import {
   getSelectedLinkId,
   getShouldRedraw,
 } from './selectors'
-import { LOCK } from 'utils/icons'
+import { LOCK, WARN } from 'utils/icons'
 
 /* disable linting that is incompatible with d3 */
 /* eslint no-unused-vars: 0, no-param-reassign:0, no-var: 0*/
@@ -523,9 +523,13 @@ export class Graph extends React.PureComponent {
     this.updateStyle() // update the overall style of the container
     this.setMotion() // pause the graph when some element is selected
 
+    // update the graph's copy of objects from the store
     this.props.storyData.toJS().nodes.forEach(node => {
       if (node.title) {
         this.getNode(node).title = node.title
+      }
+      if (node.content) {
+        this.getNode(node).content = node.content
       }
     })
 
@@ -599,6 +603,31 @@ export class Graph extends React.PureComponent {
       }
       return false
     })
+
+    this.warnBackground = this.warnBackground.data(
+      this.nodes.filter(e => !e.title || !e.content), d => d.id)
+
+    this.warnBackground.enter()
+        .insert('circle')
+        .attr('r', 8)
+        .attr('cx', d => d.x + this.props.nodeSize.width / 2 - 0.5)
+        .attr('cy', d => d.y - this.props.nodeSize.height / 2 + 3.5)
+        .attr('class', 'node-warning-background')
+
+    this.warnBackground.exit().remove()
+
+    this.warn = this.warn.data(this.nodes.filter(e => !e.title || !e.content),
+      d => d.id)
+
+    this.warn.enter()
+        .insert('path')
+        .attr('class', 'node-warning')
+        .attr('d', WARN)
+        .attr('x', d => d.x)
+        .attr('y', d => d.y)
+        .attr('transform', d => `translate(${d.x},${d.y})`)
+
+    this.warn.exit().remove()
 
     this.nodelabels = this.nodelabels.data(this.nodes)
 
@@ -697,6 +726,12 @@ export class Graph extends React.PureComponent {
     // whether or not we are in the 'undoing'/'redoing' state
     _this.isUndoing = false
     _this.isRedoing = false
+
+    // positioning of the warning based on the size of the node
+    _this.warnOffset = {
+      x: _this.props.nodeSize.width / 2 - 8,
+      y: _this.props.nodeSize.height / 2 + 4,
+    }
 
     // create the initial set of data if nothing is passed in
     if (initialNodes.length === 0) {
@@ -875,9 +910,27 @@ export class Graph extends React.PureComponent {
         .attr('height', this.props.nodeSize.height)
         .attr('rx', this.props.nodeSize.rx)
         .attr('ry', this.props.nodeSize.ry)
+        .attr('x', d => d.x - _this.props.nodeSize.width / 2)
+        .attr('y', d => d.y - _this.props.nodeSize.height / 2)
         .attr('class', 'node')
         .style('filter', 'url(#drop-shadow)')
         .call(_this.node_drag)
+
+    _this.warnBackground = container.selectAll('.node-warning-background')
+        .data(this.nodes.filter(e => !e.title))
+        .enter().append('circle')
+        .attr('r', 8)
+        .attr('cx', d => d.x + this.props.nodeSize.width / 2 - 0.5)
+        .attr('cy', d => d.y - this.props.nodeSize.height / 2 + 3.5)
+        .attr('class', 'node-warning-background')
+
+    _this.warn = container.selectAll('.node-warning')
+        .data(this.nodes.filter(e => !e.title))
+        .enter().append('path')
+        .attr('d', WARN)
+        .attr('class', 'node-warning')
+        .attr('transform', d =>
+            `translate(${d.x + _this.warnOffset.x},${d.y - _this.warnOffset.y}),scale(0.3,0.3)`)
 
     _this.nodelabels = container.selectAll('.nodelabel')
         .data(this.nodes)
@@ -937,6 +990,14 @@ export class Graph extends React.PureComponent {
       _this.nodelabels
           .attr('x', d => d.x - _this.props.nodeSize.width / 2 + 6)
           .attr('y', d => d.y - _this.props.nodeSize.height / 2 + 4)
+
+      _this.warn
+          .attr('transform', d =>
+            `translate(${d.x + _this.warnOffset.x},${d.y - _this.warnOffset.y}),scale(0.3,0.3)`)
+
+      _this.warnBackground
+          .attr('cx', d => d.x + _this.props.nodeSize.width / 2 - 0.5)
+          .attr('cy', d => d.y - _this.props.nodeSize.height / 2 + 3.5)
     }
 
     // clear the story data so that this won't be called again unnecessarily
