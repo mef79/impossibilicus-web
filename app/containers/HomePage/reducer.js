@@ -22,6 +22,8 @@ import {
   SAVE_CONTENT_ITEM,
   UPDATE_STORY,
   UPDATE_LAST_SAVED,
+  LOCK_LINK,
+  UNLOCK_LINK,
 } from './constants'
 
 // The initial state of the App
@@ -34,6 +36,7 @@ const initialState = fromJS({
     links: [],
   },
   lastSavedData: {},
+  selectedNode: {},
 })
 
 function homeReducer(state = initialState, action) {
@@ -81,6 +84,19 @@ function homeReducer(state = initialState, action) {
     case UPDATE_LAST_SAVED:
       return state
         .set('lastSavedData', fromJS(action.story))
+
+    case LOCK_LINK:
+      const linkToLock = state.get('currentData').get('links')
+        .findIndex(e => e.get('id') === action.linkId)
+      return state
+        .setIn(['currentData', 'links', linkToLock, 'locked'], true)
+
+    case UNLOCK_LINK:
+      const linkToUnlock = state.get('currentData').get('links')
+        .findIndex(e => e.get('id') === action.linkId)
+      return state
+        .setIn(['currentData', 'links', linkToUnlock, 'locked'], false)
+
     default:
       return state
   }

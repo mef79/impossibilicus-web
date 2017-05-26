@@ -7,20 +7,25 @@ import { getSelectedNodeId, getSelectedLinkId } from './selectors'
 
 export function* clearSelectedLink() {
   const selectedLinkId = yield select(getSelectedLinkId())
-  if (selectedLinkId) {
+  const selectedNodeId = yield select(getSelectedNodeId())
+  if (selectedLinkId && selectedNodeId) {
     yield put(setSelectedLink(null))
   }
 }
 
 export function* clearSelectedNode() {
   const selectedNodeId = yield select(getSelectedNodeId())
-  if (selectedNodeId) {
+  const selectedLinkId = yield select(getSelectedLinkId())
+  if (selectedNodeId && selectedLinkId) {
     yield put(setSelectedNode(null))
   }
 }
 
 export function* rootSaga() {
+  // clear the selected link when selecting a node
   yield takeEvery(SET_SELECTED_NODE, clearSelectedLink)
+
+  // clear the selected node when selecting a link
   yield takeEvery(SET_SELECTED_LINK, clearSelectedNode)
 }
 

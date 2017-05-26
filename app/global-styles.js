@@ -104,6 +104,10 @@ body {
   fill: #ff4a4a;
 }
 
+.node-warning {
+  fill: #FFEB3B;
+}
+
 .link {
   stroke: #555555;
   stroke-width: 2;
@@ -119,9 +123,14 @@ body {
 }
 
 .nodelabel {
-  fill: #fff;
+  color: #fff;
+  background: transparent;
   stroke-width: 0px;
   cursor: pointer;
+}
+
+.nodelabel div {
+  overflow: hidden;
 }
 
 .mf-tooltip {

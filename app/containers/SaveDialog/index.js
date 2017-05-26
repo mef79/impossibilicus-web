@@ -15,7 +15,7 @@ import ModalClose from 'components/ModalClose'
 import Button from 'components/Button'
 import ButtonGroup from 'components/ButtonGroup'
 
-import { getValid } from './selectors'
+import { getValid, getEnteredName } from './selectors'
 import { getCurrentStory, getCurrentData, getSaveDialogVisibility, getCurrentName } from 'containers/HomePage/selectors'
 import { getLoadedStories } from 'containers/LoadDialog/selectors'
 
@@ -43,12 +43,7 @@ const modalStyle = {
 }
 
 export class SaveDialog extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
-  constructor(props) {
-    super(props)
-    this.onChangeInput = this.onChangeInput.bind(this)
-  }
-
-  onChangeInput(evt) {
+  onChangeInput = evt => {
     this.props.onChangeStoryName(evt.target.value)
     this.props.onValidate(evt.target.value, this.props.existingStories.map(story => story.name))
   }
@@ -104,6 +99,7 @@ const mapStateToProps = createStructuredSelector({
   storyData: getCurrentData(),
   isOpen: getSaveDialogVisibility(),
   currentStory: getCurrentName(),
+  storyName: getEnteredName(),
 })
 
 function mapDispatchToProps(dispatch) {
@@ -111,7 +107,10 @@ function mapDispatchToProps(dispatch) {
     onChangeStoryName: name => dispatch(changeStoryName(name)),
     onValidate: (name, existing) => dispatch(setValid(name, existing)),
     onSaveStory: () => dispatch(saveStory()),
-    close: () => dispatch(hideSaveDialog()),
+    close: () => {
+      dispatch(hideSaveDialog())
+      dispatch(changeStoryName(null))
+    },
   }
 }
 

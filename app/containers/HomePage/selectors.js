@@ -69,6 +69,6 @@ export {
   getCurrentName,
   getAllNodes,
   getSelectedNode,
-  getLastSavedData,
   getSelectedLink,
+  getLastSavedData,
 }
