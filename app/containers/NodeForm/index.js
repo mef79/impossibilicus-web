@@ -8,12 +8,13 @@ import React, { PropTypes } from 'react'
 import { getFormValues } from 'containers/FormPane/selectors'
 import { connect } from 'react-redux'
 import { createStructuredSelector } from 'reselect'
-import { getContentItem, getSelectedNode } from 'containers/HomePage/selectors'
+import { getContentItem, getSelectedNode, getSelectedNodeIncomingLinks, getSelectedNodeOutgoingLinks } from 'containers/HomePage/selectors'
 import Button from 'components/Button'
 import TextInput from 'components/TextInput'
 import TextArea from 'components/TextArea'
 import { updateFormValues } from 'containers/FormPane/actions'
-import { setSelectedNode } from 'containers/Graph/actions'
+import { setSelectedNode, setSelectedLink } from 'containers/Graph/actions'
+import GraphLink from 'components/GraphLink'
 
 
 export class NodeForm extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
@@ -35,8 +36,29 @@ export class NodeForm extends React.PureComponent { // eslint-disable-line react
     this.props.onSaveFormClick(contentItem)
   }
 
+  navigateToTargetLink = event => {
+    this.props.onLinkSelected(event.target.key)
+  }
+
   updateForm = () => {
     this.props.onFormUpdate(this.getCurrentFormContent())
+  }
+
+  renderLinks = (links, label) => {
+    if (links) {
+      const linkList = []
+      links.forEach(x =>
+        linkList.push(
+          <GraphLink
+            entity={x}
+            key={x.get('id')}
+            label={label}
+            clickFunc={() => this.props.onLinkSelected(x.get('id'))}
+          />
+        )
+      )
+      return linkList
+    }
   }
 
   render() {
@@ -64,6 +86,8 @@ export class NodeForm extends React.PureComponent { // eslint-disable-line react
             defaultValue={this.props.selectedNode.get('content')}
           />
           <Button primary onClick={this.saveForm} text="Save" />
+          {this.renderLinks(this.props.incomingLinks, '=>')}
+          {this.renderLinks(this.props.outgoingLinks, '<=')}
         </form>
       </div>
     )
@@ -75,12 +99,17 @@ NodeForm.propTypes = {
   onFormUpdate: PropTypes.func,
   selectedNode: PropTypes.object,
   onSaveFormClick: PropTypes.func,
+  incomingLinks: PropTypes.object,
+  outgoingLinks: PropTypes.object,
+  onLinkSelected: PropTypes.func,
 }
 
 const mapStateToProps = createStructuredSelector({
   contentItem: getContentItem(),
   formValues: getFormValues(),
   selectedNode: getSelectedNode(),
+  incomingLinks: getSelectedNodeIncomingLinks(),
+  outgoingLinks: getSelectedNodeOutgoingLinks(),
 })
 
 function mapDispatchToProps(dispatch) {
@@ -94,6 +123,9 @@ function mapDispatchToProps(dispatch) {
     onNodeSelected: nodeId => {
       dispatch(setSelectedNode(nodeId))
     },
+    onLinkSelected: linkId => {
+      dispatch(setSelectedLink(linkId))
+    }
   }
 }
 

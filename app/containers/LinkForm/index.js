@@ -16,13 +16,24 @@ export class LinkForm extends React.PureComponent { // eslint-disable-line react
     event.preventDefault()
     this.props.changeNode(this.props.selectedLink.get('source').get('id'))
   }
-  navigateToSourceNode = event => {
+
+  navigateToTargetNode = event => {
     event.preventDefault()
     this.props.changeNode(this.props.selectedLink.get('target').get('id'))
   }
+
+  renderTargetLink = () => {
+    if (this.props.selectedLink.get('target')) {
+      return (<GraphLink
+        entity={this.props.selectedLink.get('target')}
+        label="Target :"
+        clickFunc={this.navigateToTargetNode}
+      />)
+    }
+  }
+
   render() {
     const fromNode = this.props.selectedLink.get('source')
-    const toNode = this.props.selectedLink.get('target')
     return (
       <div>
         <h2 className="card-header">Edit Link</h2>
@@ -30,7 +41,7 @@ export class LinkForm extends React.PureComponent { // eslint-disable-line react
           <h4>{this.props.selectedLink ? this.props.selectedLink.get('id') : ''} </h4>
           <GraphLink entity={fromNode} label="Source :" clickFunc={this.navigateToSourceNode} />
           {
-            toNode ? <GraphLink entity={toNode} label="Target :" clickFunc={this.navigateToTargetNode} /> : ''
+            this.renderTargetLink()
           }
         </form>
       </div>
@@ -49,7 +60,7 @@ const mapStateToProps = createStructuredSelector({
 
 function mapDispatchToProps(dispatch) {
   return {
-    changeNode: (id) => dispatch(setSelectedNode(id))
+    changeNode: id => dispatch(setSelectedNode(id))
   }
 }
 

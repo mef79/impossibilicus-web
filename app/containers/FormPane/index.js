@@ -12,6 +12,11 @@ import LinkForm from 'containers/LinkForm'
 import NodeForm from 'containers/NodeForm'
 
 export class FormPane extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
+  selectForm = () => {
+    if (this.props.selectedNode) return <NodeForm />
+    if (this.props.selectedLink) return <LinkForm />
+  }
+
   render() {
     if (!this.props.selectedNode && !this.props.selectedLink) {
       return (
@@ -28,10 +33,7 @@ export class FormPane extends React.PureComponent { // eslint-disable-line react
     return (
       <div style={{ width: 600 }}>
         {
-          this.props.selectedNode ? <NodeForm /> : ''
-        }
-        {
-          this.props.selectedLink ? <LinkForm /> : ''
+          this.selectForm()
         }
       </div>
     )
