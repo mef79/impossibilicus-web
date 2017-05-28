@@ -58,6 +58,19 @@ const getSelectedLink = () => createSelector(
   selectCurrentLinkId,
   (homeState, selectedLinkId) => homeState.get('currentData').get('links').find(e => e.get('id') === selectedLinkId))
 
+const getSelectedNodeOutgoingLinks = () => createSelector(
+  selectHome,
+  selectCurrentNodeId,
+  (homeState, selectedNodeId) => homeState.get('currentData').get('links')
+    .filter(e => e.get('source').get('id') === selectedNodeId))
+
+const getSelectedNodeIncomingLinks = () => createSelector(
+  selectHome,
+  selectCurrentNodeId,
+  (homeState, selectedNodeId) => homeState.get('currentData').get('links')
+    .filter(e => e.get('target').get('id') === selectedNodeId))
+
+
 export {
   selectHome,
   getLoadDialogVisibility,
@@ -71,4 +84,6 @@ export {
   getSelectedNode,
   getSelectedLink,
   getLastSavedData,
+  getSelectedNodeIncomingLinks,
+  getSelectedNodeOutgoingLinks,
 }
