@@ -259,7 +259,7 @@ export class Graph extends React.PureComponent {
 
     // save links that have been deleted so that they can be stored in undo
     var deleted = this.links.filter(link =>
-      link.source === node || link.target === node)
+      link.source.id === node.id || link.target.id === node.id)
 
     // remove the deleted links
     deleted.forEach(link => { this.removeLink(link) })
@@ -279,7 +279,7 @@ export class Graph extends React.PureComponent {
 
   // remove a node from the list
   removeNode = node => {
-    this.nodes.splice(this.nodes.indexOf(node), 1)
+    this.nodes.splice(this.nodes.indexOf(this.getNode(node)), 1)
   }
 
   // create and insert a link
@@ -573,7 +573,7 @@ export class Graph extends React.PureComponent {
       return result
     })
 
-    this.node = this.node.data(this.nodes)
+    this.node = this.node.data(this.nodes, d => d.id)
 
     this.node.enter().insert('rect')
         .attr('class', 'node')
@@ -629,7 +629,7 @@ export class Graph extends React.PureComponent {
 
     this.warn.exit().remove()
 
-    this.nodelabels = this.nodelabels.data(this.nodes)
+    this.nodelabels = this.nodelabels.data(this.nodes, d => d.id)
 
     this.nodelabels.enter().insert('foreignObject')
         .attr('height', this.props.nodeSize.height - 8)
