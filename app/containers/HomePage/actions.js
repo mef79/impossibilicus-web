@@ -25,6 +25,7 @@ import {
   LOAD_STORY_ERROR,
   CLEAR_LOADED_STORY,
   SAVE_CONTENT_ITEM,
+  UPDATE_STORY_NAME,
   UPDATE_STORY,
   UPDATE_LAST_SAVED,
   LOCK_LINK,
@@ -85,6 +86,13 @@ export function saveContentItem(contentItem) {
   return {
     type: SAVE_CONTENT_ITEM,
     contentItem,
+  }
+}
+
+export function updateStoryName(name) {
+  return {
+    type: UPDATE_STORY_NAME,
+    name
   }
 }
 

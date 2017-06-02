@@ -13,7 +13,6 @@ import styled from 'styled-components'
 import ModalHeader from 'components/ModalHeader'
 import ModalClose from 'components/ModalClose'
 import Button from 'components/Button'
-import ButtonGroup from 'components/ButtonGroup'
 
 import { getValid, getEnteredName } from './selectors'
 import { getCurrentStory, getCurrentData, getSaveDialogVisibility, getCurrentName } from 'containers/HomePage/selectors'
@@ -47,33 +46,22 @@ export class SaveDialog extends React.PureComponent { // eslint-disable-line rea
     this.props.onChangeStoryName(evt.target.value)
     this.props.onValidate(evt.target.value, this.props.existingStories.map(story => story.name))
   }
-
   render() {
-    const isCurrentStory = this.props.currentStory || false
-    const canSaveNew = !isCurrentStory && !!this.props.storyName && this.props.isValid
+    const canSaveNew = !!this.props.storyName && this.props.isValid
     return (
       <Modal isOpen={this.props.isOpen} contentLabel="Dialog" style={modalStyle}>
         <ModalHeader>Save Story</ModalHeader>
         <ModalClose onClick={this.props.close}>x</ModalClose>
         <StoryNameInput
           className={this.props.isValid ? '' : 'invalid'}
-          defaultValue={this.props.currentStory || ''}
           onChange={this.onChangeInput}
         />
-        <ButtonGroup>
-          <Button
-            primary
-            text="Update Story"
-            disabled={!isCurrentStory}
-            onClick={this.props.onSaveStory}
-          />
-          <Button
-            primary
-            text="New Story"
-            disabled={!canSaveNew}
-            onClick={this.props.onSaveStory}
-          />
-        </ButtonGroup>
+        <Button
+          primary
+          text="New Story"
+          disabled={!canSaveNew}
+          onClick={this.props.onSaveStory}
+        />
       </Modal>
     )
   }

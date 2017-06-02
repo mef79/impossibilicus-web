@@ -17,7 +17,7 @@ class ButtonGroup extends React.PureComponent { // eslint-disable-line react/pre
 }
 
 ButtonGroup.propTypes = {
-  children: PropTypes.array.isRequired,
+  children: PropTypes.array
 }
 
 export default ButtonGroup

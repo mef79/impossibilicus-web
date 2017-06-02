@@ -22,7 +22,7 @@ class NavigationBar extends React.PureComponent { // eslint-disable-line react/p
           </ButtonGroup>
           <ButtonGroup>
             <Button id="load" text="Load" onClick={this.props.onLoadClick} />
-            <Button id="save" text="Save" onClick={this.props.onSaveClick} />
+            <Button id="save" text="New" onClick={this.props.onSaveClick} />
           </ButtonGroup>
         </div>
       </nav>

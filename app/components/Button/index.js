@@ -16,7 +16,7 @@ class Button extends React.PureComponent { // eslint-disable-line react/prefer-s
       disabled: this.props.disabled,
     })
     return (
-      <button className={btnClass} onClick={this.props.onClick} id={this.props.id}>
+      <button disabled={this.props.disabled} className={btnClass} onClick={this.props.onClick} id={this.props.id}>
         {this.props.text}
       </button>
     )

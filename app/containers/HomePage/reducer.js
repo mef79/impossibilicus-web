@@ -20,6 +20,7 @@ import {
   LOAD_STORY_SUCCESS,
   CLEAR_LOADED_STORY,
   SAVE_CONTENT_ITEM,
+  UPDATE_STORY_NAME,
   UPDATE_STORY,
   UPDATE_LAST_SAVED,
   LOCK_LINK,
@@ -75,6 +76,10 @@ function homeReducer(state = initialState, action) {
       return state
         .setIn(['currentData', 'nodes', indexToUpdate, 'title'], action.contentItem.title)
         .setIn(['currentData', 'nodes', indexToUpdate, 'content'], action.contentItem.content)
+
+    case UPDATE_STORY_NAME:
+      return state
+        .setIn(['currentData', 'name'], action.name)
 
     case UPDATE_STORY:
       return state

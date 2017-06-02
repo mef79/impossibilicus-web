@@ -3,9 +3,9 @@ import { call, put, select, takeEvery, takeLatest } from 'redux-saga/effects'
 
 import { SAVE_STORY } from './constants'
 import { getEnteredName } from './selectors'
-import { hideSaveDialog, updateLastSaved } from 'containers/HomePage/actions'
+import { hideSaveDialog, updateLastSaved, updateStoryName } from 'containers/HomePage/actions'
 import { UPDATE_STORY, SAVE_CONTENT_ITEM } from 'containers/HomePage/constants'
-import { getCurrentData, getLastSavedData, getCurrentName } from 'containers/HomePage/selectors'
+import { getCurrentData, getLastSavedData } from 'containers/HomePage/selectors'
 
 /**
  * Github repos request/response handler
@@ -13,9 +13,8 @@ import { getCurrentData, getLastSavedData, getCurrentName } from 'containers/Hom
 export function* postNewStory() {
   const requestURL = `${process.env.API_HOST}/story`
   // Call our request helper (see 'utils/request')
+  const name = yield select(getEnteredName())
   const data = yield select(getCurrentData())
-  let name = yield select(getEnteredName())
-  if (!name) name = yield select(getCurrentName())
   const { nodes, links } = data.toJS()
   yield call(request, requestURL, {
     method: 'POST',
@@ -25,6 +24,8 @@ export function* postNewStory() {
     body: JSON.stringify({ name, nodes, links })
   })
   // TODO: feedback
+  yield put(updateStoryName(name))
+  yield put(updateLastSaved(data))
   yield put(hideSaveDialog())
 }
 
