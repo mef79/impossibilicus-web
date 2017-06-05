@@ -6,6 +6,7 @@ import { getEnteredName } from './selectors'
 import { hideSaveDialog, updateLastSaved, updateStoryName } from 'containers/HomePage/actions'
 import { UPDATE_STORY, SAVE_CONTENT_ITEM } from 'containers/HomePage/constants'
 import { getCurrentData, getLastSavedData } from 'containers/HomePage/selectors'
+import { getNodeCount, getLinkCount } from 'containers/Graph/selectors'
 
 /**
  * Github repos request/response handler
@@ -15,13 +16,19 @@ export function* postNewStory() {
   // Call our request helper (see 'utils/request')
   const name = yield select(getEnteredName())
   const data = yield select(getCurrentData())
+
+  // underscores instead of camel case because the API is in Python
+  const link_counter = yield select(getLinkCount()) // eslint-disable-line camelcase
+  const node_counter = yield select(getNodeCount()) // eslint-disable-line camelcase
+
   const { nodes, links } = data.toJS()
+
   yield call(request, requestURL, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json'
     },
-    body: JSON.stringify({ name, nodes, links })
+    body: JSON.stringify({ name, nodes, links, link_counter, node_counter })
   })
   // TODO: feedback
   yield put(updateStoryName(name))
@@ -48,6 +55,8 @@ export function* postUpdatedStory() {
           name: current.get('name'),
           nodes: current.get('nodes').toJS(),
           links: current.get('links').toJS(),
+          node_counter: yield select(getNodeCount()), // eslint-disable-line camelcase
+          link_counter: yield select(getLinkCount()), // eslint-disable-line camelcase
         })
       })
       // make API call

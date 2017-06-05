@@ -33,6 +33,7 @@ import {
   setMousedownNode,
   setMousedownLink,
   setShouldRedraw,
+  setShouldInitialize,
 } from './actions'
 import {
   isListening,
@@ -45,6 +46,7 @@ import {
   getSelectedNodeId,
   getSelectedLinkId,
   getShouldRedraw,
+  getShouldInitialize,
 } from './selectors'
 import { LOCK, WARN } from 'utils/icons'
 
@@ -78,13 +80,6 @@ export class Graph extends React.PureComponent {
   }
 
   componentWillReceiveProps(nextProps) {
-    // if there is new data to load in
-    if (this.props.loadedData.size === 0 && nextProps.loadedData.size > 0) {
-      // re-initialize the graph
-      this.initialize(nextProps.loadedData.get('nodes').toJS(),
-        nextProps.loadedData.get('links').toJS())
-    }
-
     // if the size of the graph has changed
     if (!this.props.dimensions.equals(nextProps.dimensions)) {
       // then resize the graph with the new dimensions
@@ -95,6 +90,9 @@ export class Graph extends React.PureComponent {
   componentDidUpdate() {
     if (this.props.shouldRedraw) {
       this.redraw()
+    }
+    if (this.props.shouldInitialize) {
+      this.initialize()
     }
   }
 
@@ -704,7 +702,7 @@ export class Graph extends React.PureComponent {
     return node
   }
 
-  initialize = (initialNodes, initialLinks) => {
+  initialize = () => {
     var _this = this
     // remove the svg if there already is one
     d3.select('svg').remove()
@@ -733,8 +731,19 @@ export class Graph extends React.PureComponent {
       y: _this.props.nodeSize.height / 2 + 4,
     }
 
+    let initialNodes = _this.props.loadedData.get('nodes')
+    let initialLinks = _this.props.loadedData.get('links')
+
+    if (initialNodes) {
+      initialNodes = initialNodes.toJS()
+    }
+
+    if (initialLinks) {
+      initialLinks = initialLinks.toJS()
+    }
+
     // create the initial set of data if nothing is passed in
-    if (initialNodes.length === 0) {
+    if (!initialNodes || initialNodes.length === 0) {
       ({ initialNodes, initialLinks } =
         this.props.createDefaultStructure(this.createNode))
     }
@@ -1044,6 +1053,7 @@ Graph.propTypes = {
   onLinkingNodeChange: PropTypes.func,
   createDefaultStructure: PropTypes.func.isRequired,
   shouldRedraw: PropTypes.bool,
+  shouldInitialize: PropTypes.bool,
   onRedrawn: PropTypes.func,
 }
 
@@ -1060,12 +1070,13 @@ const mapStateToProps = createStructuredSelector({
   mousedownNode: getMousedownNode(),
   mousedownLink: getMousedownLink(),
   shouldRedraw: getShouldRedraw(),
+  shouldInitialize: getShouldInitialize(),
 })
 
 export function mapDispatchToProps(dispatch) {
   return {
     onInitialized: () => { // done creating the graph
-      dispatch(clearLoadedStory()) // remove the loaded story data
+      dispatch(setShouldInitialize(false))
       dispatch(setListening(true)) // update store when things happen
       // dispatch(setCurrentStoryName())
     },

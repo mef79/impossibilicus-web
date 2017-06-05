@@ -12,10 +12,13 @@ import {
   SET_DIMENSIONS,
   INCREMENT_NODE_COUNTER,
   INCREMENT_LINK_COUNTER,
+  SET_NODE_COUNTER,
+  SET_LINK_COUNTER,
   SET_LINKING_NODE,
   SET_MOUSEDOWN_NODE,
   SET_MOUSEDOWN_LINK,
   SET_SHOULD_REDRAW,
+  SET_SHOULD_INITIALIZE,
 } from './constants'
 
 export function defaultAction() {
@@ -63,6 +66,20 @@ export function incrementLinkCounter() {
   }
 }
 
+export function setNodeCounter(nodeCounter) {
+  return {
+    type: SET_NODE_COUNTER,
+    nodeCounter,
+  }
+}
+
+export function setLinkCounter(linkCounter) {
+  return {
+    type: SET_LINK_COUNTER,
+    linkCounter,
+  }
+}
+
 export function setLinkingNode(node) {
   return {
     type: SET_LINKING_NODE,
@@ -88,5 +105,12 @@ export function setShouldRedraw(shouldRedraw) {
   return {
     type: SET_SHOULD_REDRAW,
     shouldRedraw,
+  }
+}
+
+export function setShouldInitialize(shouldInitialize) {
+  return {
+    type: SET_SHOULD_INITIALIZE,
+    shouldInitialize,
   }
 }

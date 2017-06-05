@@ -13,10 +13,13 @@ import {
   SET_DIMENSIONS,
   INCREMENT_NODE_COUNTER,
   INCREMENT_LINK_COUNTER,
+  SET_NODE_COUNTER,
+  SET_LINK_COUNTER,
   SET_LINKING_NODE,
   SET_MOUSEDOWN_NODE,
   SET_MOUSEDOWN_LINK,
   SET_SHOULD_REDRAW,
+  SET_SHOULD_INITIALIZE,
 } from './constants'
 
 const initialState = fromJS({
@@ -57,6 +60,12 @@ function graphReducer(state = initialState, action) {
     case INCREMENT_LINK_COUNTER:
       return state
         .set('linkCounter', state.get('linkCounter') + 1)
+    case SET_NODE_COUNTER:
+      return state
+        .set('nodeCounter', action.nodeCounter)
+    case SET_LINK_COUNTER:
+      return state
+        .set('linkCounter', action.linkCounter)
     case SET_LINKING_NODE:
       return state
         .set('linkingNode', action.node)
@@ -69,6 +78,9 @@ function graphReducer(state = initialState, action) {
     case SET_SHOULD_REDRAW:
       return state
         .set('shouldRedraw', action.shouldRedraw)
+    case SET_SHOULD_INITIALIZE:
+      return state
+        .set('shouldInitialize', action.shouldInitialize)
     default:
       return state
   }

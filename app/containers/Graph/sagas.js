@@ -1,8 +1,16 @@
-// import { take, call, put, select } from 'redux-saga/effects'
-import { SET_SELECTED_NODE, SET_SELECTED_LINK } from './constants'
 import { put, select, takeEvery } from 'redux-saga/effects'
-import { setSelectedNode, setSelectedLink, setShouldRedraw } from './actions'
+import { SET_SELECTED_NODE, SET_SELECTED_LINK } from './constants'
+import { LOAD_STORY_SUCCESS } from 'containers/HomePage/constants'
+import {
+  setSelectedNode,
+  setSelectedLink,
+  setShouldRedraw,
+  setShouldInitialize,
+  setNodeCounter,
+  setLinkCounter
+} from './actions'
 import { getSelectedNodeId, getSelectedLinkId } from './selectors'
+import { getLoadedStoryData } from 'containers/HomePage/selectors'
 // Individual exports for testing
 
 export function* redrawAndClearSelectedLink() {
@@ -23,12 +31,26 @@ export function* redrawAndClearSelectedNode() {
   yield put(setShouldRedraw(true))
 }
 
+export function* setNodeAndLinkCounters() {
+  const loaded = yield select(getLoadedStoryData())
+  // console.log(loaded.get('node_counter'))
+  // console.log(loaded.get('link_counter'))
+  const nodeCounter = loaded.get('node_counter')
+  const linkCounter = loaded.get('link_counter')
+  yield put(setNodeCounter(nodeCounter))
+  yield put(setLinkCounter(linkCounter))
+  yield put(setShouldInitialize(true))
+}
+
 export function* rootSaga() {
   // clear the selected link when selecting a node
   yield takeEvery(SET_SELECTED_NODE, redrawAndClearSelectedLink)
 
   // clear the selected node when selecting a link
   yield takeEvery(SET_SELECTED_LINK, redrawAndClearSelectedNode)
+
+  // watch for story loaded to set the node and link counters
+  yield takeEvery(LOAD_STORY_SUCCESS, setNodeAndLinkCounters)
 }
 
 // All sagas to be loaded
