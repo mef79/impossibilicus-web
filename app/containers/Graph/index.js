@@ -547,7 +547,7 @@ export class Graph extends React.PureComponent {
           `translate(${d.midX - 8},${d.midY - 10})scale(.7,.7)`)
     this.lock.exit().remove()
 
-    this.link = this.link.data(this.links)
+    this.link = this.link.data(this.links, d => d.id)
 
     this.link.enter().insert('path', '.node')
         .attr('class', 'link')
@@ -662,7 +662,7 @@ export class Graph extends React.PureComponent {
 
   // remove a link from the list
   removeLink = link => {
-    this.links.splice(this.nodes.indexOf(link), 1)
+    this.links.splice(this.links.indexOf(this.getLink(link)), 1)
   }
 
   resizeGraph = dimensions => {
