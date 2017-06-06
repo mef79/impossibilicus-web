@@ -888,6 +888,16 @@ export class Graph extends React.PureComponent {
       _this.redraw()
     }
 
+    // helper to insure the label is in front of a node and the warning is in
+    // front of the warning background by tacking on a position index
+    function addIndexToArr(arr, positionIndex) {
+      const copied = JSON.parse(JSON.stringify(arr))
+      copied.forEach(e => {
+        e.positionIndex = positionIndex
+      })
+      return copied
+    }
+
     _this.node_drag = d3.behavior.drag()
         .on('dragstart', dragStart)
         .on('drag', dragMove)
@@ -912,7 +922,7 @@ export class Graph extends React.PureComponent {
         .attr('class', 'link-lock')
 
     _this.node = container.selectAll('.node')
-        .data(this.nodes)
+        .data(addIndexToArr(this.nodes, 0))
         .enter().append('rect')
         .on('click', this.onNodeClick)
         .attr('width', this.props.nodeSize.width)
@@ -926,7 +936,7 @@ export class Graph extends React.PureComponent {
         .call(_this.node_drag)
 
     _this.warnBackground = container.selectAll('.node-warning-background')
-        .data(this.nodes.filter(e => !e.title))
+        .data(addIndexToArr(this.nodes.filter(e => !e.title), 1))
         .enter().append('circle')
         .attr('r', 8)
         .attr('cx', d => d.x + this.props.nodeSize.width / 2 - 0.5)
@@ -934,7 +944,7 @@ export class Graph extends React.PureComponent {
         .attr('class', 'node-warning-background')
 
     _this.warn = container.selectAll('.node-warning')
-        .data(this.nodes.filter(e => !e.title))
+        .data(addIndexToArr(this.nodes.filter(e => !e.title), 2))
         .enter().append('path')
         .attr('d', WARN)
         .attr('class', 'node-warning')
@@ -942,7 +952,7 @@ export class Graph extends React.PureComponent {
             `translate(${d.x + _this.warnOffset.x},${d.y - _this.warnOffset.y}),scale(0.3,0.3)`)
 
     _this.nodelabels = container.selectAll('.nodelabel')
-        .data(this.nodes)
+        .data(addIndexToArr(this.nodes, 4))
         .enter()
         .append('foreignObject')
         .attr('height', this.props.nodeSize.height - 8)
@@ -953,6 +963,30 @@ export class Graph extends React.PureComponent {
         .attr('y', d => d.y - this.props.nodeSize.height + 4)
         .attr('class', 'nodelabel')
         .call(_this.node_drag)
+
+    /* when loading, we need to reposition the elements within the SVG such that
+     * the order is: [
+        node-0, node-0 warning-background, node-0 warning, node-0 label,
+        node-1, node-1 warning-background, node-1 warning, node-1 label, ...
+      ]
+      so that all objects that are part of the same node are direct siblings
+     */
+    const toOrder = '.node, .node-warning, .node-warning-background, .nodelabel'
+    container.selectAll(toOrder).sort((a, b) => {
+      // push lower-indexed nodes in back, higher to the front
+      if (a.id < b.id) {
+        return -1
+      }
+      if (a.id > b.id) {
+        return 1
+      }
+
+      // positioning elements that are part of the same nodes
+      if (a.positionIndex < b.positionIndex) {
+        return -1
+      }
+      return 1
+    })
 
     _this.labelHeight = this.props.nodeSize.height - 8
     _this.labelWidth = this.props.nodeSize.width - 12
