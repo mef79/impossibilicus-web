@@ -96,12 +96,6 @@ export class Graph extends React.PureComponent {
     }
   }
 
-  onSvgClick = () => {
-    if (!this.props.mousedownNode && !this.props.mousedownLink) {
-      this.resetSelected()
-    }
-  }
-
   onUndoClick = () => {
     var latestAction = this.undoStack.pop()
     this.undoneStack.push(latestAction)
@@ -172,11 +166,13 @@ export class Graph extends React.PureComponent {
     this.redraw()
   }
 
-  onNodeClick = d => {
+  onNodeMouseDown = d => {
     if (this.props.linkingNode) {
       // create a link from selected to this node
       this.insertNewLink(this.props.linkingNode.toJS(), d)
       this.props.onLinkingNodeChange(null)
+      this.props.onMousedownNodeUpdate(null)
+      this.props.onSelectedNodeUpdate(null)
     }
     else {
       this.props.onSelectedNodeUpdate(d.id)
@@ -580,7 +576,7 @@ export class Graph extends React.PureComponent {
         .attr('rx', this.props.nodeSize.rx)
         .attr('ry', this.props.nodeSize.ry)
         .style('filter', 'url(#drop-shadow)')
-        .on('click', this.onNodeClick)
+        .on('mousedown', this.onNodeMouseDown)
         .call(this.node_drag)
         .transition()
         .duration(750)
@@ -632,7 +628,7 @@ export class Graph extends React.PureComponent {
     this.nodelabels.enter().insert('foreignObject')
         .attr('height', this.props.nodeSize.height - 8)
         .attr('width', this.props.nodeSize.width - 12)
-        .on('click', this.onNodeClick)
+        .on('mousedown', this.onNodeMouseDown)
         .call(this.node_drag)
         // .attr('clip-path', 'url(#clip-path)')
         .attr('x', d => d.x - this.props.nodeSize.width / 2 + 6)
@@ -855,7 +851,6 @@ export class Graph extends React.PureComponent {
     function dragStart(d) {
       d3.event.sourceEvent.stopPropagation()
       dragstartPosition = { x: d.x, y: d.y }
-      _this.props.onSelectedNodeUpdate(d.id)
       _this.redraw()
       _this.force.stop()
     }
@@ -924,7 +919,7 @@ export class Graph extends React.PureComponent {
     _this.node = container.selectAll('.node')
         .data(addIndexToArr(this.nodes, 0))
         .enter().append('rect')
-        .on('click', this.onNodeClick)
+        .on('mousedown', _this.onNodeMouseDown)
         .attr('width', this.props.nodeSize.width)
         .attr('height', this.props.nodeSize.height)
         .attr('rx', this.props.nodeSize.rx)
@@ -955,9 +950,9 @@ export class Graph extends React.PureComponent {
         .data(addIndexToArr(this.nodes, 4))
         .enter()
         .append('foreignObject')
+        .on('mousedown', _this.onNodeMouseDown)
         .attr('height', this.props.nodeSize.height - 8)
         .attr('width', this.props.nodeSize.width - 12)
-        .on('click', this.onNodeClick)
         // .attr('clip-path', 'url(#clip-path)')
         .attr('x', d => d.x - this.props.nodeSize.width / 2 + 6)
         .attr('y', d => d.y - this.props.nodeSize.height + 4)
@@ -1002,8 +997,14 @@ export class Graph extends React.PureComponent {
 
     // indicate there is no element currently being clicked on
     function mouseup() {
-      _this.props.onMousedownNodeUpdate(null)
-      _this.props.onMousedownLinkUpdate(null)
+      if (!_this.props.mousedownNode && !_this.props.mousedownLink) {
+        _this.resetSelected()
+      }
+      // avoid firing off unnecessary actions
+      else {
+        _this.props.onMousedownNodeUpdate(null)
+        _this.props.onMousedownLinkUpdate(null)
+      }
     }
 
     // called by the d3 force graph every time a frame is redrawn
