@@ -81,17 +81,8 @@ function nodesChanged(newNodes, oldNodes) {
     return true
   }
 
-  // super lame type conversion
-  const newArray = newNodes.toJS()
-  const oldArray = oldNodes.toJS()
-  const newMap = {}
-  const oldMap = {}
-  newArray.forEach(e => {
-    newMap[e.id] = e
-  })
-  oldArray.forEach(e => {
-    oldMap[e.id] = e
-  })
+  const newMap = generateMap(newNodes)
+  const oldMap = generateMap(oldNodes)
 
   // equally lame huge chain of comparisons, not sure how to get around this
   // use .some() to break out as soon as a comparison shows it's changed
@@ -111,12 +102,33 @@ function nodesChanged(newNodes, oldNodes) {
 }
 
 function linksChanged(newLinks, oldLinks) {
-  if (!oldLinks || newLinks.size !== oldLinks.size) {
+  if (!oldLinks) {
     return false
   }
-  // all that should be checked: source ID/target ID equality for each link
-  // link functionality needs to be built out more before bothering with this
-  return false
+  if (newLinks.size !== oldLinks.size) {
+    return true
+  }
+  const newMap = generateMap(newLinks)
+  const oldMap = generateMap(oldLinks)
+
+  let changed = Object.keys(newMap).some(e => {
+    const a = newMap[e]
+    const b = oldMap[e]
+    changed = changed || !b
+    changed = changed || a.target.id !== b.target.id
+    changed = changed || a.source.id !== b.source.id
+    return changed
+  })
+  return changed
+}
+
+function generateMap(immutableList) {
+  const tempArray = immutableList.toJS()
+  const map = {}
+  tempArray.forEach(e => {
+    map[e.id] = e
+  })
+  return map
 }
 
 export function* rootSaga() {
