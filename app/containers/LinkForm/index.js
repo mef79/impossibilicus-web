@@ -10,6 +10,7 @@ import { createStructuredSelector } from 'reselect'
 import { getSelectedLink } from 'containers/HomePage/selectors'
 import { setSelectedNode } from 'containers/Graph/actions'
 import GraphLink from 'components/GraphLink'
+import { HotKeys } from 'react-hotkeys'
 
 export class LinkForm extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   navigateToSourceNode = event => {
@@ -34,17 +35,27 @@ export class LinkForm extends React.PureComponent { // eslint-disable-line react
 
   render() {
     const fromNode = this.props.selectedLink.get('source')
+    const keyMap = {
+      navigateToSourceNode: 'shift+left',
+      navigateToTargetNode: 'shift+right',
+    }
+    const handlers = {
+      navigateToSourceNode: event => this.navigateToSourceNode(event),
+      navigateToTargetNode: event => this.navigateToTargetNode(event),
+    }
     return (
-      <div>
-        <h2 className="card-header">Edit Link</h2>
-        <form >
-          <h4>{this.props.selectedLink ? this.props.selectedLink.get('id') : ''} </h4>
-          <GraphLink entity={fromNode} label="Source :" clickFunc={this.navigateToSourceNode} />
-          {
-            this.renderTargetLink()
-          }
-        </form>
-      </div>
+      <HotKeys keyMap={keyMap} handlers={handlers} >
+        <div>
+          <h2 className="card-header" tabIndex="0">Edit Link</h2>
+          <form >
+            <h4>{this.props.selectedLink ? this.props.selectedLink.get('id') : ''} </h4>
+            <GraphLink entity={fromNode} label="Source :" clickFunc={this.navigateToSourceNode} />
+            {
+              this.renderTargetLink()
+            }
+          </form>
+        </div>
+      </HotKeys>
     )
   }
 }
