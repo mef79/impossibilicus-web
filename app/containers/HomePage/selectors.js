@@ -10,15 +10,17 @@ const selectHome = state => state.get('home')
 const selectCurrentNodeId = state => state.get('graph').get('selectedNodeId')
 const selectCurrentLinkId = state => state.get('graph').get('selectedLinkId')
 
+const getImportDialogVisibility = () => createSelector(
+  selectHome,
+  homeState => homeState.get('isImportDialogVisible'))
+
 const getLoadDialogVisibility = () => createSelector(
   selectHome,
-  homeState => homeState.get('isLoadDialogVisible')
-)
+  homeState => homeState.get('isLoadDialogVisible'))
 
 const getSaveDialogVisibility = () => createSelector(
   selectHome,
-  homeState => homeState.get('isSaveDialogVisible')
-)
+  homeState => homeState.get('isSaveDialogVisible'))
 
 const getCurrentStory = () => createSelector(
   selectHome,
@@ -70,9 +72,8 @@ const getSelectedNodeIncomingLinks = () => createSelector(
   (homeState, selectedNodeId) => homeState.get('currentData').get('links')
     .filter(e => e.get('target').get('id') === selectedNodeId))
 
-
 export {
-  selectHome,
+  getImportDialogVisibility,
   getLoadDialogVisibility,
   getSaveDialogVisibility,
   getCurrentStory,

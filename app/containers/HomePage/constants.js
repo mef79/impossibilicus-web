@@ -1,5 +1,7 @@
+export const SHOW_IMPORT_DIALOG = 'Home/SHOW_IMPORT_DIALOG'
 export const SHOW_LOAD_DIALOG = 'Home/SHOW_LOAD_DIALOG'
 export const HIDE_LOAD_DIALOG = 'Home/HIDE_LOAD_DIALOG'
+export const HIDE_IMPORT_DIALOG = 'Home/HIDE_IMPORT_DIALOG'
 export const SHOW_SAVE_DIALOG = 'Home/SHOW_SAVE_DIALOG'
 export const HIDE_SAVE_DIALOG = 'Home/HIDE_SAVE_DIALOG'
 export const LOAD_STORY = 'Home/LOAD_STORY'
