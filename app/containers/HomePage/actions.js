@@ -16,6 +16,8 @@
  */
 
 import {
+  SHOW_IMPORT_DIALOG,
+  HIDE_IMPORT_DIALOG,
   SHOW_LOAD_DIALOG,
   HIDE_LOAD_DIALOG,
   SHOW_SAVE_DIALOG,
@@ -31,6 +33,18 @@ import {
   LOCK_LINK,
   UNLOCK_LINK,
 } from './constants'
+
+export function showImportDialog() {
+  return {
+    type: SHOW_IMPORT_DIALOG,
+  }
+}
+
+export function hideImportDialog() {
+  return {
+    type: HIDE_IMPORT_DIALOG,
+  }
+}
 
 export function showLoadDialog() {
   return {

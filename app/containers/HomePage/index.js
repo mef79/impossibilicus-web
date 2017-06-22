@@ -11,30 +11,25 @@
 
 /* ignore lots of eslint functions because d3 */
 
-import React, { PropTypes } from 'react'
-import { connect } from 'react-redux'
-import { createStructuredSelector } from 'reselect'
+import React from 'react'
 
+import ImportDialog from 'containers/ImportDialog'
 import LoadDialog from 'containers/LoadDialog'
 import SaveDialog from 'containers/SaveDialog'
 import FormPane from 'containers/FormPane'
 import NavigationBar from 'components/NavigationBar'
 import StoryGraph from 'containers/StoryGraph'
-import { showLoadDialog, showSaveDialog } from './actions'
-import { loadStories } from '../LoadDialog/actions'
-
-import { getLoadedStories } from 'containers/LoadDialog/selectors'
-import { getCurrentStory, getLoadedStoryData } from './selectors'
 
 export class HomePage extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   render() {
     return (<div>
-      <NavigationBar onLoadClick={this.props.onLoadClick} onSaveClick={this.props.onSaveClick} />
+      <NavigationBar />
       <div className="container-fluid">
         <div className="row justify-content-around align-self-start">
           <StoryGraph />
           <FormPane />
         </div>
+        <ImportDialog />
         <LoadDialog />
         <SaveDialog />
       </div>
@@ -43,28 +38,4 @@ export class HomePage extends React.PureComponent { // eslint-disable-line react
   }
 }
 
-HomePage.propTypes = {
-  stories: PropTypes.object,
-  currentStory: PropTypes.string,
-  storyData: PropTypes.object,
-  onLoadClick: PropTypes.func,
-  onSaveClick: PropTypes.func,
-}
-
-const mapStateToProps = createStructuredSelector({
-  stories: getLoadedStories(),
-  currentStory: getCurrentStory(),
-  storyData: getLoadedStoryData(),
-})
-
-export function mapDispatchToProps(dispatch) {
-  return {
-    onLoadClick: () => {
-      dispatch(showLoadDialog())
-      dispatch(loadStories())
-    },
-    onSaveClick: () => dispatch(showSaveDialog())
-  }
-}
-
-export default connect(mapStateToProps, mapDispatchToProps)(HomePage)
+export default HomePage

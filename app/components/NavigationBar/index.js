@@ -4,11 +4,19 @@
 *
 */
 
-import React from 'react'
+import React, { PropTypes } from 'react'
+import { connect } from 'react-redux'
+import { createStructuredSelector } from 'reselect'
+
 import Button from 'components/Button'
 import ButtonGroup from 'components/ButtonGroup'
-// import styled from 'styled-components'
 
+import {
+  showImportDialog,
+  showLoadDialog,
+  showSaveDialog,
+} from 'containers/HomePage/actions'
+import { loadStories } from 'containers/LoadDialog/actions'
 
 class NavigationBar extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   render() {
@@ -21,6 +29,7 @@ class NavigationBar extends React.PureComponent { // eslint-disable-line react/p
             <Button primary id="redo" text="Redo" />
           </ButtonGroup>
           <ButtonGroup>
+            <Button id="import" text="Import" onClick={this.props.onImportClick} />
             <Button id="load" text="Load" onClick={this.props.onLoadClick} />
             <Button id="save" text="New" onClick={this.props.onSaveClick} />
           </ButtonGroup>
@@ -31,8 +40,22 @@ class NavigationBar extends React.PureComponent { // eslint-disable-line react/p
 }
 
 NavigationBar.propTypes = {
-  onSaveClick: React.PropTypes.func,
-  onLoadClick: React.PropTypes.func,
+  onImportClick: PropTypes.func,
+  onSaveClick: PropTypes.func,
+  onLoadClick: PropTypes.func,
 }
 
-export default NavigationBar
+const mapStateToProps = createStructuredSelector({})
+
+export function mapDispatchToProps(dispatch) {
+  return {
+    onImportClick: () => dispatch(showImportDialog()),
+    onLoadClick: () => {
+      dispatch(showLoadDialog())
+      dispatch(loadStories())
+    },
+    onSaveClick: () => dispatch(showSaveDialog()),
+  }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(NavigationBar)

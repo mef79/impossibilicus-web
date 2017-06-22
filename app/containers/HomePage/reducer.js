@@ -12,6 +12,8 @@
 import { fromJS } from 'immutable'
 
 import {
+  SHOW_IMPORT_DIALOG,
+  HIDE_IMPORT_DIALOG,
   SHOW_LOAD_DIALOG,
   HIDE_LOAD_DIALOG,
   SHOW_SAVE_DIALOG,
@@ -29,6 +31,7 @@ import {
 
 // The initial state of the App
 const initialState = fromJS({
+  isImportDialogVisible: false,
   isLoadDialogVisible: false,
   isSaveDialogVisible: false,
   loadedStory: {},
@@ -43,18 +46,18 @@ const initialState = fromJS({
 function homeReducer(state = initialState, action) {
   switch (action.type) {
     // showing/hiding dialogs
+    case SHOW_IMPORT_DIALOG:
+      return state.set('isImportDialogVisible', true)
+    case HIDE_IMPORT_DIALOG:
+      return state.set('isImportDialogVisible', false)
     case SHOW_LOAD_DIALOG:
-      return state
-        .set('isLoadDialogVisible', true)
+      return state.set('isLoadDialogVisible', true)
     case HIDE_LOAD_DIALOG:
-      return state
-        .set('isLoadDialogVisible', false)
+      return state.set('isLoadDialogVisible', false)
     case SHOW_SAVE_DIALOG:
-      return state
-        .set('isSaveDialogVisible', true)
+      return state.set('isSaveDialogVisible', true)
     case HIDE_SAVE_DIALOG:
-      return state
-        .set('isSaveDialogVisible', false)
+      return state.set('isSaveDialogVisible', false)
 
     // loading an individual story
     case LOAD_STORY: // fire off event to make request for story
