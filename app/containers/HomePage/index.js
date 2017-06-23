@@ -12,6 +12,7 @@
 /* ignore lots of eslint functions because d3 */
 
 import React from 'react'
+import HotKeyHandler from 'containers/HotKeyHandler'
 
 import ImportDialog from 'containers/ImportDialog'
 import LoadDialog from 'containers/LoadDialog'
@@ -23,16 +24,18 @@ import StoryGraph from 'containers/StoryGraph'
 export class HomePage extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   render() {
     return (<div>
-      <NavigationBar />
-      <div className="container-fluid">
-        <div className="row justify-content-around align-self-start">
-          <StoryGraph />
-          <FormPane />
+      <HotKeyHandler>
+        <NavigationBar />
+        <div className="container-fluid">
+          <div className="row justify-content-around align-self-start">
+            <StoryGraph />
+            <FormPane />
+          </div>
+          <ImportDialog />
+          <LoadDialog />
+          <SaveDialog />
         </div>
-        <ImportDialog />
-        <LoadDialog />
-        <SaveDialog />
-      </div>
+      </HotKeyHandler>
     </div>
     )
   }

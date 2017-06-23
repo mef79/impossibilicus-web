@@ -15,6 +15,7 @@ import homeReducer from 'containers/HomePage/reducer'
 import formPaneReducer from 'containers/FormPane/reducer'
 import graphReducer from 'containers/Graph/reducer'
 import storyListReducer from 'containers/StoryList/reducer'
+import hotKeyHandlerReducer from 'containers/HotKeyHandler/reducer'
 
 /*
  * routeReducer
@@ -58,6 +59,7 @@ export default function createReducer(asyncReducers) {
     formPane: formPaneReducer,
     graph: graphReducer,
     storyList: storyListReducer,
+    hotKeyHandler: hotKeyHandlerReducer,
     ...asyncReducers
   })
 }
