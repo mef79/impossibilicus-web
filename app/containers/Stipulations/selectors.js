@@ -19,8 +19,20 @@ const getAllStipulations = () => createSelector(
   substate => substate.get('stipulations')
 )
 
+const getFilterText = () => createSelector(
+  selectStipulationsDomain(),
+  substate => substate.get('filterText')
+)
+
+const getFilteredStipulations = () => createSelector(
+  [getAllStipulations(), getFilterText()],
+  (stipulations, filterText) => filterText ? stipulations.toJS().filter(t => t.indexOf(filterText) > -1) : stipulations.toJS()
+)
+
 export default makeSelectStipulations
 export {
   selectStipulationsDomain,
   getAllStipulations,
+  getFilterText,
+  getFilteredStipulations,
 }

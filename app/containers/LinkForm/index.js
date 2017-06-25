@@ -8,8 +8,10 @@ import React, { PropTypes } from 'react'
 import { connect } from 'react-redux'
 import { createStructuredSelector } from 'reselect'
 import { getSelectedLink } from 'containers/HomePage/selectors'
-import { getAllStipulations } from 'containers/Stipulations/selectors'
+import { getAllStipulations, getFilteredStipulations, getFilterText } from 'containers/Stipulations/selectors'
+import { updateFilterText } from 'containers/Stipulations/actions'
 import ButtonGroup from 'components/ButtonGroup'
+import TextInput from 'components/TextInput'
 import { setSelectedNode } from 'containers/Graph/actions'
 import GraphLink from 'components/GraphLink'
 import { addToKeyMap, addToHandlers, removeFromKeyMap, removeFromHandlers } from 'containers/HotKeyHandler/actions'
@@ -41,6 +43,21 @@ export class LinkForm extends React.PureComponent { // eslint-disable-line react
     this.props.changeNode(this.props.selectedLink.get('target').get('id'))
   }
 
+  updateFilter = () => {
+    this.props.filterStipulations(document.getElementById('filterStipulations').value)
+  }
+
+  renderStipulations = () => {
+    const stipulationsList = []
+    this.props.stipulations.toJS().forEach(x =>
+      stipulationsList.push(
+        <span key={x}>
+          {x}
+        </span>
+      )
+    )
+    return stipulationsList
+  }
   renderTargetLink = () => {
     if (this.props.selectedLink.get('target')) {
       return (<GraphLink
@@ -50,11 +67,12 @@ export class LinkForm extends React.PureComponent { // eslint-disable-line react
       />)
     }
   }
-  renderStipulations = () => {
+
+  renderFilteredStipulations = () => {
     const stipulationsList = []
-    this.props.stipulations.toJS().forEach(x =>
+    this.props.filteredStipulations.forEach(x =>
       stipulationsList.push(
-        <span key={x}>
+        <span key={x + x}>
           {x}
         </span>
       )
@@ -75,7 +93,20 @@ export class LinkForm extends React.PureComponent { // eslint-disable-line react
               this.renderTargetLink()
             }
           </ButtonGroup>
-          { this.renderStipulations()}
+          <TextInput
+            label="Filter Stipulations"
+            id="filterStipulations"
+            placeholder="..."
+            helpText="Type to filter list"
+            onChange={this.updateFilter}
+            value={this.props.filterText}
+          />
+          <div>
+            { this.renderStipulations() }
+          </div>
+          <div>
+            { this.renderFilteredStipulations()}
+          </div>
         </form>
       </div>
     )
@@ -90,11 +121,17 @@ LinkForm.propTypes = {
   removeHandler: PropTypes.func,
   removeKeyMap: PropTypes.func,
   stipulations: PropTypes.object,
+  filteredStipulations: PropTypes.array,
+  updateFilterText: PropTypes.func,
+  filterText: PropTypes.string,
+  filterStipulations: PropTypes.func,
 }
 
 const mapStateToProps = createStructuredSelector({
   selectedLink: getSelectedLink(),
   stipulations: getAllStipulations(),
+  filteredStipulations: getFilteredStipulations(),
+  filterText: getFilterText(),
 })
 
 function mapDispatchToProps(dispatch) {
@@ -103,7 +140,8 @@ function mapDispatchToProps(dispatch) {
     removeHandler: handlers => dispatch(removeFromHandlers(handlers)),
     addKeyMap: keyMap => dispatch(addToKeyMap(keyMap)),
     removeKeyMap: keyMap => dispatch(removeFromKeyMap(keyMap)),
-    changeNode: id => dispatch(setSelectedNode(id))
+    changeNode: id => dispatch(setSelectedNode(id)),
+    filterStipulations: filterText => dispatch(updateFilterText(filterText))
   }
 }
 
