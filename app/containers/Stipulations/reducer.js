@@ -9,7 +9,9 @@ import {
   DEFAULT_ACTION
 } from './constants'
 
-const initialState = fromJS({})
+const initialState = fromJS({
+  stipulations: ['some', 'stipulations', 'here', 'quite', 'good', 'stipu', 'som']
+})
 
 function stipulationsReducer(state = initialState, action) {
   switch (action.type) {

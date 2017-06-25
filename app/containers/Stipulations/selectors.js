@@ -9,17 +9,18 @@ const selectStipulationsDomain = () => state => state.get('stipulations')
  * Other specific selectors
  */
 
-
-/**
- * Default selector used by Stipulations
- */
-
 const makeSelectStipulations = () => createSelector(
   selectStipulationsDomain(),
-  (substate) => substate.toJS()
+  substate => substate.toJS()
+)
+
+const getAllStipulations = () => createSelector(
+  selectStipulationsDomain(),
+  substate => substate.get('stipulations')
 )
 
 export default makeSelectStipulations
 export {
   selectStipulationsDomain,
+  getAllStipulations,
 }

@@ -8,6 +8,7 @@ import React, { PropTypes } from 'react'
 import { connect } from 'react-redux'
 import { createStructuredSelector } from 'reselect'
 import { getSelectedLink } from 'containers/HomePage/selectors'
+import { getAllStipulations } from 'containers/Stipulations/selectors'
 import ButtonGroup from 'components/ButtonGroup'
 import { setSelectedNode } from 'containers/Graph/actions'
 import GraphLink from 'components/GraphLink'
@@ -49,6 +50,17 @@ export class LinkForm extends React.PureComponent { // eslint-disable-line react
       />)
     }
   }
+  renderStipulations = () => {
+    const stipulationsList = []
+    this.props.stipulations.toJS().forEach(x =>
+      stipulationsList.push(
+        <span key={x}>
+          {x}
+        </span>
+      )
+    )
+    return stipulationsList
+  }
 
   render() {
     const fromNode = this.props.selectedLink.get('source')
@@ -63,6 +75,7 @@ export class LinkForm extends React.PureComponent { // eslint-disable-line react
               this.renderTargetLink()
             }
           </ButtonGroup>
+          { this.renderStipulations()}
         </form>
       </div>
     )
@@ -75,11 +88,13 @@ LinkForm.propTypes = {
   addHandlers: PropTypes.func,
   addKeyMap: PropTypes.func,
   removeHandler: PropTypes.func,
-  removeKeyMap: PropTypes.func
+  removeKeyMap: PropTypes.func,
+  stipulations: PropTypes.object,
 }
 
 const mapStateToProps = createStructuredSelector({
   selectedLink: getSelectedLink(),
+  stipulations: getAllStipulations(),
 })
 
 function mapDispatchToProps(dispatch) {
