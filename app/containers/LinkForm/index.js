@@ -8,6 +8,7 @@ import React, { PropTypes } from 'react'
 import { connect } from 'react-redux'
 import { createStructuredSelector } from 'reselect'
 import { getSelectedLink } from 'containers/HomePage/selectors'
+import ButtonGroup from 'components/ButtonGroup'
 import { setSelectedNode } from 'containers/Graph/actions'
 import GraphLink from 'components/GraphLink'
 import { addToKeyMap, addToHandlers, removeFromKeyMap, removeFromHandlers } from 'containers/HotKeyHandler/actions'
@@ -43,7 +44,7 @@ export class LinkForm extends React.PureComponent { // eslint-disable-line react
     if (this.props.selectedLink.get('target')) {
       return (<GraphLink
         entity={this.props.selectedLink.get('target')}
-        label="Target :"
+        label="Target: "
         clickFunc={this.navigateToTargetNode}
       />)
     }
@@ -54,12 +55,14 @@ export class LinkForm extends React.PureComponent { // eslint-disable-line react
     return (
       <div>
         <h2 className="card-header" tabIndex="0">Edit Link</h2>
-        <form >
+        <form className="form-group" >
           <h4>{this.props.selectedLink ? this.props.selectedLink.get('id') : ''} </h4>
-          <GraphLink entity={fromNode} label="Source :" clickFunc={this.navigateToSourceNode} />
-          {
-            this.renderTargetLink()
-          }
+          <ButtonGroup>
+            <GraphLink entity={fromNode} label="Source: " clickFunc={this.navigateToSourceNode} />
+            {
+              this.renderTargetLink()
+            }
+          </ButtonGroup>
         </form>
       </div>
     )

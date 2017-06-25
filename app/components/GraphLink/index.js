@@ -11,12 +11,10 @@ import React, { PropTypes } from 'react'
 class GraphLink extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   render() {
     return (
-      <div className="card" onClick={this.props.clickFunc}>
-        <div className="card-block">
-          <h4 className="card-title" key={this.props.entity.get('id')}>
-            {this.props.label}
-            {this.props.entity.get('title') || this.props.entity.get('id')}
-          </h4>
+      <div className="btn btn-primary" onClick={this.props.clickFunc}>
+        <div key={this.props.entity.get('id')}>
+          {this.props.label}
+          {this.props.entity.get('title') || this.props.entity.get('id')}
         </div>
       </div>
     )
