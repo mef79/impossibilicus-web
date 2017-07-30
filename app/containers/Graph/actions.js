@@ -5,7 +5,6 @@
  */
 
 import {
-  DEFAULT_ACTION,
   SET_LISTENING,
   SET_SELECTED_NODE,
   SET_SELECTED_LINK,
@@ -20,12 +19,6 @@ import {
   SET_SHOULD_REDRAW,
   SET_SHOULD_INITIALIZE,
 } from './constants'
-
-export function defaultAction() {
-  return {
-    type: DEFAULT_ACTION,
-  }
-}
 
 export function setListening() {
   return {
