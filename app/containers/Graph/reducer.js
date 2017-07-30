@@ -6,7 +6,6 @@
 
 import { fromJS } from 'immutable'
 import {
-  DEFAULT_ACTION,
   SET_LISTENING,
   SET_SELECTED_NODE,
   SET_SELECTED_LINK,
@@ -40,20 +39,18 @@ const initialState = fromJS({
 
 function graphReducer(state = initialState, action) {
   switch (action.type) {
-    case DEFAULT_ACTION:
-      return state
     case SET_LISTENING:
       return state
-        .set('listening', action.isListening)
+        .set('isListening', action.isListening)
     case SET_SELECTED_NODE:
       return state
-        .set('selectedNodeId', fromJS(action.selectedNodeId))
+        .set('selectedNodeId', action.selectedNodeId)
     case SET_SELECTED_LINK:
       return state
-        .set('selectedLinkId', fromJS(action.selectedLinkId))
+        .set('selectedLinkId', action.selectedLinkId)
     case SET_DIMENSIONS:
       return state
-        .set('dimensions', fromJS(action.dimensions))
+        .set('dimensions', action.dimensions)
     case INCREMENT_NODE_COUNTER:
       return state
         .set('nodeCounter', state.get('nodeCounter') + 1)

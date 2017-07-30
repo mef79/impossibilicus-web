@@ -20,9 +20,10 @@ import {
   SET_SHOULD_INITIALIZE,
 } from './constants'
 
-export function setListening() {
+export function setListening(isListening) {
   return {
     type: SET_LISTENING,
+    isListening,
   }
 }
 
