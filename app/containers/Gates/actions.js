@@ -1,6 +1,6 @@
 /*
  *
- * Stipulations actions
+ * Gates actions
  *
  */
 

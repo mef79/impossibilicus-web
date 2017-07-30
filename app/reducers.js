@@ -16,7 +16,7 @@ import formPaneReducer from 'containers/FormPane/reducer'
 import graphReducer from 'containers/Graph/reducer'
 import storyListReducer from 'containers/StoryList/reducer'
 import hotKeyHandlerReducer from 'containers/HotKeyHandler/reducer'
-import stipulationsReducer from 'containers/Stipulations/reducer'
+import gatesReducer from 'containers/Gates/reducer'
 
 /*
  * routeReducer
@@ -61,7 +61,7 @@ export default function createReducer(asyncReducers) {
     graph: graphReducer,
     storyList: storyListReducer,
     hotKeyHandler: hotKeyHandlerReducer,
-    stipulations: stipulationsReducer,
+    gates: gatesReducer,
     ...asyncReducers
   })
 }

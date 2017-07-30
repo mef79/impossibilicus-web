@@ -1,6 +1,6 @@
 /*
  *
- * Stipulations reducer
+ * Gates reducer
  *
  */
 
@@ -11,11 +11,11 @@ import {
 } from './constants'
 
 const initialState = fromJS({
-  stipulations: ['some', 'stipulations', 'here', 'quite', 'good', 'stipu', 'som'],
+  gates: ['some', 'gates', 'here', 'quite', 'good', 'gate', 'som', 'marvel', 'dance', 'killer', 'tofu', 'blizzard', 'waltz', 'klutz', 'orange', 'cannot', 'brains'],
   filterText: '',
 })
 
-function stipulationsReducer(state = initialState, action) {
+function gatesReducer(state = initialState, action) {
   switch (action.type) {
     case DEFAULT_ACTION:
       return state
@@ -26,4 +26,4 @@ function stipulationsReducer(state = initialState, action) {
   }
 }
 
-export default stipulationsReducer
+export default gatesReducer

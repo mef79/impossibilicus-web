@@ -5,15 +5,17 @@
  */
 
 import React, { PropTypes } from 'react'
+import styled from 'styled-components'
 import { connect } from 'react-redux'
 import { createStructuredSelector } from 'reselect'
 import { getSelectedLink } from 'containers/HomePage/selectors'
-import { getAllStipulations, getFilteredStipulations, getFilterText } from 'containers/Stipulations/selectors'
-import { updateFilterText } from 'containers/Stipulations/actions'
+import { getAllGates, getFilteredGates, getFilterText } from 'containers/Gates/selectors'
+import { updateFilterText } from 'containers/Gates/actions'
 import ButtonGroup from 'components/ButtonGroup'
 import TextInput from 'components/TextInput'
 import { setSelectedNode } from 'containers/Graph/actions'
 import GraphLink from 'components/GraphLink'
+import GatePill from 'components/GatePill'
 import { addToKeyMap, addToHandlers, removeFromKeyMap, removeFromHandlers } from 'containers/HotKeyHandler/actions'
 
 export class LinkForm extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
@@ -44,20 +46,16 @@ export class LinkForm extends React.PureComponent { // eslint-disable-line react
   }
 
   updateFilter = () => {
-    this.props.filterStipulations(document.getElementById('filterStipulations').value)
+    this.props.filterGates(document.getElementById('filterGates').value)
   }
 
-  renderStipulations = () => {
-    const stipulationsList = []
-    this.props.stipulations.toJS().forEach(x =>
-      stipulationsList.push(
-        <span key={x}>
-          {x}
-        </span>
-      )
-    )
-    return stipulationsList
+  removeGate = () => {
+    const clickActions = []
+    clickActions.push({ clickFunc: () => alert('remove'), symbol: 'x' })
+    clickActions.push({ clickFunc: () => alert('add'), symbol: '+' })
+    return clickActions
   }
+
   renderTargetLink = () => {
     if (this.props.selectedLink.get('target')) {
       return (<GraphLink
@@ -68,19 +66,33 @@ export class LinkForm extends React.PureComponent { // eslint-disable-line react
     }
   }
 
-  renderFilteredStipulations = () => {
-    const stipulationsList = []
-    this.props.filteredStipulations.forEach(x =>
-      stipulationsList.push(
-        <span key={x + x}>
-          {x}
-        </span>
+  renderGates = () => {
+    const gatesList = []
+    this.props.gates.toJS().forEach(x =>
+      gatesList.push(
+        <GatePill color="rebeccapurple" actions={this.removeGate()} key={x} name={x} />
       )
     )
-    return stipulationsList
+    return gatesList
+  }
+
+  renderFilteredGates = () => {
+    const gatesList = []
+    this.props.filteredGates.forEach(x =>
+      gatesList.push(
+        <GatePill color="rebeccapurple" actions={this.removeGate()} key={x} name={x} />
+      )
+    )
+    return gatesList
   }
 
   render() {
+    const GateContainer = styled.div`
+      display: flex;
+      flex-direction:row;
+      margin-bottom:1em;
+      flex-wrap: wrap;
+    `
     const fromNode = this.props.selectedLink.get('source')
     return (
       <div>
@@ -94,19 +106,19 @@ export class LinkForm extends React.PureComponent { // eslint-disable-line react
             }
           </ButtonGroup>
           <TextInput
-            label="Filter Stipulations"
-            id="filterStipulations"
+            label="Filter Gates"
+            id="filterGates"
             placeholder="..."
             helpText="Type to filter list"
             onChange={this.updateFilter}
             value={this.props.filterText}
           />
-          <div>
-            { this.renderStipulations() }
-          </div>
-          <div>
-            { this.renderFilteredStipulations()}
-          </div>
+          <GateContainer>
+            {this.renderGates()}
+          </GateContainer>
+          <GateContainer>
+            {this.renderFilteredGates()}
+          </GateContainer>
         </form>
       </div>
     )
@@ -120,17 +132,17 @@ LinkForm.propTypes = {
   addKeyMap: PropTypes.func,
   removeHandler: PropTypes.func,
   removeKeyMap: PropTypes.func,
-  stipulations: PropTypes.object,
-  filteredStipulations: PropTypes.array,
+  gates: PropTypes.object,
+  filteredGates: PropTypes.array,
   updateFilterText: PropTypes.func,
   filterText: PropTypes.string,
-  filterStipulations: PropTypes.func,
+  filterGates: PropTypes.func,
 }
 
 const mapStateToProps = createStructuredSelector({
   selectedLink: getSelectedLink(),
-  stipulations: getAllStipulations(),
-  filteredStipulations: getFilteredStipulations(),
+  gates: getAllGates(),
+  filteredGates: getFilteredGates(),
   filterText: getFilterText(),
 })
 
@@ -141,7 +153,7 @@ function mapDispatchToProps(dispatch) {
     addKeyMap: keyMap => dispatch(addToKeyMap(keyMap)),
     removeKeyMap: keyMap => dispatch(removeFromKeyMap(keyMap)),
     changeNode: id => dispatch(setSelectedNode(id)),
-    filterStipulations: filterText => dispatch(updateFilterText(filterText))
+    filterGates: filterText => dispatch(updateFilterText(filterText))
   }
 }
 

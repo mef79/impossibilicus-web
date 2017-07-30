@@ -1,15 +1,16 @@
 /*
  *
- * Stipulations
+ * Gates
  *
  */
 
 import React, { PropTypes } from 'react'
 import { connect } from 'react-redux'
 import { createStructuredSelector } from 'reselect'
-import makeSelectStipulations from './selectors'
+import makeSelectGates from './selectors'
+// import styled from 'styled-components'
 
-export class Stipulations extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
+export class Gates extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   render() {
     return (
       <div>
@@ -18,12 +19,12 @@ export class Stipulations extends React.PureComponent { // eslint-disable-line r
   }
 }
 
-Stipulations.propTypes = {
+Gates.propTypes = {
   dispatch: PropTypes.func.isRequired
 }
 
 const mapStateToProps = createStructuredSelector({
-  Stipulations: makeSelectStipulations()
+  Gates: makeSelectGates()
 })
 
 function mapDispatchToProps(dispatch) {
@@ -32,4 +33,4 @@ function mapDispatchToProps(dispatch) {
   }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(Stipulations)
+export default connect(mapStateToProps, mapDispatchToProps)(Gates)
