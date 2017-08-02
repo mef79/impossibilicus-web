@@ -206,11 +206,12 @@
   },
   "jest": {
     "collectCoverageFrom": [
-      "app/**/*.{js,jsx}",
+      "app/**/reducer.{js,jsx}",
       "!app/**/*.test.{js,jsx}",
       "!app/*/RbGenerated*/*.{js,jsx}",
       "!app/app.js",
-      "!app/routes.js"
+      "!app/routes.js",
+      "!app/bootstrap/**"
     ],
     "coverageThreshold": {
       "global": {

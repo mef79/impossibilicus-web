@@ -1,10 +1,34 @@
-// import { fromJS } from 'immutable'
-// import { makeSelectHotKeyHandlerDomain } from '../selectors'
+import { fromJS } from 'immutable'
+import {
+  getKeyMap,
+  getHandlers,
+} from '../selectors'
 
-// const selector = makeSelectHotKeyHandlerDomain()
+const handlers = fromJS({
+  testLog: () => 1
+})
+const keyMap = fromJS({
+  testLog: 'shift + l'
+})
+const hotkeyHandlerState = fromJS({
+  handlers,
+  keyMap,
+})
 
-describe('makeSelectHotKeyHandlerDomain', () => {
-  it('Expect to have unit tests specified', () => {
-    expect(true).toEqual(false)
+const mockedState = fromJS({
+  hotKeyHandler: hotkeyHandlerState,
+})
+
+describe('getKeyMap', () => {
+  it('should select key map', () => {
+    const getKeyMapSelector = getKeyMap()
+    expect(getKeyMapSelector(mockedState)).toEqual(keyMap)
+  })
+})
+
+describe('getHandlers', () => {
+  it('should select handlers', () => {
+    const getHandlersSelector = getHandlers()
+    expect(getHandlersSelector(mockedState)).toEqual(handlers)
   })
 })

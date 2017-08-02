@@ -8,7 +8,12 @@ import React, { PropTypes } from 'react'
 import { getFormValues } from 'containers/FormPane/selectors'
 import { connect } from 'react-redux'
 import { createStructuredSelector } from 'reselect'
-import { getContentItem, getSelectedNode, getSelectedNodeIncomingLinks, getSelectedNodeOutgoingLinks } from 'containers/HomePage/selectors'
+import {
+  getContentItem,
+  getSelectedNode,
+  getSelectedNodeIncomingLinks,
+  getSelectedNodeOutgoingLinks
+} from 'containers/HomePage/selectors'
 import Button from 'components/Button'
 import TextInput from 'components/TextInput'
 import TextArea from 'components/TextArea'
