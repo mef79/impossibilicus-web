@@ -1,10 +1,11 @@
-// import React from 'react';
-// import { shallow } from 'enzyme';
+import React from 'react'
+// import { shallow } from 'enzyme'
+import { mountInProvider } from '../../../utils/test-utils'
 
-// import Date from '../index';
+import FormattedDate from '../index'
 
-describe('<Date />', () => {
-  it('Expect to have unit tests specified', () => {
-    expect(true).toEqual(false)
+describe('<FormattedDate />', () => {
+  it('should render without crashing', () => {
+    mountInProvider(<FormattedDate />)
   })
 })

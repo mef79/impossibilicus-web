@@ -1,6 +1,6 @@
 /*
  *
- * SaveDialog2 reducer
+ * SaveDialog reducer
  *
  */
 

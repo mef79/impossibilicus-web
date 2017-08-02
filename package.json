@@ -206,7 +206,7 @@
   },
   "jest": {
     "collectCoverageFrom": [
-      "app/**/*.{js,jsx}",
+      "app/**/reducer.{js,jsx}",
       "!app/**/*.test.{js,jsx}",
       "!app/*/RbGenerated*/*.{js,jsx}",
       "!app/app.js",
