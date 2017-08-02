@@ -1,10 +1,23 @@
-// import { fromJS } from 'immutable'
-// import { makeSelectFormPaneDomain } from '../selectors'
+import { fromJS } from 'immutable'
+import { getFormValues } from '../selectors'
 
-// const selector = makeSelectFormPaneDomain()
 
-describe('makeSelectFormPaneDomain', () => {
-  it('Expect to have unit tests specified', () => {
-    expect(true).toEqual(false)
+const formValues = fromJS({
+  title: 'Default Title',
+  content: 'Default Content',
+})
+
+const formPaneState = fromJS({
+  formValues
+})
+
+const mockedState = fromJS({
+  formPane: formPaneState,
+})
+
+describe('getFormValues', () => {
+  it('should select form values', () => {
+    const getFormValuesSelector = getFormValues()
+    expect(getFormValuesSelector(mockedState)).toEqual(formValues)
   })
 })
