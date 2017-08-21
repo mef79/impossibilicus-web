@@ -182,6 +182,52 @@ export class Graph extends React.PureComponent {
     this.redraw()
   }
 
+  onLinkMouseover() {
+    let markerId = '#end-mousedover'
+    let otherMarkerId = '#end-selected-mousedover'
+    if (this.className.animVal.indexOf('selected') !== -1) {
+      markerId = '#end-selected-mousedover'
+      otherMarkerId = '#end-mousedover'
+    }
+    d3.select(this).attr('marker-end', `url(${markerId})`)
+    d3.select(markerId)
+        .transition().duration(100)
+        .attr('refX', 8)
+        .attr('markerWidth', 2)
+        .attr('markerHeight', 2)
+    d3.select(this)
+        .transition().duration(100)
+        .style('stroke-width', 10)
+    d3.select(otherMarkerId)
+        .attr('refX', 8)
+        .attr('markerWidth', 2)
+        .attr('markerHeight', 2)
+  }
+
+  onLinkMouseout() {
+    let markerId = '#end-mousedover'
+    let otherMarkerId = '#end-selected-mousedover'
+    if (this.className.animVal.indexOf('selected') !== -1) {
+      markerId = '#end-selected-mousedover'
+      otherMarkerId = '#end-mousedover'
+    }
+    d3.select(this)
+        .transition().duration(500)
+        .style('stroke-width', 2)
+    d3.select(markerId)
+        .transition().duration(500)
+        .attr('refX', 12)
+        .attr('markerWidth', 5)
+        .attr('markerHeight', 5)
+    d3.select(this)
+        .transition().duration(0).delay(500)
+        .attr('marker-end', `url(${markerId})`)
+    d3.select(otherMarkerId)
+        .attr('refX', 12)
+        .attr('markerWidth', 5)
+        .attr('markerHeight', 5)
+  }
+
   // given a starting point, find the closest point along the perimeter of the
   // given rectangle to that point
   getClosestPointOnRect = (from, rect) => {
@@ -548,6 +594,8 @@ export class Graph extends React.PureComponent {
     this.link.enter().insert('path', '.node')
         .attr('class', 'link')
         .on('click', this.onLinkClick)
+        .on('mouseover', this.onLinkMouseover)
+        .on('mouseout', this.onLinkMouseout)
 
     this.link.exit().remove()
 
@@ -559,7 +607,7 @@ export class Graph extends React.PureComponent {
       let result
       if (this.props.selectedLink) {
         result = d.id === this.props.selectedLink.get('id') ?
-          'url(#end-selected)' : 'url(#end)'
+          'url(#end-selected-mousedover)' : 'url(#end)'
       }
       else {
         result = 'url(#end)'
@@ -789,7 +837,7 @@ export class Graph extends React.PureComponent {
     // build the arrow
     var defs = _this.svg.append('defs')
 
-    defs.selectAll('marker').append('marker')
+    defs.selectAll('defs').append('marker')
         .data(['end', 'end-selected'])
         .enter()
         .append('svg:marker')    // This section adds in the arrows
@@ -801,6 +849,22 @@ export class Graph extends React.PureComponent {
         .attr('markerHeight', 5)
         .attr('orient', 'auto')
         .attr('class', d => d)
+        .append('svg:path')
+        .attr('d', 'M0,-5L10,0L0,5')
+        .attr('fill', d => d === 'end-selected' ? '#ff7f0e' : '#555555')
+
+    defs.selectAll('defs').append('marker')
+        .data(['end', 'end-selected'])
+        .enter()
+        .append('svg:marker')
+        .attr('id', d => `${d}-mousedover`)
+        .attr('viewBox', '0 -5 10 10')
+        .attr('refX', 0)
+        .attr('refY', 0)
+        .attr('markerWidth', 5)
+        .attr('markerHeight', 5)
+        .attr('orient', 'auto')
+        .attr('class', d => `${d}-mousedover`)
         .append('svg:path')
         .attr('d', 'M0,-5L10,0L0,5')
         .attr('fill', d => d === 'end-selected' ? '#ff7f0e' : '#555555')
@@ -904,6 +968,8 @@ export class Graph extends React.PureComponent {
         .data(this.links)
         .enter().append('svg:path')
         .on('click', _this.onLinkClick)
+        .on('mouseover', _this.onLinkMouseover)
+        .on('mouseout', _this.onLinkMouseout)
         .attr('class', d => `link ${d.type}`)
         .attr('marker-end', d =>
           _this.props.selectedLink === d ? 'url(#end-selected)' : 'url(#end)')
