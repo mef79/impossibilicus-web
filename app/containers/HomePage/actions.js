@@ -32,6 +32,7 @@ import {
   UPDATE_LAST_SAVED,
   LOCK_LINK,
   UNLOCK_LINK,
+  RESET_STORY,
 } from './constants'
 
 export function showImportDialog() {
@@ -136,5 +137,11 @@ export function unlockLink(linkId) {
   return {
     type: UNLOCK_LINK,
     linkId
+  }
+}
+
+export function resetStory() {
+  return {
+    type: RESET_STORY,
   }
 }

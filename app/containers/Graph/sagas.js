@@ -1,6 +1,6 @@
 import { put, select, takeEvery } from 'redux-saga/effects'
 import { SET_SELECTED_NODE, SET_SELECTED_LINK } from './constants'
-import { LOAD_STORY_SUCCESS } from 'containers/HomePage/constants'
+import { LOAD_STORY_SUCCESS, RESET_STORY } from 'containers/HomePage/constants'
 import {
   setSelectedNode,
   setSelectedLink,
@@ -42,6 +42,15 @@ export function* setNodeAndLinkCounters() {
   yield put(setShouldInitialize(true))
 }
 
+export function* redrawOnStoryReset() {
+  const nodeCounter = 0
+  const linkCounter = 0
+  yield put(setNodeCounter(nodeCounter))
+  yield put(setLinkCounter(linkCounter))
+  yield put(setShouldInitialize(true))
+}
+
+
 export function* rootSaga() {
   // clear the selected link when selecting a node
   yield takeEvery(SET_SELECTED_NODE, redrawAndClearSelectedLink)
@@ -51,6 +60,8 @@ export function* rootSaga() {
 
   // watch for story loaded to set the node and link counters
   yield takeEvery(LOAD_STORY_SUCCESS, setNodeAndLinkCounters)
+
+  yield takeEvery(RESET_STORY, redrawOnStoryReset)
 }
 
 // All sagas to be loaded

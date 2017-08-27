@@ -9,3 +9,8 @@ describe('<HomePage />', () => {
     mountInProvider(<HomePage />)
   })
 })
+
+// it('should return initial state', () => {
+//   const expectedResult = state
+//   expect(homeReducer(undefined, {})).toEqual(expectedResult)
+// })

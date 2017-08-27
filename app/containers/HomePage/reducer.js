@@ -29,6 +29,8 @@ import {
   UNLOCK_LINK,
 } from './constants'
 
+import { RESET_STORY } from 'containers/Graph/constants'
+
 // The initial state of the App
 const initialState = fromJS({
   isImportDialogVisible: false,
@@ -104,6 +106,9 @@ function homeReducer(state = initialState, action) {
         .findIndex(e => e.get('id') === action.linkId)
       return state
         .setIn(['currentData', 'links', linkToUnlock, 'locked'], false)
+
+    case RESET_STORY:
+      return state.set('currentData', initialState)
 
     default:
       return state

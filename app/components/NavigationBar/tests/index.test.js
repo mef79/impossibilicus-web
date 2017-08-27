@@ -7,3 +7,4 @@ describe('<NavigationBar />', () => {
     mountInProvider(<NavigationBar />)
   })
 })
+
