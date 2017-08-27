@@ -28,8 +28,8 @@ export default function createRoutes(store) {
           import('containers/SaveDialog/sagas'),
           import('containers/ImportDialog/sagas'),
           import('containers/Graph/sagas'),
-          import('containers/FormPane/sagas'),
-          import('containers/HotKeyHandler/sagas')
+          // import('containers/FormPane/sagas'),
+          // import('containers/HotKeyHandler/sagas')
         ])
 
         const renderRoute = loadModule(cb)
@@ -41,8 +41,8 @@ export default function createRoutes(store) {
           saveSagas,
           importSagas,
           graphSagas,
-          formPaneSagas,
-          hotKeyHandlerSagas,
+          // formPaneSagas,
+          // hotKeyHandlerSagas,
         ]) => {
           // injectReducer('loadDialog', loadDialogReducer.default)
           injectSagas(homeSagas.default)
@@ -50,8 +50,8 @@ export default function createRoutes(store) {
           injectSagas(saveSagas.default)
           injectSagas(importSagas.default)
           injectSagas(graphSagas.default)
-          injectSagas(formPaneSagas.default)
-          injectSagas(hotKeyHandlerSagas.default)
+          // injectSagas(formPaneSagas.default)
+          // injectSagas(hotKeyHandlerSagas.default)
           renderRoute(component)
         })
 
