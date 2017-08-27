@@ -15,6 +15,7 @@ import {
   updateLastSaved,
   lockLink,
   unlockLink,
+  resetStory,
 } from '../actions'
 import {
   SHOW_IMPORT_DIALOG,
@@ -33,6 +34,7 @@ import {
   UPDATE_LAST_SAVED,
   LOCK_LINK,
   UNLOCK_LINK,
+  RESET_STORY,
 } from '../constants'
 
 describe('Graph actions', () => {
@@ -162,6 +164,14 @@ describe('Graph actions', () => {
         type: UNLOCK_LINK
       }
       expect(unlockLink()).toEqual(expected)
+    })
+  })
+  describe('resetStory', () => {
+    it('should handle resetStory action correctly', () => {
+      const expected = {
+        type: RESET_STORY
+      }
+      expect(resetStory()).toEqual(expected)
     })
   })
 })

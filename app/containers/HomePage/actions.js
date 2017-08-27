@@ -141,7 +141,7 @@ export function unlockLink(linkId) {
 }
 
 export function resetStory() {
-    return{
-      type: RESET_STORY,
-    }
+  return {
+    type: RESET_STORY,
+  }
 }

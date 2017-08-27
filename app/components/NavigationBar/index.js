@@ -33,7 +33,7 @@ class NavigationBar extends React.PureComponent { // eslint-disable-line react/p
             <Button id="import" text="Import" onClick={this.props.onImportClick} />
             <Button id="load" text="Load" onClick={this.props.onLoadClick} />
             <Button id="save" text="New" onClick={this.props.onSaveClick} />
-            <Button id="reset" text="Reset" onClick={this.props.onResetClick}/>
+            <Button id="reset" text="Reset" onClick={this.props.onResetClick} />
           </ButtonGroup>
         </div>
       </nav>

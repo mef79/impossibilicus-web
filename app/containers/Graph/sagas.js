@@ -42,7 +42,7 @@ export function* setNodeAndLinkCounters() {
   yield put(setShouldInitialize(true))
 }
 
-export function* redrawOnStoryReset() { 
+export function* redrawOnStoryReset() {
   const nodeCounter = 0
   const linkCounter = 0
   yield put(setNodeCounter(nodeCounter))
@@ -61,7 +61,7 @@ export function* rootSaga() {
   // watch for story loaded to set the node and link counters
   yield takeEvery(LOAD_STORY_SUCCESS, setNodeAndLinkCounters)
 
-   yield takeEvery(RESET_STORY, redrawOnStoryReset)
+  yield takeEvery(RESET_STORY, redrawOnStoryReset)
 }
 
 // All sagas to be loaded
