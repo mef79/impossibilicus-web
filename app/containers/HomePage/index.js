@@ -46,7 +46,11 @@ export class HomePage extends React.PureComponent { // eslint-disable-line react
     if (this.props.overview) {
       return (
         <div className="container-fluid">
-          <div className="row justify-content-around align-self-start" />
+          <div className="row justify-content-around align-self-start" >
+            <h1>This is the overview page</h1>
+            <div>There will be a variable editor here</div>
+            <div>And also an overview of stories</div>
+          </div>
         </div>
       )
     }
