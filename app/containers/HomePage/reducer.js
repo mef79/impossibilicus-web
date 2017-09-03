@@ -27,6 +27,7 @@ import {
   UPDATE_LAST_SAVED,
   LOCK_LINK,
   UNLOCK_LINK,
+  TOGGLE_OVERVIEW,
 } from './constants'
 
 import { RESET_STORY } from 'containers/Graph/constants'
@@ -43,6 +44,7 @@ const initialState = fromJS({
   },
   lastSavedData: {},
   selectedNode: {},
+  overview: false,
 })
 
 function homeReducer(state = initialState, action) {
@@ -109,6 +111,9 @@ function homeReducer(state = initialState, action) {
 
     case RESET_STORY:
       return state.set('currentData', initialState)
+
+    case TOGGLE_OVERVIEW:
+      return state.set('overview', !state.get('overview'))
 
     default:
       return state

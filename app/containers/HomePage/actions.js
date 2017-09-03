@@ -33,6 +33,7 @@ import {
   LOCK_LINK,
   UNLOCK_LINK,
   RESET_STORY,
+  TOGGLE_OVERVIEW,
 } from './constants'
 
 export function showImportDialog() {
@@ -143,5 +144,11 @@ export function unlockLink(linkId) {
 export function resetStory() {
   return {
     type: RESET_STORY,
+  }
+}
+
+export function toggleOverview() {
+  return {
+    type: TOGGLE_OVERVIEW,
   }
 }
