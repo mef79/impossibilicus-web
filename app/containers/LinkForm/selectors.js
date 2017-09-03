@@ -16,7 +16,7 @@ const selectLinkFormDomain = () => state => state.get('linkForm')
 
 const makeSelectLinkForm = () => createSelector(
   selectLinkFormDomain(),
-  (substate) => substate.toJS()
+  substate => substate.toJS()
 )
 
 export default makeSelectLinkForm

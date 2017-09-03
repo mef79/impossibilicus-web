@@ -1,18 +1,38 @@
 
 import {
-  defaultAction
+  loadStories,
+  storiesLoaded,
+  storyLoadingError,
 } from '../actions'
 import {
-  DEFAULT_ACTION
+  LOAD_ALL_STORIES,
+  LOAD_ALL_STORIES_SUCCESS,
+  LOAD_ALL_STORIES_ERROR,
 } from '../constants'
 
 describe('LoadDialog actions', () => {
-  describe('Default Action', () => {
-    it('has a type of DEFAULT_ACTION', () => {
+  describe('LOAD_ALL_STORIES', () => {
+    it('has a type of LOAD_ALL_STORIES', () => {
       const expected = {
-        type: DEFAULT_ACTION
+        type: LOAD_ALL_STORIES
       }
-      expect(defaultAction()).toEqual(expected)
+      expect(loadStories()).toEqual(expected)
+    })
+  })
+  describe('LOAD_ALL_STORIES_SUCCESS', () => {
+    it('has a type of LOAD_ALL_STORIES_SUCCESS', () => {
+      const expected = {
+        type: LOAD_ALL_STORIES_SUCCESS
+      }
+      expect(storiesLoaded()).toEqual(expected)
+    })
+  })
+  describe('LOAD_ALL_STORIES_ERROR', () => {
+    it('has a type of LOAD_ALL_STORIES_ERROR', () => {
+      const expected = {
+        type: LOAD_ALL_STORIES_ERROR
+      }
+      expect(storyLoadingError()).toEqual(expected)
     })
   })
 })

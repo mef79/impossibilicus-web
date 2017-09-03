@@ -29,9 +29,7 @@ import {
   UNLOCK_LINK,
 } from './constants'
 
-import{ RESET_STORY, } from 'containers/Graph/constants'
-
-
+import { RESET_STORY } from 'containers/Graph/constants'
 
 // The initial state of the App
 const initialState = fromJS({
@@ -111,7 +109,7 @@ function homeReducer(state = initialState, action) {
 
     case RESET_STORY:
       return state.set('currentData', initialState)
-     
+
     default:
       return state
   }

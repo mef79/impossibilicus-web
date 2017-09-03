@@ -1,10 +1,11 @@
-// import React from 'react'
+import React from 'react'
 // import { shallow } from 'enzyme'
+import { mountInProvider } from '../../../utils/test-utils'
 
-// import { LinkForm } from '../index'
+import { LinkForm } from '../index'
 
 describe('<LinkForm />', () => {
-  it('Expect to have unit tests specified', () => {
-    expect(true).toEqual(false)
+  it('should render without crashing', () => {
+    mountInProvider(<LinkForm />)
   })
 })
