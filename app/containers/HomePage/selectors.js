@@ -72,6 +72,10 @@ const getSelectedNodeIncomingLinks = () => createSelector(
   (homeState, selectedNodeId) => homeState.get('currentData').get('links')
     .filter(e => e.get('target').get('id') === selectedNodeId))
 
+const isViewingOverview = () => createSelector(
+  selectHome,
+  homeState => homeState.get('overview'))
+
 export {
   getImportDialogVisibility,
   getLoadDialogVisibility,
@@ -87,4 +91,5 @@ export {
   getLastSavedData,
   getSelectedNodeIncomingLinks,
   getSelectedNodeOutgoingLinks,
+  isViewingOverview,
 }
