@@ -6,6 +6,6 @@ import Button from '../index'
 
 describe('<Button />', () => {
   it('should render without crashing', () => {
-    mountInProvider(<Button />)
+    mountInProvider(<Button text="" />)
   })
 })

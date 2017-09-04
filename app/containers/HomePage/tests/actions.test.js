@@ -16,6 +16,7 @@ import {
   lockLink,
   unlockLink,
   resetStory,
+  toggleOverview,
 } from '../actions'
 import {
   SHOW_IMPORT_DIALOG,
@@ -35,6 +36,7 @@ import {
   LOCK_LINK,
   UNLOCK_LINK,
   RESET_STORY,
+  TOGGLE_OVERVIEW,
 } from '../constants'
 
 describe('Graph actions', () => {
@@ -172,6 +174,14 @@ describe('Graph actions', () => {
         type: RESET_STORY
       }
       expect(resetStory()).toEqual(expected)
+    })
+  })
+  describe('toggleOverview', () => {
+    it('should handle toggleOverview action correctly', () => {
+      const expected = {
+        type: TOGGLE_OVERVIEW
+      }
+      expect(toggleOverview()).toEqual(expected)
     })
   })
 })

@@ -5,6 +5,6 @@ import { SaveDialog } from '../index'
 
 describe('<SaveDialog />', () => {
   it('should render without crashing', () => {
-    mountInProvider(<SaveDialog />)
+    mountInProvider(<SaveDialog isOpen={true} />)
   })
 })

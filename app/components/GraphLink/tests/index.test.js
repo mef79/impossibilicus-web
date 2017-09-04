@@ -6,6 +6,12 @@ import GraphLink from '../index'
 
 describe('<GraphLink />', () => {
   it('should render without crashing', () => {
-    mountInProvider(<GraphLink />)
+    mountInProvider(
+      <GraphLink
+        createDefaultStructure={() => {}}
+        dimensions={{}}
+        entity={{}}
+      />
+    )
   })
 })
