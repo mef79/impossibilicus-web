@@ -6,6 +6,6 @@ import TextArea from '../index'
 
 describe('<TextArea />', () => {
   it('should render without crashing', () => {
-    mountInProvider(<TextArea />)
+    mountInProvider(<TextArea placeholder="" label="" />)
   })
 })

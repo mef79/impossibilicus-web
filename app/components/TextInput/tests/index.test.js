@@ -6,6 +6,6 @@ import TextInput from '../index'
 
 describe('<TextInput />', () => {
   it('should render without crashing', () => {
-    mountInProvider(<TextInput />)
+    mountInProvider(<TextInput label="" placeholder="" />)
   })
 })

@@ -6,6 +6,6 @@ import { StoryGraph } from '../index'
 
 describe('<StoryGraph />', () => {
   it('should render without crashing', () => {
-    mountInProvider(<StoryGraph />)
+    mountInProvider(<StoryGraph dispatch={() => {}} />)
   })
 })

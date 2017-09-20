@@ -6,6 +6,6 @@ import { HotKeyHandler } from '../index'
 
 describe('<HotKeyHandler />', () => {
   it('should render without crashing', () => {
-    mountInProvider(<HotKeyHandler />)
+    mountInProvider(<HotKeyHandler dispatch={() => {}} />)
   })
 })

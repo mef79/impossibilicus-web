@@ -6,6 +6,6 @@ import Story from '../index'
 
 describe('<Story />', () => {
   it('should render without crashing', () => {
-    mountInProvider(<Story />)
+    mountInProvider(<Story item={{}} selectStory={() => {}} isSelected={true} />)
   })
 })

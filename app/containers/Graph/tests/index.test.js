@@ -6,7 +6,7 @@ import { Graph } from '../index'
 
 describe('<Graph />', () => {
   it('should render without crashing', () => {
-    mountInProvider(<Graph />)
+    mountInProvider(<Graph dimensions={{}} createDefaultStructure={() => {}} />)
   })
 })
 

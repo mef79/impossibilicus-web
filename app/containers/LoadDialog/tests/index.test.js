@@ -6,6 +6,6 @@ import { LoadDialog } from '../index'
 
 describe('<LoadDialog />', () => {
   it('should render without crashing', () => {
-    mountInProvider(<LoadDialog />)
+    mountInProvider(<LoadDialog close={() => {}} isOpen={true} />)
   })
 })

@@ -6,6 +6,6 @@ import { ImportDialog } from '../index'
 
 describe('<ImportDialog />', () => {
   it('should render without crashing', () => {
-    mountInProvider(<ImportDialog />)
+    mountInProvider(<ImportDialog close={() => {}} isOpen={true} isValid={false} />)
   })
 })
