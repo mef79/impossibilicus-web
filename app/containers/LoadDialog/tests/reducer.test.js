@@ -4,6 +4,6 @@ import loadDialogReducer from '../reducer'
 
 describe('loadDialogReducer', () => {
   it('returns the initial state', () => {
-    expect(loadDialogReducer(undefined, {})).toEqual(fromJS({}))
+    expect(loadDialogReducer(undefined, {})).not.toEqual(fromJS({}))
   })
 })

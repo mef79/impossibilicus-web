@@ -34,6 +34,8 @@ import {
   UNLOCK_LINK,
   ADD_GATE_TO_SELECTED_LINK,
   REMOVE_GATE_FROM_SELECTED_LINK,
+  RESET_STORY,
+  TOGGLE_OVERVIEW,
 } from './constants'
 
 export function showImportDialog() {
@@ -154,5 +156,17 @@ export function removeGateFromSelectedLink(linkId, gateId) {
     type: REMOVE_GATE_FROM_SELECTED_LINK,
     linkId,
     gateId
+  }
+}
+
+export function resetStory() {
+  return {
+    type: RESET_STORY,
+  }
+}
+
+export function toggleOverview() {
+  return {
+    type: TOGGLE_OVERVIEW,
   }
 }

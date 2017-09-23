@@ -4,7 +4,6 @@
  *
  */
 
-export const DEFAULT_ACTION = 'Graph/DEFAULT_ACTION'
 export const SET_LISTENING = 'Graph/SET_LISTENING'
 export const SET_SELECTED_NODE = 'Graph/SET_SELECTED_NODE'
 export const SET_SELECTED_LINK = 'Graph/SET_SELECTED_LINK'
@@ -18,3 +17,4 @@ export const SET_MOUSEDOWN_NODE = 'Graph/SET_MOUSEDOWN_NODE'
 export const SET_MOUSEDOWN_LINK = 'Graph/SET_MOUSEDOWN_LINK'
 export const SET_SHOULD_REDRAW = 'Graph/SET_SHOULD_REDRAW'
 export const SET_SHOULD_INITIALIZE = 'Graph/SET_SHOULD_INITIALIZE'
+export const RESET_STORY = 'Graph/RESET_STORY'

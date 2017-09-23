@@ -1,10 +1,10 @@
-// import React from 'react'
-// import { shallow } from 'enzyme'
-
-// import NavigationBar from '../index'
+import React from 'react'
+import NavigationBar from '../index'
+import { mountInProvider } from '../../../utils/test-utils'
 
 describe('<NavigationBar />', () => {
-  it('Expect to have unit tests specified', () => {
-    expect(true).toEqual(false)
+  it('renders without crashing', () => {
+    mountInProvider(<NavigationBar />)
   })
 })
+

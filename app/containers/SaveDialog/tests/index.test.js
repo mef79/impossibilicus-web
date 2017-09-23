@@ -1,10 +1,10 @@
-// import React from 'react'
+import React from 'react'
 // import { shallow } from 'enzyme'
+import { mountInProvider } from '../../../utils/test-utils'
+import { SaveDialog } from '../index'
 
-// import { SaveDialog2 } from '../index'
-
-describe('<SaveDialog2 />', () => {
-  it('Expect to have unit tests specified', () => {
-    expect(true).toEqual(false)
+describe('<SaveDialog />', () => {
+  it('should render without crashing', () => {
+    mountInProvider(<SaveDialog isOpen={true} />)
   })
 })

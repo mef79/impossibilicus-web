@@ -11,7 +11,9 @@
 
 /* ignore lots of eslint functions because d3 */
 
-import React from 'react'
+import React, { PropTypes } from 'react'
+import { connect } from 'react-redux'
+import { createStructuredSelector } from 'reselect'
 import HotKeyHandler from 'containers/HotKeyHandler'
 
 import ImportDialog from 'containers/ImportDialog'
@@ -21,11 +23,12 @@ import FormPane from 'containers/FormPane'
 import NavigationBar from 'components/NavigationBar'
 import StoryGraph from 'containers/StoryGraph'
 
+import { isViewingOverview } from 'containers/HomePage/selectors'
+
 export class HomePage extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
-  render() {
-    return (<div>
-      <HotKeyHandler>
-        <NavigationBar />
+  renderStoryPage = () => {
+    if (!this.props.overview) {
+      return (
         <div className="container-fluid">
           <div className="row justify-content-around align-self-start">
             <StoryGraph />
@@ -35,10 +38,43 @@ export class HomePage extends React.PureComponent { // eslint-disable-line react
           <LoadDialog />
           <SaveDialog />
         </div>
-      </HotKeyHandler>
-    </div>
+      )
+    }
+  }
+
+  renderOverviewPage = () => {
+    if (this.props.overview) {
+      return (
+        <div className="container-fluid">
+          <div className="row justify-content-around align-self-start" >
+            <h1>This is the overview page</h1>
+            <div>There will be a variable editor here</div>
+            <div>And also an overview of stories</div>
+          </div>
+        </div>
+      )
+    }
+  }
+
+  render() {
+    return (
+      <div>
+        <HotKeyHandler>
+          <NavigationBar />
+          { this.renderStoryPage() }
+          { this.renderOverviewPage() }
+        </HotKeyHandler>
+      </div>
     )
   }
 }
 
-export default HomePage
+HomePage.propTypes = {
+  overview: PropTypes.bool,
+}
+
+const mapStateToProps = createStructuredSelector({
+  overview: isViewingOverview(),
+})
+
+export default connect(mapStateToProps)(HomePage)

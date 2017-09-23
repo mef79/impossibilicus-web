@@ -29,7 +29,10 @@ import {
   UNLOCK_LINK,
   ADD_GATE_TO_SELECTED_LINK,
   REMOVE_GATE_FROM_SELECTED_LINK,
+  TOGGLE_OVERVIEW,
 } from './constants'
+
+import { RESET_STORY } from 'containers/Graph/constants'
 
 // The initial state of the App
 const initialState = fromJS({
@@ -43,6 +46,7 @@ const initialState = fromJS({
   },
   lastSavedData: {},
   selectedNode: {},
+  overview: false,
 })
 
 function homeReducer(state = initialState, action) {
@@ -119,6 +123,12 @@ function homeReducer(state = initialState, action) {
       const gateIndex = links.get(linkIndex).get('gates')
         .findIndex(e => e.get('id') === action.gateId)
       return state.deleteIn(['currentData', 'links', linkIndex, 'gates', gateIndex])
+    case RESET_STORY:
+      return state.set('currentData', initialState)
+
+    case TOGGLE_OVERVIEW:
+      return state.set('overview', !state.get('overview'))
+
     default:
       return state
   }

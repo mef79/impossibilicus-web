@@ -5,7 +5,6 @@
  */
 
 import {
-  DEFAULT_ACTION,
   ADD_TO_HANDLERS,
   ADD_TO_KEYMAP,
   REMOVE_FROM_HANDLERS,
@@ -37,11 +36,5 @@ export function removeFromKeyMap(keys) {
   return {
     type: REMOVE_FROM_KEYMAP,
     keys
-  }
-}
-
-export function defaultAction() {
-  return {
-    type: DEFAULT_ACTION
   }
 }

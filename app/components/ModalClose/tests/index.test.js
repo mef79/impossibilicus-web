@@ -1,10 +1,11 @@
-// import React from 'react';
-// import { shallow } from 'enzyme';
+import React from 'react'
+// import { shallow } from 'enzyme'
+import { mountInProvider } from '../../../utils/test-utils'
 
-// import ModalClose from '../index';
+import ModalClose from '../index'
 
 describe('<ModalClose />', () => {
-  it('Expect to have unit tests specified', () => {
-    expect(true).toEqual(false)
+  it('should render without crashing', () => {
+    mountInProvider(<ModalClose />)
   })
 })
