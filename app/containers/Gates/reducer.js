@@ -11,7 +11,7 @@ import {
 } from './constants'
 
 const initialState = fromJS({
-  gates: ['some', 'gates', 'here', 'quite', 'good', 'gate', 'som', 'marvel', 'dance', 'killer', 'tofu', 'blizzard', 'waltz', 'klutz', 'orange', 'cannot', 'brains'],
+  gateTypes: ['Stat', 'Item', 'History', 'Quality', 'Open'],
   filterText: '',
 })
 

@@ -1,9 +1,9 @@
 // import React from 'react'
 // import { shallow } from 'enzyme'
 
-// import GatePill from '../index'
+// import ItemGate from '../index'
 
-describe('<GatePill />', () => {
+describe('<ItemGate />', () => {
   it('Expect to have unit tests specified', () => {
     expect(true).toEqual(false)
   })

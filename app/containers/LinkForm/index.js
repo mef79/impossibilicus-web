@@ -9,13 +9,14 @@ import styled from 'styled-components'
 import { connect } from 'react-redux'
 import { createStructuredSelector } from 'reselect'
 import { getSelectedLink } from 'containers/HomePage/selectors'
-import { getAllGates, getFilteredGates, getFilterText } from 'containers/Gates/selectors'
+import { listGateTypes, getFilteredGates, getFilterText } from 'containers/Gates/selectors'
 import { updateFilterText } from 'containers/Gates/actions'
 import ButtonGroup from 'components/ButtonGroup'
-import TextInput from 'components/TextInput'
+import Button from 'components/Button'
 import { setSelectedNode } from 'containers/Graph/actions'
+import { removeGateFromSelectedLink, addGateToSelectedLink } from 'containers/HomePage/actions'
 import GraphLink from 'components/GraphLink'
-import GatePill from 'components/GatePill'
+import GateForm from 'components/GateForm'
 import { addToKeyMap, addToHandlers, removeFromKeyMap, removeFromHandlers } from 'containers/HotKeyHandler/actions'
 
 export class LinkForm extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
@@ -45,44 +46,51 @@ export class LinkForm extends React.PureComponent { // eslint-disable-line react
     this.props.changeNode(this.props.selectedLink.get('target').get('id'))
   }
 
-  updateFilter = () => {
-    this.props.filterGates(document.getElementById('filterGates').value)
-  }
-
-  removeGate = () => {
-    const clickActions = []
-    clickActions.push({ clickFunc: () => alert('remove'), symbol: 'x' })
-    clickActions.push({ clickFunc: () => alert('add'), symbol: '+' })
-    return clickActions
-  }
-
   renderTargetLink = () => {
     if (this.props.selectedLink.get('target')) {
       return (<GraphLink
         entity={this.props.selectedLink.get('target')}
-        label="Target: "
+        label="Target Node: "
         clickFunc={this.navigateToTargetNode}
       />)
     }
   }
 
-  renderGates = () => {
+  // show a list of types of gates that can be added
+  // will be from a dropdown in the future
+  renderGateTypes = () => {
     const gatesList = []
-    this.props.gates.toJS().forEach(x =>
+    this.props.gateTypes.toJS().forEach(gateType => {
+      const addAction = event => {
+        event.preventDefault();
+        this.props.addGate(this.props.selectedLink.get('id'), gateType)
+      }
       gatesList.push(
-        <GatePill color="rebeccapurple" actions={this.removeGate()} key={x} name={x} />
+        <Button
+          secondary
+          key={gateType}
+          text={gateType}
+          onClick={addAction}
+        />
       )
-    )
+    })
     return gatesList
   }
 
-  renderFilteredGates = () => {
+  renderCurrentGates = () => {
     const gatesList = []
-    this.props.filteredGates.forEach(x =>
-      gatesList.push(
-        <GatePill color="rebeccapurple" actions={this.removeGate()} key={x} name={x} />
-      )
-    )
+    if (this.props.selectedLink) {
+      this.props.selectedLink.get('gates').forEach(gate => {
+        // let clickFunc = (e) => {
+        //   e.preventDefault()
+        //   this.props.removeGate(this.props.selectedLink.get('id'), gate.get('id'))
+        // }
+        gatesList.push(
+          <GateForm key={gate.get('id')} gate={gate} />
+
+        )
+      })
+    }
     return gatesList
   }
 
@@ -96,28 +104,34 @@ export class LinkForm extends React.PureComponent { // eslint-disable-line react
     const fromNode = this.props.selectedLink.get('source')
     return (
       <div>
-        <h2 className="card-header" tabIndex="0">Edit Link</h2>
-        <form className="form-group" >
-          <h4>{this.props.selectedLink ? this.props.selectedLink.get('id') : ''} </h4>
+        <h2 className="card-header" tabIndex="0">Edit Link
+          <span style={{ float: 'right' }}>
+            <Button text="Save" />
+          </span>
+        </h2>
+        <form className="form-group card-block" >
+          <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'space-evenly', justifyContent: 'space-around', margin: '1em' }}>
+            <h4 style={{ alignSelf: 'flex-end' }}>Id: {this.props.selectedLink ? this.props.selectedLink.get('id') : ''} </h4>
+            <div>
+              <ButtonGroup>
+                <GraphLink entity={fromNode} label="Source Node: " clickFunc={this.navigateToSourceNode} />
+                {
+                  this.renderTargetLink()
+                }
+              </ButtonGroup>
+            </div>
+          </div>
           <ButtonGroup>
-            <GraphLink entity={fromNode} label="Source: " clickFunc={this.navigateToSourceNode} />
-            {
-              this.renderTargetLink()
-            }
+            <Button
+              disabled
+              text="Add A Gate"
+
+            />
+            {this.renderGateTypes()}
           </ButtonGroup>
-          <TextInput
-            label="Filter Gates"
-            id="filterGates"
-            placeholder="..."
-            helpText="Type to filter list"
-            onChange={this.updateFilter}
-            value={this.props.filterText}
-          />
+          <h4 style={{ marginTop: '1em' }}>Current Gates</h4>
           <GateContainer>
-            {this.renderGates()}
-          </GateContainer>
-          <GateContainer>
-            {this.renderFilteredGates()}
+            {this.renderCurrentGates()}
           </GateContainer>
         </form>
       </div>
@@ -132,16 +146,18 @@ LinkForm.propTypes = {
   addKeyMap: PropTypes.func,
   removeHandler: PropTypes.func,
   removeKeyMap: PropTypes.func,
-  gates: PropTypes.object,
+  gateTypes: PropTypes.object,
   filteredGates: PropTypes.array,
   updateFilterText: PropTypes.func,
   filterText: PropTypes.string,
   filterGates: PropTypes.func,
+  addGate: PropTypes.func,
+  removeGate: PropTypes.func,
 }
 
 const mapStateToProps = createStructuredSelector({
   selectedLink: getSelectedLink(),
-  gates: getAllGates(),
+  gateTypes: listGateTypes(),
   filteredGates: getFilteredGates(),
   filterText: getFilterText(),
 })
@@ -153,7 +169,9 @@ function mapDispatchToProps(dispatch) {
     addKeyMap: keyMap => dispatch(addToKeyMap(keyMap)),
     removeKeyMap: keyMap => dispatch(removeFromKeyMap(keyMap)),
     changeNode: id => dispatch(setSelectedNode(id)),
-    filterGates: filterText => dispatch(updateFilterText(filterText))
+    filterGates: filterText => dispatch(updateFilterText(filterText)),
+    addGate: (linkId, gateType) => dispatch(addGateToSelectedLink(linkId, gateType)),
+    removeGate: (linkId, gateId) => dispatch(removeGateFromSelectedLink(linkId, gateId)),
   }
 }
 

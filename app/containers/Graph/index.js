@@ -298,6 +298,10 @@ export class Graph extends React.PureComponent {
       source: this.getNode(source),
       target: this.getNode(target),
       locked: false,
+      gates: [{
+        gateType: 'Open',
+        id: `link-${this.props.linkCounter}-gate-0`
+      }]
     }
     this.props.onLinkAdded()
     return link
@@ -368,25 +372,25 @@ export class Graph extends React.PureComponent {
     // style to make it v clear that adding a link is what's currently happening
     if (text) {
       this.svg.append('text')
-          .text(text)
-          .attr('x', '50px')
-          .attr('y', '50px')
-          .attr('font-size', '50px')
-          .attr('font-weight', 'bold')
-          .attr('fill', '#ffe3e3')
-          .attr('class', 'top-label')
+        .text(text)
+        .attr('x', '50px')
+        .attr('y', '50px')
+        .attr('font-size', '50px')
+        .attr('font-weight', 'bold')
+        .attr('fill', '#ffe3e3')
+        .attr('class', 'top-label')
 
       this.rect.attr('stroke', 'red')
-          .attr('stroke-dasharray', '10,10')
-          .attr('stroke-width', '6px')
+        .attr('stroke-dasharray', '10,10')
+        .attr('stroke-width', '6px')
     }
 
     // go back to the original style
     else {
       this.svg.selectAll('.top-label').remove()
       this.rect.attr('stroke', 'black')
-          .attr('stroke-width', '1px')
-          .attr('stroke-dasharray', null)
+        .attr('stroke-width', '1px')
+        .attr('stroke-dasharray', null)
     }
   }
 
@@ -534,20 +538,20 @@ export class Graph extends React.PureComponent {
     this.lock = this.lock.data(this.links.filter(e => e.locked))
 
     this.lock.enter()
-        .insert('path')
-        .attr('class', 'link-lock')
-        .attr('d', LOCK)
-        .attr('x', d => d.midX)
-        .attr('y', d => d.midY)
-        .attr('transform', d =>
-          `translate(${d.midX - 8},${d.midY - 10})scale(.7,.7)`)
+      .insert('path')
+      .attr('class', 'link-lock')
+      .attr('d', LOCK)
+      .attr('x', d => d.midX)
+      .attr('y', d => d.midY)
+      .attr('transform', d =>
+        `translate(${d.midX - 8},${d.midY - 10})scale(.7,.7)`)
     this.lock.exit().remove()
 
     this.link = this.link.data(this.links, d => d.id)
 
     this.link.enter().insert('path', '.node')
-        .attr('class', 'link')
-        .on('click', this.onLinkClick)
+      .attr('class', 'link')
+      .on('click', this.onLinkClick)
 
     this.link.exit().remove()
 
@@ -570,26 +574,26 @@ export class Graph extends React.PureComponent {
     this.node = this.node.data(this.nodes, d => d.id)
 
     this.node.enter().insert('rect')
-        .attr('class', 'node')
-        .attr('height', this.props.nodeSize.height)
-        .attr('width', this.props.nodeSize.width)
-        .attr('rx', this.props.nodeSize.rx)
-        .attr('ry', this.props.nodeSize.ry)
-        .style('filter', 'url(#drop-shadow)')
-        .on('mousedown', this.onNodeMouseDown)
-        .call(this.node_drag)
-        .transition()
-        .duration(750)
-        .ease('elastic')
-        .attr('height', this.props.nodeSize.height)
-        .attr('width', this.props.nodeSize.width)
-        .attr('rx', this.props.nodeSize.rx)
-        .attr('ry', this.props.nodeSize.ry)
+      .attr('class', 'node')
+      .attr('height', this.props.nodeSize.height)
+      .attr('width', this.props.nodeSize.width)
+      .attr('rx', this.props.nodeSize.rx)
+      .attr('ry', this.props.nodeSize.ry)
+      .style('filter', 'url(#drop-shadow)')
+      .on('mousedown', this.onNodeMouseDown)
+      .call(this.node_drag)
+      .transition()
+      .duration(750)
+      .ease('elastic')
+      .attr('height', this.props.nodeSize.height)
+      .attr('width', this.props.nodeSize.width)
+      .attr('rx', this.props.nodeSize.rx)
+      .attr('ry', this.props.nodeSize.ry)
 
     this.node.exit().transition()
-        .attr('height', 0)
-        .attr('width', 0)
-        .remove()
+      .attr('height', 0)
+      .attr('width', 0)
+      .remove()
 
     this.node.classed('node_selected', d => {
       if (this.props.selectedNode) {
@@ -602,11 +606,11 @@ export class Graph extends React.PureComponent {
       this.nodes.filter(e => !e.title || !e.content), d => d.id)
 
     this.warnBackground.enter()
-        .insert('circle')
-        .attr('r', 8)
-        .attr('cx', d => d.x + this.props.nodeSize.width / 2 - 0.5)
-        .attr('cy', d => d.y - this.props.nodeSize.height / 2 + 3.5)
-        .attr('class', 'node-warning-background')
+      .insert('circle')
+      .attr('r', 8)
+      .attr('cx', d => d.x + this.props.nodeSize.width / 2 - 0.5)
+      .attr('cy', d => d.y - this.props.nodeSize.height / 2 + 3.5)
+      .attr('class', 'node-warning-background')
 
     this.warnBackground.exit().remove()
 
@@ -614,38 +618,38 @@ export class Graph extends React.PureComponent {
       d => d.id)
 
     this.warn.enter()
-        .insert('path')
-        .attr('class', 'node-warning')
-        .attr('d', WARN)
-        .attr('x', d => d.x)
-        .attr('y', d => d.y)
-        .attr('transform', d => `translate(${d.x},${d.y})`)
+      .insert('path')
+      .attr('class', 'node-warning')
+      .attr('d', WARN)
+      .attr('x', d => d.x)
+      .attr('y', d => d.y)
+      .attr('transform', d => `translate(${d.x},${d.y})`)
 
     this.warn.exit().remove()
 
     this.nodelabels = this.nodelabels.data(this.nodes, d => d.id)
 
     this.nodelabels.enter().insert('foreignObject')
-        .attr('height', this.props.nodeSize.height - 8)
-        .attr('width', this.props.nodeSize.width - 12)
-        .on('mousedown', this.onNodeMouseDown)
-        .call(this.node_drag)
-        // .attr('clip-path', 'url(#clip-path)')
-        .attr('x', d => d.x - this.props.nodeSize.width / 2 + 6)
-        .attr('y', d => d.y - this.props.nodeSize.height / 2 + 4)
-        .attr('class', 'nodelabel')
-        .append('xhtml')
-        .append('div')
-        .attr('style',
-          `height:${this.labelHeight}px;width:${this.labelWidth}px;`)
-        .html(d => d.title ? `<p>${d.title}</p>` : `<p>${d.id}</p>`)
+      .attr('height', this.props.nodeSize.height - 8)
+      .attr('width', this.props.nodeSize.width - 12)
+      .on('mousedown', this.onNodeMouseDown)
+      .call(this.node_drag)
+      // .attr('clip-path', 'url(#clip-path)')
+      .attr('x', d => d.x - this.props.nodeSize.width / 2 + 6)
+      .attr('y', d => d.y - this.props.nodeSize.height / 2 + 4)
+      .attr('class', 'nodelabel')
+      .append('xhtml')
+      .append('div')
+      .attr('style',
+      `height:${this.labelHeight}px;width:${this.labelWidth}px;`)
+      .html(d => d.title ? `<p>${d.title}</p>` : `<p>${d.id}</p>`)
 
     this.nodelabels.selectAll('div').html(d =>
       d.title ? `<p>${d.title}</p>` : `<p>${d.id}</p>`)
 
     this.nodelabels.exit().transition()
-        .attr('font-size', '0px')
-        .remove()
+      .attr('font-size', '0px')
+      .remove()
 
     this.updateInfo()
 
@@ -755,34 +759,34 @@ export class Graph extends React.PureComponent {
     const dimensions = _this.props.dimensions.toJS()
 
     _this.force = d3.layout.force() // create a force layout
-        .size([dimensions.width, dimensions.height])
-        .nodes(this.nodes)
-        .links(this.links)
-        .linkDistance(150) // how far the nodes are away from eachother
-        .charge(-500) // how strongly the nodes repel eachother
-        .on('tick', tick.bind(this)) // call 'tick' function when drawing frames
+      .size([dimensions.width, dimensions.height])
+      .nodes(this.nodes)
+      .links(this.links)
+      .linkDistance(150) // how far the nodes are away from eachother
+      .charge(-500) // how strongly the nodes repel eachother
+      .on('tick', tick.bind(this)) // call 'tick' function when drawing frames
 
     // defines the zoom behavior
     var zoom = d3.behavior.zoom()
-        .scaleExtent([0.1, 10]) // min/max zoom
-        .on('zoom', zoomed) // call the zoom function when zooming
+      .scaleExtent([0.1, 10]) // min/max zoom
+      .on('zoom', zoomed) // call the zoom function when zooming
 
     // init svg
     _this.svg = d3.select('#graph')
-        .append('svg')
-        .attr('width', _this.props.dimensions.get('width'))
-        .attr('height', _this.props.dimensions.get('height'))
-        .on('click', _this.onSvgClick)
-        .on('mouseup', mouseup)
-        .append('g')
-        .call(zoom)
+      .append('svg')
+      .attr('width', _this.props.dimensions.get('width'))
+      .attr('height', _this.props.dimensions.get('height'))
+      .on('click', _this.onSvgClick)
+      .on('mouseup', mouseup)
+      .append('g')
+      .call(zoom)
 
     _this.rect = _this.svg.append('rect')
-        .attr('width', '100%')
-        .attr('height', '100%')
-        .attr('fill', 'none')
-        .attr('stroke', 'black')
-        .style('pointer-events', 'all')
+      .attr('width', '100%')
+      .attr('height', '100%')
+      .attr('fill', 'none')
+      .attr('stroke', 'black')
+      .style('pointer-events', 'all')
 
     var container = _this.svg.append('g').attr('class', 'transformer')
 
@@ -790,58 +794,58 @@ export class Graph extends React.PureComponent {
     var defs = _this.svg.append('defs')
 
     defs.selectAll('marker').append('marker')
-        .data(['end', 'end-selected'])
-        .enter()
-        .append('svg:marker')    // This section adds in the arrows
-        .attr('id', String)
-        .attr('viewBox', '0 -5 10 10')
-        .attr('refX', 12)
-        .attr('refY', 0)
-        .attr('markerWidth', 5)
-        .attr('markerHeight', 5)
-        .attr('orient', 'auto')
-        .attr('class', d => d)
-        .append('svg:path')
-        .attr('d', 'M0,-5L10,0L0,5')
-        .attr('fill', d => d === 'end-selected' ? '#ff7f0e' : '#555555')
+      .data(['end', 'end-selected'])
+      .enter()
+      .append('svg:marker')    // This section adds in the arrows
+      .attr('id', String)
+      .attr('viewBox', '0 -5 10 10')
+      .attr('refX', 12)
+      .attr('refY', 0)
+      .attr('markerWidth', 5)
+      .attr('markerHeight', 5)
+      .attr('orient', 'auto')
+      .attr('class', d => d)
+      .append('svg:path')
+      .attr('d', 'M0,-5L10,0L0,5')
+      .attr('fill', d => d === 'end-selected' ? '#ff7f0e' : '#555555')
 
     var clipPath = defs.append('clipPath')
-        .attr('id', 'clip-path')
-        .append('rect')
-        .attr('width', this.props.nodeSize.width - 12)
-        .attr('height', 30)
+      .attr('id', 'clip-path')
+      .append('rect')
+      .attr('width', this.props.nodeSize.width - 12)
+      .attr('height', 30)
 
     // create filter with id #drop-shadow
     // height=130% so that the shadow is not clipped
     var filter = defs.append('filter')
-        .attr('id', 'drop-shadow')
-        .attr('y', '-20%')
-        .attr('height', '150%')
+      .attr('id', 'drop-shadow')
+      .attr('y', '-20%')
+      .attr('height', '150%')
 
     // SourceAlpha refers to opacity of graphic that this filter will be applied
     // to convolve that with a Gaussian with standard deviation 3 and store
     // result in blur
     filter.append('feGaussianBlur')
-        .attr('in', 'SourceAlpha')
-        .attr('stdDeviation', 2)
-        .attr('result', 'blur')
+      .attr('in', 'SourceAlpha')
+      .attr('stdDeviation', 2)
+      .attr('result', 'blur')
 
     // translate output of Gaussian blur to the right and downwards with 2px
     // store result in offsetBlur
     filter.append('feOffset')
-        .attr('in', 'blur')
-        .attr('dx', 2)
-        .attr('dy', 2)
-        .attr('result', 'offsetBlur')
+      .attr('in', 'blur')
+      .attr('dx', 2)
+      .attr('dy', 2)
+      .attr('result', 'offsetBlur')
 
     // overlay original SourceGraphic over translated blurred opacity by using
     // feMerge filter. Order of specifying inputs is important!
     var feMerge = filter.append('feMerge')
 
     feMerge.append('feMergeNode')
-        .attr('in', 'offsetBlur')
+      .attr('in', 'offsetBlur')
     feMerge.append('feMergeNode')
-        .attr('in', 'SourceGraphic')
+      .attr('in', 'SourceGraphic')
 
     function zoomed() {
       container.attr('transform',
@@ -894,70 +898,70 @@ export class Graph extends React.PureComponent {
     }
 
     _this.node_drag = d3.behavior.drag()
-        .on('dragstart', dragStart)
-        .on('drag', dragMove)
-        .on('dragend', dragEnd)
+      .on('dragstart', dragStart)
+      .on('drag', dragMove)
+      .on('dragend', dragEnd)
 
     _this.link = container.append('g')
-        .attr('class', 'link-group')
-        .selectAll('path')
-        .data(this.links)
-        .enter().append('svg:path')
-        .on('click', _this.onLinkClick)
-        .attr('class', d => `link ${d.type}`)
-        .attr('marker-end', d =>
-          _this.props.selectedLink === d ? 'url(#end-selected)' : 'url(#end)')
+      .attr('class', 'link-group')
+      .selectAll('path')
+      .data(this.links)
+      .enter().append('svg:path')
+      .on('click', _this.onLinkClick)
+      .attr('class', d => `link ${d.type}`)
+      .attr('marker-end', d =>
+        _this.props.selectedLink === d ? 'url(#end-selected)' : 'url(#end)')
 
     _this.lock = container.append('g')
-        .attr('class', 'lock-group')
-        .selectAll('path')
-        .data(this.links.filter(e => e.locked))
-        .enter().append('path')
-        .attr('d', LOCK)
-        .attr('class', 'link-lock')
+      .attr('class', 'lock-group')
+      .selectAll('path')
+      .data(this.links.filter(e => e.locked))
+      .enter().append('path')
+      .attr('d', LOCK)
+      .attr('class', 'link-lock')
 
     _this.node = container.selectAll('.node')
-        .data(addIndexToArr(this.nodes, 0))
-        .enter().append('rect')
-        .on('mousedown', _this.onNodeMouseDown)
-        .attr('width', this.props.nodeSize.width)
-        .attr('height', this.props.nodeSize.height)
-        .attr('rx', this.props.nodeSize.rx)
-        .attr('ry', this.props.nodeSize.ry)
-        .attr('x', d => d.x - _this.props.nodeSize.width / 2)
-        .attr('y', d => d.y - _this.props.nodeSize.height / 2)
-        .attr('class', 'node')
-        .style('filter', 'url(#drop-shadow)')
-        .call(_this.node_drag)
+      .data(addIndexToArr(this.nodes, 0))
+      .enter().append('rect')
+      .on('mousedown', _this.onNodeMouseDown)
+      .attr('width', this.props.nodeSize.width)
+      .attr('height', this.props.nodeSize.height)
+      .attr('rx', this.props.nodeSize.rx)
+      .attr('ry', this.props.nodeSize.ry)
+      .attr('x', d => d.x - _this.props.nodeSize.width / 2)
+      .attr('y', d => d.y - _this.props.nodeSize.height / 2)
+      .attr('class', 'node')
+      .style('filter', 'url(#drop-shadow)')
+      .call(_this.node_drag)
 
     _this.warnBackground = container.selectAll('.node-warning-background')
-        .data(addIndexToArr(this.nodes.filter(e => !e.title), 1))
-        .enter().append('circle')
-        .attr('r', 8)
-        .attr('cx', d => d.x + this.props.nodeSize.width / 2 - 0.5)
-        .attr('cy', d => d.y - this.props.nodeSize.height / 2 + 3.5)
-        .attr('class', 'node-warning-background')
+      .data(addIndexToArr(this.nodes.filter(e => !e.title), 1))
+      .enter().append('circle')
+      .attr('r', 8)
+      .attr('cx', d => d.x + this.props.nodeSize.width / 2 - 0.5)
+      .attr('cy', d => d.y - this.props.nodeSize.height / 2 + 3.5)
+      .attr('class', 'node-warning-background')
 
     _this.warn = container.selectAll('.node-warning')
-        .data(addIndexToArr(this.nodes.filter(e => !e.title), 2))
-        .enter().append('path')
-        .attr('d', WARN)
-        .attr('class', 'node-warning')
-        .attr('transform', d =>
-            `translate(${d.x + _this.warnOffset.x},${d.y - _this.warnOffset.y}),scale(0.3,0.3)`)
+      .data(addIndexToArr(this.nodes.filter(e => !e.title), 2))
+      .enter().append('path')
+      .attr('d', WARN)
+      .attr('class', 'node-warning')
+      .attr('transform', d =>
+        `translate(${d.x + _this.warnOffset.x},${d.y - _this.warnOffset.y}),scale(0.3,0.3)`)
 
     _this.nodelabels = container.selectAll('.nodelabel')
-        .data(addIndexToArr(this.nodes, 4))
-        .enter()
-        .append('foreignObject')
-        .on('mousedown', _this.onNodeMouseDown)
-        .attr('height', this.props.nodeSize.height - 8)
-        .attr('width', this.props.nodeSize.width - 12)
-        // .attr('clip-path', 'url(#clip-path)')
-        .attr('x', d => d.x - this.props.nodeSize.width / 2 + 6)
-        .attr('y', d => d.y - this.props.nodeSize.height + 4)
-        .attr('class', 'nodelabel')
-        .call(_this.node_drag)
+      .data(addIndexToArr(this.nodes, 4))
+      .enter()
+      .append('foreignObject')
+      .on('mousedown', _this.onNodeMouseDown)
+      .attr('height', this.props.nodeSize.height - 8)
+      .attr('width', this.props.nodeSize.width - 12)
+      // .attr('clip-path', 'url(#clip-path)')
+      .attr('x', d => d.x - this.props.nodeSize.width / 2 + 6)
+      .attr('y', d => d.y - this.props.nodeSize.height + 4)
+      .attr('class', 'nodelabel')
+      .call(_this.node_drag)
 
     /* when loading, we need to reposition the elements within the SVG such that
      * the order is: [
@@ -988,9 +992,9 @@ export class Graph extends React.PureComponent {
     _this.labelStyle =
       `height:${_this.labelHeight}px;width:${_this.labelWidth}px`
     _this.nodelabels.append('xhtml')
-        .append('div')
-        .attr('style', _this.labelStyle)
-        .html(d => d.title ? `<p>${d.title}</p>` : `<p>${d.id}</p>`)
+      .append('div')
+      .attr('style', _this.labelStyle)
+      .html(d => d.title ? `<p>${d.title}</p>` : `<p>${d.id}</p>`)
 
     _this.redraw()
 
@@ -1023,25 +1027,25 @@ export class Graph extends React.PureComponent {
       })
 
       _this.lock.attr('x', d => d.midX)
-          .attr('y', d => d.midY)
-          .attr('transform', d =>
-            `translate(${d.midX - 8},${d.midY - 10})scale(.7,.7)`)
+        .attr('y', d => d.midY)
+        .attr('transform', d =>
+          `translate(${d.midX - 8},${d.midY - 10})scale(.7,.7)`)
 
       // redraw the ndes at their new position
       _this.node.attr('x', d => d.x - _this.props.nodeSize.width / 2)
-          .attr('y', d => d.y - _this.props.nodeSize.height / 2)
+        .attr('y', d => d.y - _this.props.nodeSize.height / 2)
 
       _this.nodelabels
-          .attr('x', d => d.x - _this.props.nodeSize.width / 2 + 6)
-          .attr('y', d => d.y - _this.props.nodeSize.height / 2 + 4)
+        .attr('x', d => d.x - _this.props.nodeSize.width / 2 + 6)
+        .attr('y', d => d.y - _this.props.nodeSize.height / 2 + 4)
 
       _this.warn
-          .attr('transform', d =>
-            `translate(${d.x + _this.warnOffset.x},${d.y - _this.warnOffset.y}),scale(0.3,0.3)`)
+        .attr('transform', d =>
+          `translate(${d.x + _this.warnOffset.x},${d.y - _this.warnOffset.y}),scale(0.3,0.3)`)
 
       _this.warnBackground
-          .attr('cx', d => d.x + _this.props.nodeSize.width / 2 - 0.5)
-          .attr('cy', d => d.y - _this.props.nodeSize.height / 2 + 3.5)
+        .attr('cx', d => d.x + _this.props.nodeSize.width / 2 - 0.5)
+        .attr('cy', d => d.y - _this.props.nodeSize.height / 2 + 3.5)
     }
 
     // clear the story data so that this won't be called again unnecessarily

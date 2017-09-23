@@ -14,9 +14,9 @@ const makeSelectGates = () => createSelector(
   substate => substate.toJS()
 )
 
-const getAllGates = () => createSelector(
+const listGateTypes = () => createSelector(
   selectGatesDomain(),
-  substate => substate.get('gates')
+  substate => substate.get('gateTypes')
 )
 
 const getFilterText = () => createSelector(
@@ -25,14 +25,14 @@ const getFilterText = () => createSelector(
 )
 
 const getFilteredGates = () => createSelector(
-  [getAllGates(), getFilterText()],
+  [listGateTypes(), getFilterText()],
   (gates, filterText) => filterText ? gates.toJS().filter(t => t.indexOf(filterText) > -1) : gates.toJS()
 )
 
 export default makeSelectGates
 export {
   selectGatesDomain,
-  getAllGates,
+  listGateTypes,
   getFilterText,
   getFilteredGates,
 }

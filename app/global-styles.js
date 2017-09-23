@@ -60,7 +60,9 @@ body {
         width: 800px
   }
 
-
+.floatRight{
+ float: right;
+}
   #bottom {
   height: 100px;
   background: #dbe8fc;

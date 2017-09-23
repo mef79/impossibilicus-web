@@ -32,6 +32,8 @@ import {
   UPDATE_LAST_SAVED,
   LOCK_LINK,
   UNLOCK_LINK,
+  ADD_GATE_TO_SELECTED_LINK,
+  REMOVE_GATE_FROM_SELECTED_LINK,
 } from './constants'
 
 export function showImportDialog() {
@@ -136,5 +138,21 @@ export function unlockLink(linkId) {
   return {
     type: UNLOCK_LINK,
     linkId
+  }
+}
+
+export function addGateToSelectedLink(linkId, gateType) {
+  return {
+    type: ADD_GATE_TO_SELECTED_LINK,
+    linkId,
+    gateType
+  }
+}
+
+export function removeGateFromSelectedLink(linkId, gateId) {
+  return {
+    type: REMOVE_GATE_FROM_SELECTED_LINK,
+    linkId,
+    gateId
   }
 }
