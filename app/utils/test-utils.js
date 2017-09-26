@@ -3,10 +3,7 @@ import { createStore } from 'redux'
 import { Provider } from 'react-redux'
 
 export function mockFormStore(initialState = {}) {
-  const store = createStore((state = initialState) => {
-    return Object.assign({}, state)
-  })
-
+  const store = createStore((state = initialState) => Object.assign({}, state))
   return store
 }
 

@@ -9,10 +9,9 @@ import styled from 'styled-components'
 import { connect } from 'react-redux'
 import { createStructuredSelector } from 'reselect'
 import { getSelectedLink } from 'containers/HomePage/selectors'
-import { listGateTypes, getFilteredGates, getFilterText } from 'containers/Gates/selectors'
-import { updateFilterText } from 'containers/Gates/actions'
 import ButtonGroup from 'components/ButtonGroup'
 import Button from 'components/Button'
+import GATE_TYPES from 'utils/gatetypes'
 import { setSelectedNode } from 'containers/Graph/actions'
 import { removeGateFromSelectedLink, addGateToSelectedLink } from 'containers/HomePage/actions'
 import GraphLink from 'components/GraphLink'
@@ -60,16 +59,24 @@ export class LinkForm extends React.PureComponent { // eslint-disable-line react
   // will be from a dropdown in the future
   renderGateTypes = () => {
     const gatesList = []
-    this.props.gateTypes.toJS().forEach(gateType => {
+    const gateTypes = [
+      { value: GATE_TYPES.OPEN, outputText: 'Open' },
+      { value: GATE_TYPES.ITEM, outputText: 'Item' },
+      { value: GATE_TYPES.QUALITY, outputText: 'Quality' },
+      { value: GATE_TYPES.HISTORY, outputText: 'History' },
+      { value: GATE_TYPES.STAT, outputText: 'Stat' }
+    ]
+    gateTypes.forEach(gateType => {
+      const outputText = gateType.outputText
       const addAction = event => {
-        event.preventDefault();
-        this.props.addGate(this.props.selectedLink.get('id'), gateType)
+        event.preventDefault()
+        this.props.addGate(this.props.selectedLink.get('id'), gateType.value)
       }
       gatesList.push(
         <Button
           secondary
-          key={gateType}
-          text={gateType}
+          key={outputText}
+          text={outputText}
           onClick={addAction}
         />
       )
@@ -87,7 +94,6 @@ export class LinkForm extends React.PureComponent { // eslint-disable-line react
         // }
         gatesList.push(
           <GateForm key={gate.get('id')} gate={gate} />
-
         )
       })
     }
@@ -101,17 +107,34 @@ export class LinkForm extends React.PureComponent { // eslint-disable-line react
       margin-bottom:1em;
       flex-wrap: wrap;
     `
+    const GateHeader = styled.h2`
+      margin-top: 1em;
+    `
+    const LinkHeader = styled.div`
+      display: flex;
+      flex-direction: row;
+      align-items: space-evenly;
+      justify-content: space-around;
+      margin: 1em;
+    `
+    const SaveButtonContainer = styled.span`
+      float: right;
+    `
+    const LinkLabel = styled.h4`
+      align-self: flex-end;
+    `
+
     const fromNode = this.props.selectedLink.get('source')
     return (
       <div>
         <h2 className="card-header" tabIndex="0">Edit Link
-          <span style={{ float: 'right' }}>
+          <SaveButtonContainer>
             <Button text="Save" />
-          </span>
+          </SaveButtonContainer>
         </h2>
         <form className="form-group card-block" >
-          <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'space-evenly', justifyContent: 'space-around', margin: '1em' }}>
-            <h4 style={{ alignSelf: 'flex-end' }}>Id: {this.props.selectedLink ? this.props.selectedLink.get('id') : ''} </h4>
+          <LinkHeader>
+            <LinkLabel>Id: {this.props.selectedLink ? this.props.selectedLink.get('id') : ''} </LinkLabel>
             <div>
               <ButtonGroup>
                 <GraphLink entity={fromNode} label="Source Node: " clickFunc={this.navigateToSourceNode} />
@@ -120,16 +143,15 @@ export class LinkForm extends React.PureComponent { // eslint-disable-line react
                 }
               </ButtonGroup>
             </div>
-          </div>
+          </LinkHeader>
           <ButtonGroup>
             <Button
               disabled
               text="Add A Gate"
-
             />
             {this.renderGateTypes()}
           </ButtonGroup>
-          <h4 style={{ marginTop: '1em' }}>Current Gates</h4>
+          <GateHeader>Current Gates</GateHeader>
           <GateContainer>
             {this.renderCurrentGates()}
           </GateContainer>
@@ -146,20 +168,12 @@ LinkForm.propTypes = {
   addKeyMap: PropTypes.func,
   removeHandler: PropTypes.func,
   removeKeyMap: PropTypes.func,
-  gateTypes: PropTypes.object,
-  filteredGates: PropTypes.array,
-  updateFilterText: PropTypes.func,
-  filterText: PropTypes.string,
-  filterGates: PropTypes.func,
   addGate: PropTypes.func,
   removeGate: PropTypes.func,
 }
 
 const mapStateToProps = createStructuredSelector({
   selectedLink: getSelectedLink(),
-  gateTypes: listGateTypes(),
-  filteredGates: getFilteredGates(),
-  filterText: getFilterText(),
 })
 
 function mapDispatchToProps(dispatch) {
@@ -169,7 +183,6 @@ function mapDispatchToProps(dispatch) {
     addKeyMap: keyMap => dispatch(addToKeyMap(keyMap)),
     removeKeyMap: keyMap => dispatch(removeFromKeyMap(keyMap)),
     changeNode: id => dispatch(setSelectedNode(id)),
-    filterGates: filterText => dispatch(updateFilterText(filterText)),
     addGate: (linkId, gateType) => dispatch(addGateToSelectedLink(linkId, gateType)),
     removeGate: (linkId, gateId) => dispatch(removeGateFromSelectedLink(linkId, gateId)),
   }

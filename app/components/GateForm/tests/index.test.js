@@ -1,10 +1,12 @@
-// import React from 'react'
+import React from 'react'
 // import { shallow } from 'enzyme'
-
-// import GateForm from '../index'
+import { fromJS } from 'immutable'
+import { mountInProvider } from '../../../utils/test-utils'
+import GATE_TYPES from '../../../utils/gatetypes'
+import GateForm from '../index'
 
 describe('<GateForm />', () => {
-  it('Expect to have unit tests specified', () => {
-    expect(true).toEqual(false)
+  it('should render without crashing', () => {
+    mountInProvider(<GateForm gate={ fromJS({ gateType: GATE_TYPES.OPEN, id: 1 })} />)
   })
 })
