@@ -27,6 +27,8 @@ import {
   UPDATE_LAST_SAVED,
   LOCK_LINK,
   UNLOCK_LINK,
+  ADD_GATE_TO_SELECTED_LINK,
+  REMOVE_GATE_FROM_SELECTED_LINK,
   TOGGLE_OVERVIEW,
 } from './constants'
 
@@ -98,6 +100,7 @@ function homeReducer(state = initialState, action) {
         .set('lastSavedData', fromJS(action.story))
 
     case LOCK_LINK:
+
       const linkToLock = state.get('currentData').get('links')
         .findIndex(e => e.get('id') === action.linkId)
       return state
@@ -109,6 +112,17 @@ function homeReducer(state = initialState, action) {
       return state
         .setIn(['currentData', 'links', linkToUnlock, 'locked'], false)
 
+    case ADD_GATE_TO_SELECTED_LINK:
+      const targetLinkIndex = state.get('currentData').get('links').findIndex(e => e.get('id') === action.linkId)
+      return state.updateIn(['currentData', 'links', targetLinkIndex, 'gates'],
+        gates => gates.push(fromJS({ gateType: action.gateType, id: `${action.linkId}-gate-${gates.size}` })))
+
+    case REMOVE_GATE_FROM_SELECTED_LINK:
+      const links = state.get('currentData').get('links')
+      const linkIndex = links.findIndex(e => e.get('id') === action.linkId)
+      const gateIndex = links.get(linkIndex).get('gates')
+        .findIndex(e => e.get('id') === action.gateId)
+      return state.deleteIn(['currentData', 'links', linkIndex, 'gates', gateIndex])
     case RESET_STORY:
       return state.set('currentData', initialState)
 

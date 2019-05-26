@@ -24,13 +24,11 @@ import GraphLink from 'components/GraphLink'
 
 export class NodeForm extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
 
-  getCurrentFormContent = () => {
-    return {
-      title: document.getElementById('title').value,
-      content: document.getElementById('content').value,
-      id: this.props.selectedNode.get('id'),
-    }
-  }
+  getCurrentFormContent = () => ({
+    title: document.getElementById('title').value,
+    content: document.getElementById('content').value,
+    id: this.props.selectedNode.get('id'),
+  })
 
   saveForm = event => {
     event.preventDefault()

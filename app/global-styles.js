@@ -60,7 +60,6 @@ body {
         width: 800px
   }
 
-
   #bottom {
   height: 100px;
   background: #dbe8fc;

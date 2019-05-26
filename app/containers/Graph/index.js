@@ -49,6 +49,7 @@ import {
   getShouldInitialize,
 } from './selectors'
 import { LOCK, WARN } from 'utils/icons'
+import GATE_TYPES from 'utils/gatetypes'
 
 /* disable linting that is incompatible with d3 */
 /* eslint no-unused-vars: 0, no-param-reassign:0, no-var: 0*/
@@ -316,6 +317,10 @@ export class Graph extends React.PureComponent {
       source: this.getNode(source),
       target: this.getNode(target),
       locked: false,
+      gates: [{
+        gateType: GATE_TYPES.OPEN,
+        id: `link-${this.props.linkCounter}-gate-0`
+      }]
     }
     this.props.onLinkAdded()
     return link

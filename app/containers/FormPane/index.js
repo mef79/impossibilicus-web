@@ -11,6 +11,11 @@ import { getSelectedNode, getSelectedLink } from 'containers/HomePage/selectors'
 import LinkForm from 'containers/LinkForm'
 import NodeForm from 'containers/NodeForm'
 
+const formStyle = {
+  padding: '1em',
+  width: '600px'
+}
+
 export class FormPane extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   selectForm = () => {
     if (this.props.selectedNode) return <NodeForm />
@@ -20,7 +25,7 @@ export class FormPane extends React.PureComponent { // eslint-disable-line react
   render() {
     if (!this.props.selectedNode && !this.props.selectedLink) {
       return (
-        <div style={{ width: 600 }}>
+        <div style={formStyle}>
           <div className="card">
             <h2 className="card-header">Nothing selected</h2>
             <form className="card-block">
@@ -31,7 +36,7 @@ export class FormPane extends React.PureComponent { // eslint-disable-line react
       )
     }
     return (
-      <div style={{ width: 600 }}>
+      <div style={formStyle}>
         {
           this.selectForm()
         }
