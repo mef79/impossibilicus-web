@@ -1,6 +1,10 @@
 import { put, select, takeEvery } from 'redux-saga/effects'
 import { SET_SELECTED_NODE, SET_SELECTED_LINK } from './constants'
-import { LOAD_STORY_SUCCESS, RESET_STORY } from 'containers/HomePage/constants'
+import {
+  LOAD_STORY_SUCCESS,
+  RESET_STORY,
+  TOGGLE_OVERVIEW
+} from 'containers/HomePage/constants'
 import {
   setSelectedNode,
   setSelectedLink,
@@ -42,6 +46,11 @@ export function* setNodeAndLinkCounters() {
   yield put(setShouldInitialize(true))
 }
 
+export function* resetNodeAndLinkCounters() {
+  yield put(setNodeCounter(0))
+  yield put(setLinkCounter(0))
+}
+
 export function* redrawOnStoryReset() {
   const nodeCounter = 0
   const linkCounter = 0
@@ -62,6 +71,8 @@ export function* rootSaga() {
   yield takeEvery(LOAD_STORY_SUCCESS, setNodeAndLinkCounters)
 
   yield takeEvery(RESET_STORY, redrawOnStoryReset)
+
+  yield takeEvery(TOGGLE_OVERVIEW, resetNodeAndLinkCounters)
 }
 
 // All sagas to be loaded
