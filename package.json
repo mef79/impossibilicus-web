@@ -250,7 +250,7 @@
     "intl": "1.2.5",
     "invariant": "2.2.2",
     "ip": "1.1.4",
-    "jquery": "^3.2.1",
+    "jquery": "^3.5.0",
     "lodash": "4.17.13",
     "material-ui": "^0.17.2",
     "minimist": "1.2.3",
